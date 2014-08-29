@@ -29,7 +29,7 @@ def add_options( parser ):
     parser.add_option("-s", type="string", dest="psipred_file", help="An example")
     parser.add_option("-t", type="float", dest="top", help="An example")
     parser.add_option("-a", type="float", dest="alpha", help="An example")
-    parser.add_option("-o", type="string", dest="out_folder", help="An example", default="results/")
+    parser.add_option("-o", type="string", dest="out_folder", help="An example", default="../../results/29-08-14/")
     options, args = parser.parse_args()
     return options, args 
 
@@ -381,7 +381,7 @@ def get_relative_sec_struct_pos(ss_dict, i):
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
    
-    g = nx.Graph()
+    g = nx.DiGraph()
     index = 1
     pers = {}
     for i, score in xl_data[:length]:
@@ -414,20 +414,16 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
         #if pos2 > 10:
         #    pos2 = 10
         for o in g.nodes(data=True):
-            if o[0] < n[0]:
-#                if n[1]['xl'][0] == o[1]['xl'][0] or \
-#                   n[1]['xl'][0] == o[1]['xl'][1] or \
-#                   n[1]['xl'][1] == o[1]['xl'][0] or \
-#                   n[1]['xl'][1] == o[1]['xl'][1]:
+            if o[0] != n[0]:
+
 
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
                     sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
+
                     if sec_struct_shift_dict.has_key(shift_tuple):
-                        #g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-                        if g.has_edge(n[0],o[0]):
-                            pass
-                        else:
-                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+                        g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+
+
                     #if helix_shift(n[1]['xl'], o[1]['xl']):
                     #    g.add_edge(n[0],o[0])
 
@@ -524,7 +520,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data
    xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
