@@ -381,7 +381,7 @@ def get_relative_sec_struct_pos(ss_dict, i):
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
    
-    g = nx.DiGraph()
+    g = nx.Graph()
     index = 1
     pers = {}
     for i, score in xl_data[:length]:
@@ -414,7 +414,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
         #if pos2 > 10:
         #    pos2 = 10
         for o in g.nodes(data=True):
-            if o[0] != n[0]:
+            if o[0] < n[0]:
 
 
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])

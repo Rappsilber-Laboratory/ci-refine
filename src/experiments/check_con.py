@@ -20,7 +20,7 @@ for line in file:
             print pdb, a, t
             cmd = " ".join(["/scratch/fkamm/local/bin/python2.7",
                             "/scratch/schneider/projects/rbocon_2.0/src/check_contacts.py",
-                            "--restraint_file ../../results/29-08-14/%sRRPAR_%s_%s"%(pdb,a,t),
+                            "--restraint_file ../../results/29-08-14/%s/%sRRPAR_%s_%s"%(git_tag.get_branch(),pdb,a,t),
                             "--pdb /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
                             "--len %s"%l,
                             "--pdb_id %s"%pdb,
