@@ -1,4 +1,5 @@
-"""Author: Michael Schneider!
+"""Author: Michael Schneider
+   Very important notes
 """ 
 import os 
 import sys 
