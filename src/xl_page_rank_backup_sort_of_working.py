@@ -168,15 +168,16 @@ def build_xl_graph( xl_data ):
                     g.add_edge(n[0],o[0])#, weight =  numpy.max([n[1]['weight'], o[1]['weight']])  )
 
     #add_loops( g )
-    to_add = []
-    for n in g.nodes(data=True):
-        for o in g.nodes(data=True):
-            if o[0] > n[0]:
-                if has_loop( o, n,g ):
-                    #to_add.append((o[0],n[0]))
-                    g.add_edge(n[0],o[0])
-    #for i,j in to_add:
-    #    g.add_edge(i,j)
+    for i in xrange(0,2):
+        to_add = []
+        for n in g.nodes(data=True):
+            for o in g.nodes(data=True):
+                if o[0] > n[0]:
+                    if has_loop( o, n,g ):
+                        to_add.append((o[0],n[0]))
+                        #g.add_edge(n[0],o[0])
+        for i,j in to_add:
+            g.add_edge(i,j)
     return g, pers                
 
 def main():        
