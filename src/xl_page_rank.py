@@ -56,9 +56,11 @@ def load_xl_data( xl_file ):
                 decoy_scores.append((from_site, 'CA', to_site, 'CA', score))
                 decoy_dict[return_sorted_tuple((from_site, to_site))] = 'DECOY'
     file.close()
+    #InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
     InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
-    InputOutput.InputOutput.write_contact_file(decoy_scores, 'decoy_scores.txt', upper_distance = 20)
-    InputOutput.InputOutput.write_contact_file(true_scores, 'true_scores.txt', upper_distance = 20)
+    #InputOutput.InputOutput.write_contact_file(decoy_scores, 'decoy_scores.txt', upper_distance = 20)
+    #InputOutput.InputOutput.write_contact_file(true_scores, 'true_scores.txt', upper_distance = 20)
+
     return xls,decoy_dict
 
 def return_sorted_tuple(tuple):
@@ -105,10 +107,10 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
     if double:
         if m_1 == 1 and m_2 == 1:
             is_nei = True
-	else:
+    else:
         if m_1 == 1 or m_2 == 1:
-			is_nei = True
-	return is_nei
+            is_nei = True
+    return is_nei
 
    
 def do_page_rank (xl_graph,pers,decoy_dict):
@@ -130,8 +132,8 @@ def do_page_rank (xl_graph,pers,decoy_dict):
             xl_ranked_true.append((res_lower,'CA', res_upper,'CA', score))
 
     InputOutput.InputOutput.write_contact_file(xl_ranked, 'foo', upper_distance = 20)
-    InputOutput.InputOutput.write_contact_file(xl_ranked_true, 'true_pagerank.txt', upper_distance = 20)
-    InputOutput.InputOutput.write_contact_file(xl_ranked_decoy, 'decoy_pagerank.txt', upper_distance = 20)
+    #InputOutput.InputOutput.write_contact_file(xl_ranked_true, 'true_pagerank.txt', upper_distance = 20)
+    #InputOutput.InputOutput.write_contact_file(xl_ranked_decoy, 'decoy_pagerank.txt', upper_distance = 20)
 def add_loops( xl_graph ):
     import itertools
     all_connections = []
@@ -194,7 +196,7 @@ def build_xl_graph( xl_data ):
 
     
 
-    add_loops_node_graph(g)
+    #add_loops_node_graph(g)
     return g, pers
 
 def get_node_map( xl_graph ):
@@ -298,11 +300,8 @@ def add_loops_node_graph(xl_graph):
 def main():        
    """Generic main function. Executes main functionality of program
    """
-   #tg = toy_graph()
-   #has_loop(2,4,tg)
-   #sys.exit()
-   xl_data,decoy_dict = load_xl_data( options.example )
-   xl_graph,pers = build_xl_graph(xl_data)
+   xl_data, decoy_dict = load_xl_data( options.example )
+   xl_graph, pers = build_xl_graph(xl_data)
    for n in xl_graph.nodes(data=True):
        print n
    for n in xl_graph.edges(data=True):
