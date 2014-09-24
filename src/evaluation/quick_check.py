@@ -108,7 +108,8 @@ for line in file:
     #if (float(strline[-2])/ float(strline[-3])) <= 1.0  and (float(strline[-2])/ float(strline[-3])) > 0 and float(strline[-3]) < 9999999:
     #if float(strline[-1]) > 150 and float(strline[-1]) < 200:
 
-    if 1==1:
+    if float(strline[8]) <= 1.1:
+        print strline[0]
     #acc_10_mid.append(float(strline[]))
         acc_10.append(float(strline[2]))
         cov_10.append(float(strline[3]))
@@ -124,6 +125,8 @@ for line in file:
         acc_2_mid.append(float(strline[14+24]))
         cov_2_mid.append(float(strline[15+24]))
         counter +=1
+#    else:
+#        print strline
 print counter
 
 good_count = np.sum([1 for a in acc_5 if a <=0.20])

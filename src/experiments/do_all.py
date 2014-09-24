@@ -21,6 +21,7 @@ for line in file:
             cmd = " ".join(["/scratch/fkamm/local/bin/python2.7",
                             "../contact_page_rank.py",
                             "-c /scratch/schneider/results/graph_kernel_svm/bin_features/psicov_1/gamma_0.001/mi_mid_test/filtered_results/verify_test/%sRRNone_1"%(pdb),
+                            #"-c ../../../rbocon_2.0/results/phy_cm_results/%sRRPCM_1"%(pdb), 
                             "-l %s"%l,
                             "-p %s"%pdb,
                             "-f /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
