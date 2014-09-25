@@ -186,7 +186,11 @@ def main():
    #tg = toy_graph()
    #has_loop(2,4,tg)
    #sys.exit()
-   xl_data = load_xl_data( options.example )	
+   xl_data, gt_data = InputOutput.InputOutput.load_xl_data( options.example )
+   InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
+
+   #sys.exit()
+   #break
    xl_graph,pers = build_xl_graph(xl_data)
    for n in xl_graph.nodes(data=True):
        print n

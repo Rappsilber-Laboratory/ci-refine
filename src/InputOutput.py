@@ -5,8 +5,59 @@ class InputOutput:
     
     def __init__(self):
         pass
-    
+
+
     @staticmethod
+    def load_xl_data( xl_file ):
+        col_names = {}
+        max_score = 0
+        xls = []
+        gt_data = []
+        for line in open(xl_file):
+            if line.startswith('LinkID') or not line.strip():
+                for index, col in enumerate(str(line).split(',')):
+                    col_names[col] = index
+            else:
+                line = line.split(',')
+
+                from_site = int(line[col_names['fromSite']])
+                to_site = int(line[col_names['ToSite']])
+                score = float(line[col_names['Score']])
+                is_decoy = line[col_names['isDecoy']]
+
+
+
+                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and is_decoy == 'false':
+                    if max_score == 0:
+                        max_score = score
+                    xls.append(((from_site, to_site), score/max_score))
+                    gt_data.append((from_site, 'CA', to_site, 'CA', score / max_score))
+
+        return xls, gt_data
+
+    """
+        file  = open(xl_file)
+        from_site = 0
+        to_site = 0
+        score = 0
+        gt_data = []
+        xls = []
+        is_decoy = 0
+        for line in file:
+            strline = str(line).strip().split(',')
+            from_site = int(strline[7])-28
+            to_site = int(strline[8])-28
+            score = float(strline[9])
+            is_decoy = strline[10]
+            if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and is_decoy == 'FALSE':
+                xls.append(((from_site, to_site), score/30.0))
+                gt_data.append((from_site, 'CA', to_site, 'CA', score))
+        file.close()
+        InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
+        return xls
+    """
+
+
     def read_fasta( fasta_file ):
         file = open( fasta_file,'r' )
         sequence = ''
