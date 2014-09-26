@@ -18,6 +18,7 @@ import StructureContainer
 import numpy as np
 import pickle
 import cPickle
+from sklearn import cluster, datasets
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -76,6 +77,30 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
+def get_contact_vectors(structure, sec_struct, shift_mat):
+    all_contacts = []
+    for i in xrange(9, structure.get_number_of_residues()+1-9):
+        for j in xrange(i+1, structure.get_number_of_residues()+1-9):
+            if abs(i-j) >= 12:
+                distance = structure.get_contact_map().get_mapped_distance(i,j)
+                if distance <= 8.0:
+                    contact_vector = []
+                    for i_shift, j_shift in shift_mat:
+                        if abs((i+i_shift)-(j+j_shift)) >= 12:
+                            dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
+                            if dist_shift <= 8.0:
+                                contact_vector.append(1.0)
+                            else:
+                                contact_vector.append(0.0)
+                        else:
+                            contact_vector.append(0.0)
+
+                    all_contacts.append(contact_vector)
+    return np.array(all_contacts)
+
+
+
+
 def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     all_contacts = 0
     for i in xrange(9, structure.get_number_of_residues()+1-9):
@@ -101,6 +126,7 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     sec_struct_pair_types[(sec_lower,sec_upper)] = ( all_shifts, all_contacts )
     return all_contacts
     #return all_contacts
+
 def main():
     
     """Generic main function. Executes main functionality of program
@@ -126,9 +152,10 @@ def main():
     #return 0
 
 
-
+    all_c = []
     file = open(options.pdb_id_list)
     all_contacts = 0
+    #sec_struct_pair_types#
     for line in file:
         pdb_id = str(line).strip().split()[0][0:5]
 
@@ -142,37 +169,72 @@ def main():
         except:
             tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
 
+        """Buried features"""
+        #bur_dict = {}
         #buried_features = ResidueFeatureRelSasa.ResidueFeatureRelSasa(pdb_file)
-        bur_dict = {}
         #for i in xrange(1,tmp_struct.get_number_of_residues()+1):
         #    buried_features.calculate_feature(i,pdb_file)
         #    bur_dict[i] = buried_features.get_feature()
-        all_contacts += add_contacts(tmp_struct, sec_struct_pair_types, shift_mat, sec_struct, bur_dict)
-    #print all_contacts
-    super_sum_prob = 0.0
+        #all_contacts += add_contacts(tmp_struct, sec_struct_pair_types, shift_mat, sec_struct, bur_dict)
+        #print get_contact_vectors(tmp_struct, sec_struct, shift_mat)
+        c = get_contact_vectors(tmp_struct, sec_struct, shift_mat)
+        for i in c:
+            all_c.append(i)
+    c = numpy.array(all_c)
+    #for i in c:
+    #    print len(i)
+    print c.shape[0]
+    print c.shape[1]
+    k_means = cluster.KMeans(n_clusters=10)
+    k_means.fit(c)
+    #print k_means.labels_
+    #print len(k_means.labels_)
+    #sys.exit()
+    true = []
+    false = []
+    for label in xrange(0,10):
+        i_0 = numpy.array([0]*c.shape[1])
+        for i in c:
+            if k_means.predict(i)[0] == label:
+                i_0 = i_0 + numpy.array(i)
+                #print numpy.dot(i_0,i)
+            #if k_means.predict(i)[0] == label:
+        a =  numpy.array(i_0)
+        a = a / float(list(k_means.labels_).count(label))
+        #print a
+        for i in c:
+            if k_means.predict(i)[0] == label:
+                print true.append(numpy.dot(a,i))
+            else:
+                print false.append( numpy.dot(a,i))
+        #sec_struct_pair_types[0] = a
+        all_values = {}
+        for shift, val in zip(shift_mat, a):
+            all_values[shift] = val
+        sec_struct_pair_types[label] = all_values
+    print sec_struct_pair_types
+    print numpy.mean(true)
+    print numpy.mean(false)
+    cPickle.dump(sec_struct_pair_types, open( "shifts.p", "wb" ),protocol=2 )
+    sys.exit()
+
     for keys, values in sec_struct_pair_types.iteritems():
         all_shifts = values[0]
-        #all_contacts  = values[1]
+
         sum_prob = 0
         for shifts, counts in all_shifts.iteritems():
             all_shifts[shifts] = counts / float(all_contacts)
             sum_prob += counts / float(all_contacts)
-        #    super_sum_prob+=sum_prob
+
         for shifts, counts in all_shifts.iteritems():
             all_shifts[shifts] = counts / float(sum_prob)
             #sum_prob += counts / float(all_contacts)
         sec_struct_pair_types[keys] = all_shifts
-    #for keys, values in sec_struct_pair_types.iteritems():
-    #    all_shifts = values#
 
-    #    for shifts, counts in all_shifts.iteritems():
-    #        all_shifts[shifts] = counts / float(super_sum_prob)
-    #        #sum_prob += counts / float(all_contacts)
-    #    sec_struct_pair_types[keys] = all_shifts
 
     for keys, values in sec_struct_pair_types.iteritems():
         print keys, values
-        #print keys, values
+
 
     """
     for keys, values in all_shifts.iteritems():

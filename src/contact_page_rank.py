@@ -465,6 +465,9 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
     #add_loops_node_graph( g )
 
     return g, pers
+
+
+
 def clean_sec_structs(sec_struct):
 
     for i in xrange(2,len(sec_struct)-1):
