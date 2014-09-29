@@ -183,16 +183,16 @@ def main():
     c = numpy.array(all_c)
     #for i in c:
     #    print len(i)
-    print c.shape[0]
+    all_contacts = c.shape[0]
     print c.shape[1]
-    k_means = cluster.KMeans(n_clusters=10)
+    k_means = cluster.KMeans(n_clusters=20)
     k_means.fit(c)
     #print k_means.labels_
     #print len(k_means.labels_)
     #sys.exit()
     true = []
     false = []
-    for label in xrange(0,10):
+    for label in xrange(0,20):
         i_0 = numpy.array([0]*c.shape[1])
         for i in c:
             if k_means.predict(i)[0] == label:
@@ -200,13 +200,15 @@ def main():
                 #print numpy.dot(i_0,i)
             #if k_means.predict(i)[0] == label:
         a =  numpy.array(i_0)
-        a = a / float(list(k_means.labels_).count(label))
+        a = a / float(all_contacts)#float(list(k_means.labels_).count(label))
+        sum_prob = numpy.sum([i for i in a])
+        a = a / float(sum_prob)
         #print a
         for i in c:
             if k_means.predict(i)[0] == label:
-                print true.append(numpy.dot(a,i))
+                true.append(numpy.dot(i,a))
             else:
-                print false.append( numpy.dot(a,i))
+                false.append( numpy.dot(i,a))
         #sec_struct_pair_types[0] = a
         all_values = {}
         for shift, val in zip(shift_mat, a):

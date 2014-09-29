@@ -57,6 +57,18 @@ def parse_psipred(psipred_file):
 
     return ss_dict
 
+def shift_matrix():
+    matrix = []
+    for i in xrange(-8,9):
+        row = []
+        for j in xrange(-8,9):
+            row.append((i,j))
+            matrix.append((i,j))
+    #for i in matrix:
+        #print i
+    return matrix
+
+
 def load_xl_data( xl_file ):
     file  = open(xl_file)
     from_site = 0
@@ -151,7 +163,7 @@ def gauss(x,a=1.0,b=1.0,c=1.0):
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
 
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=10000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
     #ranked_nodes = nx.degree_centrality(xl_graph)
     #print ranked_nodes
     for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
@@ -380,7 +392,7 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
-def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
+def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
    
     g = nx.Graph()
     index = 1
@@ -391,8 +403,8 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
         index += 1    
     #add_loops_node_graph( g )
     for n in g.nodes(data=True):
-        sec_lower = sec_struct[n[1]['xl'][0]]
-        sec_upper = sec_struct[n[1]['xl'][1]]
+        #sec_lower = sec_struct[n[1]['xl'][0]]
+        #sec_upper = sec_struct[n[1]['xl'][1]]
         """
         if sol[n[1]['xl'][0]] < 0.3:
             sol_lower = "B"
@@ -414,14 +426,20 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
+        test_vec = get_prediction_vector(xl_data, n[1]['xl'][0], n[1]['xl'][1])
+
+        lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
+
+        sec_struct_shift_dict = shift_dict[(lowest_clust)]
+
         for o in g.nodes(data=True):
             if o[0] > n[0]:
 
 
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-                    sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
 
-                    if sec_struct_shift_dict.has_key(shift_tuple):
+
+                    if sec_struct_shift_dict.has_key(shift_tuple) and sec_struct_shift_dict[shift_tuple] != 0.0:
                         g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
 
 
@@ -492,6 +510,59 @@ def parse_scores(scores_file):
 
 
 
+def get_prediction_vector( contact_list, i,j ):
+
+    c_dict = vec_to_dict(contact_list,0,1)
+    shift_mat = shift_matrix()
+
+    pred_vec = []
+
+    for i_shift, j_shift in shift_mat:
+        if c_dict.has_key((i+i_shift, j+j_shift)):
+            #pred_vec.append(c_dict[(i+i_shift,j+j_shift)])
+            pred_vec.append(1.0)
+        else:
+            pred_vec.append(0.0)
+
+    return numpy.array(pred_vec)
+
+def get_clustered_aligns( shift_dict ):
+    shift_mat = shift_matrix()
+    vec_dict = {}
+    for keys, values in shift_dict.iteritems():
+
+        pred_vec = []
+        #print values
+        if len(values) >= 3:
+           # print values
+            for i_shift, j_shift in shift_mat:
+            #print i_shift
+            #if i_shift != 0 and j_shift != 0:
+                #print i_shift, j_shift, values[(i_shift,j_shift)]
+              #  try:
+             #       if values
+                if values.has_key((i_shift,j_shift)):
+                    pred_vec.append(values[(i_shift,j_shift)])
+                else:
+                    pred_vec.append(0.0)
+               # except:
+                #    pred_vec.append(0.0)
+        #print keys, values
+            vec_dict[keys] = numpy.array(pred_vec)
+    return vec_dict
+
+def get_lowest_scoring_clust(vec, clust_aligns):
+    lowest_score = 0.2685
+    lowest_clust = 99
+    for keys, values in clust_aligns.iteritems():
+        if numpy.dot(vec,values) > lowest_score:
+            lowest_clust = keys
+            lowest_score = numpy.dot(vec,values)
+        print lowest_score
+    return lowest_clust
+
+
+
 def main():
 
    """Generic main function. Executes main functionality of program
@@ -524,10 +595,17 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
+   clust_aligns = get_clustered_aligns(shift_dict)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data
-   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
+   #print xl_data[0][0]
+   #test_vec = get_prediction_vector(xl_data[:int(options.length*options.top)], xl_data[0][0][0], xl_data[0][0][1])
+   #print test_vec, clust_aligns[0]
+   #print get_lowest_scoring_clust(test_vec, clust_aligns)
+
+   #sys.exit()
+   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict,clust_aligns)
    #add_sec_struct_pseudo_nodes(sec_struct, xl_graph,pers )
 
    for i in xl_graph.nodes(data=True):
