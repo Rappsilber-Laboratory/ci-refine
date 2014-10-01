@@ -402,6 +402,27 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
         pers[index] = score
         index += 1    
     #add_loops_node_graph( g )
+    nodes_to_add = []
+    """
+    for n in g.nodes(data=True):
+        test_vec = get_prediction_vector(xl_data[:length], n[1]['xl'][0], n[1]['xl'][1])
+
+        #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
+        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns)
+
+        max_val = 0
+        max_key = 0
+        for keys, values in sec_struct_shift_dict.iteritems():
+            if values > max_val:
+                max_val = values
+                max_key = keys
+        nodes_to_add.append(( (n[1]['xl'][0] + max_key[0],n[1]['xl'][1] + max_key[1]), n[1]['weight']) )
+
+    for i, score in nodes_to_add:
+        g.add_node(index, xl=i, weight = score)
+        pers[index] = score
+        index += 1
+    """
     for n in g.nodes(data=True):
         #sec_lower = sec_struct[n[1]['xl'][0]]
         #sec_upper = sec_struct[n[1]['xl'][1]]
@@ -426,22 +447,27 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
-        test_vec = get_prediction_vector(xl_data, n[1]['xl'][0], n[1]['xl'][1])
+        test_vec = get_prediction_vector(xl_data[:length], n[1]['xl'][0], n[1]['xl'][1])
 
-        lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
-
-        sec_struct_shift_dict = shift_dict[(lowest_clust)]
-
-        for o in g.nodes(data=True):
-            if o[0] > n[0]:
+        #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
+        sec_struct_shift_dict = get_lowest_scoring_clust(test_vec, clust_aligns)
+        if sec_struct_shift_dict != False:
+            #sec_struct_shift_dict = shift_dict[(lowest_clust)]
+            a = 'a'
+            for o in g.nodes(data=True):
+                if o[0] > n[0]:
 
 
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
 
-                    if sec_struct_shift_dict.has_key(shift_tuple) and sec_struct_shift_dict[shift_tuple] != 0.0:
-                        g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-
+                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
+                        if g.has_edge(n[0],o[0]):
+                            #if g.edge[n[0]][o[0]]['weight'] < sec_struct_shift_dict[shift_tuple]:
+                            old_weight = g.edge[n[0]][o[0]]['weight']
+                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] + old_weight)
+                        else:
+                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
 
                     #if helix_shift(n[1]['xl'], o[1]['xl']):
                     #    g.add_edge(n[0],o[0])
@@ -519,8 +545,8 @@ def get_prediction_vector( contact_list, i,j ):
 
     for i_shift, j_shift in shift_mat:
         if c_dict.has_key((i+i_shift, j+j_shift)):
-            #pred_vec.append(c_dict[(i+i_shift,j+j_shift)])
-            pred_vec.append(1.0)
+            pred_vec.append(c_dict[(i+i_shift,j+j_shift)])
+            #pred_vec.append(1.0)
         else:
             pred_vec.append(0.0)
 
@@ -552,15 +578,74 @@ def get_clustered_aligns( shift_dict ):
     return vec_dict
 
 def get_lowest_scoring_clust(vec, clust_aligns):
-    lowest_score = 0.2685
+    lowest_score = 0.0
     lowest_clust = 99
     for keys, values in clust_aligns.iteritems():
         if numpy.dot(vec,values) > lowest_score:
             lowest_clust = keys
+            #print vec#, values
+            #print values
             lowest_score = numpy.dot(vec,values)
-        print lowest_score
-    return lowest_clust
+        #print lowest_score
+    if clust_aligns.has_key(lowest_clust):
+        new_dict = {}
+        shift_mat = shift_matrix()
+        for shifts,val in zip(shift_mat, clust_aligns[lowest_clust]):
+            new_dict[shifts] = val
+        return new_dict
+    else:
+        return False
 
+def get_averaged_dict(vec, clust_aligns):
+    shift_mat = shift_matrix()
+    all_vec = [0]*len(clust_aligns[('H','H')])
+    new_dict = {}
+    #pdb.set_trace()
+    sum_score = 0.0
+    scores = {}
+    for keys, values in clust_aligns.iteritems():
+        res = numpy.dot(vec,values)
+        scores[keys] = res
+        sum_score += res
+    #print scores
+    #print sum_score
+    #print #scores
+    if sum_score == 0:
+        #sum_score = 0.000000001
+        #norm_scores = [0 for s in scores]
+        norm_scores = {}
+        for keys, values in scores.iteritems():
+            norm_scores[keys] = 0.0
+    else:
+        norm_scores = {}
+        for keys, values in scores.iteritems():
+            norm_scores[keys] = scores[keys] / sum_score
+        #norm_scores = [s/sum_score for s in scores]
+    #print norm_scores
+
+
+
+    for i, s in norm_scores.iteritems():
+
+        for v_index in xrange(0,len(all_vec)):
+            all_vec[v_index]= all_vec[v_index] + s * clust_aligns[i][v_index]
+
+    n_sum = numpy.sum(all_vec)
+
+    for shifts, val in zip(shift_mat, all_vec):
+        new_dict[shifts] = val
+        #for shifts,values in zip(shift_mat,clust_aligns[i]):
+           # all_vec
+            #if new_dict.has_key((i_shift,j_shift)):
+            #    new_dict[(i_shift,j_shift)] = new_dict(i_shift,j_shift) + s*
+
+        #if numpy.dot(vec,values) > lowest_score:
+            #lowest_clust = keys
+            #print vec#, values
+            #print values
+            #lowest_score = numpy.dot(vec,values)
+        #print lowest_score
+    return new_dict
 
 
 def main():
@@ -595,7 +680,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    clust_aligns = get_clustered_aligns(shift_dict)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data

@@ -83,7 +83,7 @@ def get_contact_vectors(structure, sec_struct, shift_mat):
         for j in xrange(i+1, structure.get_number_of_residues()+1-9):
             if abs(i-j) >= 12:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
-                if distance <= 8.0:
+                if distance <= 9.0:
                     contact_vector = []
                     for i_shift, j_shift in shift_mat:
                         if abs((i+i_shift)-(j+j_shift)) >= 12:
@@ -91,7 +91,7 @@ def get_contact_vectors(structure, sec_struct, shift_mat):
                             if dist_shift <= 8.0:
                                 contact_vector.append(1.0)
                             else:
-                                contact_vector.append(0.0)
+                                contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
                         else:
                             contact_vector.append(0.0)
 
@@ -185,23 +185,39 @@ def main():
     #    print len(i)
     all_contacts = c.shape[0]
     print c.shape[1]
-    k_means = cluster.KMeans(n_clusters=20)
+    k_means = cluster.KMeans(n_clusters=20,n_jobs=8)
     k_means.fit(c)
-    #print k_means.labels_
+    #print list(k_means.labels_).count(1)
+    #print list(k_means.labels_).count(2)
+    #print list(k_means.labels_).count(3)
+    #print list(k_means.labels_).count(4)
     #print len(k_means.labels_)
     #sys.exit()
+    n_clusters = 20
+    num_list = []
+    for label in xrange(0,20):
+        num_list.append((list(k_means.labels_).count(label),label))
+    num_list.sort()
+    num_list.reverse()
+    print num_list
     true = []
     false = []
-    for label in xrange(0,20):
+    count = 0
+    for dummy,label in num_list[:n_clusters]:
+        print list(k_means.labels_).count(label)
         i_0 = numpy.array([0]*c.shape[1])
         for i in c:
             if k_means.predict(i)[0] == label:
                 i_0 = i_0 + numpy.array(i)
                 #print numpy.dot(i_0,i)
             #if k_means.predict(i)[0] == label:
+
         a =  numpy.array(i_0)
+
         a = a / float(all_contacts)#float(list(k_means.labels_).count(label))
+
         sum_prob = numpy.sum([i for i in a])
+
         a = a / float(sum_prob)
         #print a
         for i in c:
@@ -213,7 +229,8 @@ def main():
         all_values = {}
         for shift, val in zip(shift_mat, a):
             all_values[shift] = val
-        sec_struct_pair_types[label] = all_values
+        sec_struct_pair_types[count] = all_values
+        count+=1
     print sec_struct_pair_types
     print numpy.mean(true)
     print numpy.mean(false)
