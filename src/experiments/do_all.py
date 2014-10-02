@@ -30,6 +30,7 @@ for line in file:
                             "-a %s"%a,
                             "-o ../../results/29-08-14/%s/"%git_tag.get_branch()])
 
+	    print cmd
             os.system(cmd)
     #break
 file.close()

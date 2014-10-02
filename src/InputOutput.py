@@ -131,7 +131,8 @@ class InputOutput:
                         if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1])))==False:
                              if counter == 0:
                                 norm = float(strline[-1])
-                             res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
+                             #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
+                             res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1])  )))
                              res_dict[(int(strline[0]), int(strline[1]))] = 1
                              res_dict[(int(strline[1]), int(strline[0]))] = 1
                              counter += 1

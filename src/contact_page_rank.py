@@ -424,8 +424,8 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
         index += 1
     """
     for n in g.nodes(data=True):
-        #sec_lower = sec_struct[n[1]['xl'][0]]
-        #sec_upper = sec_struct[n[1]['xl'][1]]
+        sec_lower = sec_struct[n[1]['xl'][0]]
+        sec_upper = sec_struct[n[1]['xl'][1]]
         """
         if sol[n[1]['xl'][0]] < 0.3:
             sol_lower = "B"
@@ -447,10 +447,15 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
-        test_vec = get_prediction_vector(xl_data[:length], n[1]['xl'][0], n[1]['xl'][1])
+        test_vec = get_prediction_vector(xl_data[:length*1], n[1]['xl'][0], n[1]['xl'][1])
 
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
-        sec_struct_shift_dict = get_lowest_scoring_clust(test_vec, clust_aligns)
+        #print clust_aligns[(sec_lower, sec_upper)]
+        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
+        pseudo_shift = {}
+        pseudo_shift[0] = sec_struct_shift_dict
+        #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
+        #break
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
@@ -549,32 +554,38 @@ def get_prediction_vector( contact_list, i,j ):
             #pred_vec.append(1.0)
         else:
             pred_vec.append(0.0)
-
+    #sum_prob = numpy.sum(pred_vec)
+    #for i in xrange(0,len(pred_vec)):
+    #    pred_vec[i] = pred_vec[i]/sum_prob
     return numpy.array(pred_vec)
 
 def get_clustered_aligns( shift_dict ):
     shift_mat = shift_matrix()
     vec_dict = {}
     for keys, values in shift_dict.iteritems():
+        vec_dict[keys] = 1
 
-        pred_vec = []
         #print values
-        if len(values) >= 3:
+        pred_dict = {}
+        for i in xrange(0, len(values)):
            # print values
+            pred_vec = []
+            #print i
             for i_shift, j_shift in shift_mat:
             #print i_shift
             #if i_shift != 0 and j_shift != 0:
                 #print i_shift, j_shift, values[(i_shift,j_shift)]
               #  try:
              #       if values
-                if values.has_key((i_shift,j_shift)):
-                    pred_vec.append(values[(i_shift,j_shift)])
+                if values[i].has_key((i_shift,j_shift)):
+                    pred_vec.append(values[i][(i_shift,j_shift)])
                 else:
                     pred_vec.append(0.0)
                # except:
                 #    pred_vec.append(0.0)
         #print keys, values
-            vec_dict[keys] = numpy.array(pred_vec)
+            pred_dict[i] = numpy.array(pred_vec)
+        vec_dict[keys] = pred_dict
     return vec_dict
 
 def get_lowest_scoring_clust(vec, clust_aligns):
@@ -598,7 +609,8 @@ def get_lowest_scoring_clust(vec, clust_aligns):
 
 def get_averaged_dict(vec, clust_aligns):
     shift_mat = shift_matrix()
-    all_vec = [0]*len(clust_aligns[('H','H')])
+    #all_vec = [0]*len(clust_aligns[('H','H')])
+    all_vec = [0]*len(clust_aligns[0])
     new_dict = {}
     #pdb.set_trace()
     sum_score = 0.0
@@ -607,12 +619,8 @@ def get_averaged_dict(vec, clust_aligns):
         res = numpy.dot(vec,values)
         scores[keys] = res
         sum_score += res
-    #print scores
-    #print sum_score
-    #print #scores
+
     if sum_score == 0:
-        #sum_score = 0.000000001
-        #norm_scores = [0 for s in scores]
         norm_scores = {}
         for keys, values in scores.iteritems():
             norm_scores[keys] = 0.0
@@ -620,20 +628,17 @@ def get_averaged_dict(vec, clust_aligns):
         norm_scores = {}
         for keys, values in scores.iteritems():
             norm_scores[keys] = scores[keys] / sum_score
-        #norm_scores = [s/sum_score for s in scores]
     #print norm_scores
-
-
-
     for i, s in norm_scores.iteritems():
 
         for v_index in xrange(0,len(all_vec)):
-            all_vec[v_index]= all_vec[v_index] + s * clust_aligns[i][v_index]
+            if s > 0.0:
+                all_vec[v_index]= all_vec[v_index] + s * clust_aligns[i][v_index]
 
     n_sum = numpy.sum(all_vec)
 
     for shifts, val in zip(shift_mat, all_vec):
-        new_dict[shifts] = val
+        new_dict[shifts] = val / n_sum
         #for shifts,values in zip(shift_mat,clust_aligns[i]):
            # all_vec
             #if new_dict.has_key((i_shift,j_shift)):
@@ -680,7 +685,8 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
+   #print shift_dict[('E','H')]
    clust_aligns = get_clustered_aligns(shift_dict)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data

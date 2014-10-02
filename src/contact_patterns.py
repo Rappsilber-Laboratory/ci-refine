@@ -77,25 +77,28 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
-def get_contact_vectors(structure, sec_struct, shift_mat):
+def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
     all_contacts = []
     for i in xrange(9, structure.get_number_of_residues()+1-9):
         for j in xrange(i+1, structure.get_number_of_residues()+1-9):
             if abs(i-j) >= 12:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
                 if distance <= 9.0:
-                    contact_vector = []
-                    for i_shift, j_shift in shift_mat:
-                        if abs((i+i_shift)-(j+j_shift)) >= 12:
-                            dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
-                            if dist_shift <= 8.0:
-                                contact_vector.append(1.0)
+                    sec_lower = sec_struct.ss_dict[i]
+                    sec_upper = sec_struct.ss_dict[j]
+                    if sec_lower == sec_struct_types[0] and sec_upper == sec_struct_types[1]:
+                        contact_vector = []
+                        for i_shift, j_shift in shift_mat:
+                            if abs((i+i_shift)-(j+j_shift)) >= 12:
+                                dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
+                                if dist_shift <= 8.0:
+                                    contact_vector.append(1.0)
+                                else:
+                                    contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
                             else:
-                                contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
-                        else:
-                            contact_vector.append(0.0)
+                                contact_vector.append(0.0)
 
-                    all_contacts.append(contact_vector)
+                        all_contacts.append(contact_vector)
     return np.array(all_contacts)
 
 
@@ -127,6 +130,79 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     return all_contacts
     #return all_contacts
 
+def cluster_shift_maps(shift_map_vector):
+    k_means = cluster.KMeans(n_clusters=10,n_jobs=8)
+    k_means.fit(shift_map_vector)
+    n_clusters = 10
+    shift_mat = shift_matrix()
+    num_list = []
+    for label in xrange(0,10):
+        num_list.append((list(k_means.labels_).count(label),label))
+
+    num_list.sort()
+    num_list.reverse()
+
+    print num_list
+    true = []
+    false = []
+    count = 0
+    shift_dict = {}
+    for dummy,label in num_list[:n_clusters]:
+        print list(k_means.labels_).count(label)
+        i_0 = numpy.array([0]*shift_map_vector.shape[1])
+        for i in shift_map_vector:
+            if k_means.predict(i)[0] == label:
+                i_0 = i_0 + numpy.array(i)
+
+        for i in xrange(0,i_0.shape[0]):
+            i_0[i] = i_0[i] / float( list(k_means.labels_).count(label) )
+        sum_prob = numpy.sum([i for i in i_0])
+
+        for i in xrange(0,i_0.shape[0]):
+            i_0[i] = i_0[i] / sum_prob
+        a = numpy.array(i_0)
+
+        for i in shift_map_vector:
+            if k_means.predict(i)[0] == label:
+                true.append(numpy.dot(i,a))
+            else:
+                false.append( numpy.dot(i,a))
+
+        all_values = {}
+        for shift, val in zip(shift_mat, a):
+            all_values[shift] = val
+        shift_dict[count] = all_values
+        count+=1
+    return shift_dict
+    #print sec_struct_pair_types
+    #print numpy.mean(true)
+    #print numpy.mean(false)
+
+def load_contact_maps(sec_struct_type):
+    all_c = []
+    shift_mat = shift_matrix()
+    file = open(options.pdb_id_list)
+    all_contacts = 0
+    for line in file:
+        pdb_id = str(line).strip().split()[0][0:5]
+
+        pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
+        tmp_struct = StructureContainer.StructureContainer()
+        sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)
+
+        print pdb_id
+        try:
+            tmp_struct.load_structure('xxxx', pdb_id[-1],pdb_file, seqsep =1)
+        except:
+            tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
+
+        """Buried features"""
+        c = get_contact_vectors(tmp_struct, sec_struct,sec_struct_type, shift_mat)
+        for i in c:
+            all_c.append(i)
+    c = numpy.array(all_c)
+    file.close()
+    return c
 def main():
     
     """Generic main function. Executes main functionality of program
@@ -150,91 +226,18 @@ def main():
 
     print sec_struct_pair_types
     #return 0
+    new_stuff = {}
+    for keys,values in sec_struct_pair_types.iteritems():
+        c = load_contact_maps(keys)
+
+        shift_dict = cluster_shift_maps(c)
+        print shift_dict
+        new_stuff[keys] = shift_dict
+
+    print new_stuff
+    cPickle.dump(new_stuff, open( "shifts.p", "wb" ),protocol=2 )
 
 
-    all_c = []
-    file = open(options.pdb_id_list)
-    all_contacts = 0
-    #sec_struct_pair_types#
-    for line in file:
-        pdb_id = str(line).strip().split()[0][0:5]
-
-        pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
-        tmp_struct = StructureContainer.StructureContainer()
-        sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)
-
-        print pdb_id
-        try:
-            tmp_struct.load_structure('xxxx', pdb_id[-1],pdb_file, seqsep =1)
-        except:
-            tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
-
-        """Buried features"""
-        #bur_dict = {}
-        #buried_features = ResidueFeatureRelSasa.ResidueFeatureRelSasa(pdb_file)
-        #for i in xrange(1,tmp_struct.get_number_of_residues()+1):
-        #    buried_features.calculate_feature(i,pdb_file)
-        #    bur_dict[i] = buried_features.get_feature()
-        #all_contacts += add_contacts(tmp_struct, sec_struct_pair_types, shift_mat, sec_struct, bur_dict)
-        #print get_contact_vectors(tmp_struct, sec_struct, shift_mat)
-        c = get_contact_vectors(tmp_struct, sec_struct, shift_mat)
-        for i in c:
-            all_c.append(i)
-    c = numpy.array(all_c)
-    #for i in c:
-    #    print len(i)
-    all_contacts = c.shape[0]
-    print c.shape[1]
-    k_means = cluster.KMeans(n_clusters=20,n_jobs=8)
-    k_means.fit(c)
-    #print list(k_means.labels_).count(1)
-    #print list(k_means.labels_).count(2)
-    #print list(k_means.labels_).count(3)
-    #print list(k_means.labels_).count(4)
-    #print len(k_means.labels_)
-    #sys.exit()
-    n_clusters = 20
-    num_list = []
-    for label in xrange(0,20):
-        num_list.append((list(k_means.labels_).count(label),label))
-    num_list.sort()
-    num_list.reverse()
-    print num_list
-    true = []
-    false = []
-    count = 0
-    for dummy,label in num_list[:n_clusters]:
-        print list(k_means.labels_).count(label)
-        i_0 = numpy.array([0]*c.shape[1])
-        for i in c:
-            if k_means.predict(i)[0] == label:
-                i_0 = i_0 + numpy.array(i)
-                #print numpy.dot(i_0,i)
-            #if k_means.predict(i)[0] == label:
-
-        a =  numpy.array(i_0)
-
-        a = a / float(all_contacts)#float(list(k_means.labels_).count(label))
-
-        sum_prob = numpy.sum([i for i in a])
-
-        a = a / float(sum_prob)
-        #print a
-        for i in c:
-            if k_means.predict(i)[0] == label:
-                true.append(numpy.dot(i,a))
-            else:
-                false.append( numpy.dot(i,a))
-        #sec_struct_pair_types[0] = a
-        all_values = {}
-        for shift, val in zip(shift_mat, a):
-            all_values[shift] = val
-        sec_struct_pair_types[count] = all_values
-        count+=1
-    print sec_struct_pair_types
-    print numpy.mean(true)
-    print numpy.mean(false)
-    cPickle.dump(sec_struct_pair_types, open( "shifts.p", "wb" ),protocol=2 )
     sys.exit()
 
     for keys, values in sec_struct_pair_types.iteritems():
