@@ -115,7 +115,7 @@ for line in file:
         cov_10.append(float(strline[3]))
         acc_5.append(float(strline[8]))
         cov_5.append(float(strline[9]))
-        acc_2.append(float(strline[14]))
+        acc_2.append(float(strline[20]))
         cov_2.append(float(strline[15]))
 
         acc_10_mid.append(float(strline[2+24]))

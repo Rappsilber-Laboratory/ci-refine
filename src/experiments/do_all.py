@@ -18,9 +18,10 @@ for line in file:
     for t in lens:
         for a in alphas:
             print strline
-            cmd = " ".join(["/scratch/fkamm/local/bin/python2.7",
+            cmd = " ".join(["/scratch/mahmoud/local/bin/python2.7",
                             "../contact_page_rank.py",
                             "-c /scratch/schneider/results/graph_kernel_svm/bin_features/psicov_1/gamma_0.001/mi_mid_test/filtered_results/verify_test/%sRRNone_1"%(pdb),
+                            #"-c /scratch/schneider/projects/pagerank_refinement/results/29-08-14/ss_align/%sRRPAR_0.4_2.0"%(pdb),
                             #"-c ../../../rbocon_2.0/results/phy_cm_results/%sRRPCM_1"%(pdb), 
                             "-l %s"%l,
                             "-p %s"%pdb,

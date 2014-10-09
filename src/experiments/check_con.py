@@ -18,7 +18,7 @@ for line in file:
     for t in lens:
         for a in alphas:
             print pdb, a, t
-            cmd = " ".join(["/scratch/fkamm/local/bin/python2.7",
+            cmd = " ".join(["/scratch/mahmoud/local/bin/python2.7",
                             "/scratch/schneider/projects/rbocon_2.0/src/check_contacts.py",
                             "--restraint_file ../../results/29-08-14/%s/%sRRPAR_%s_%s"%(git_tag.get_branch(),pdb,a,t),
                             #"--restraint_file ../../../rbocon_2.0/results/phy_cm_results/%sRRPCM_1"%(pdb),

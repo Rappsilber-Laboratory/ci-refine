@@ -7,7 +7,7 @@ import random
 sys.path.append("../src")
 sys.path.append("/scratch/schneider/libs/lib/python2.7/site-packages")
 sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/features/")
-
+sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/structure/")
 import networkx as nx
 import InputOutput
 import numpy
@@ -15,7 +15,9 @@ from optparse import OptionParser
 import pdb
 import ResidueFeatureSecStruct
 import ResidueFeatureRelSasa
+import StructureContainer
 import cPickle
+import matplotlib.pyplot as plt
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -62,10 +64,11 @@ def shift_matrix():
     for i in xrange(-8,9):
         row = []
         for j in xrange(-8,9):
-            row.append((i,j))
-            matrix.append((i,j))
-    #for i in matrix:
-        #print i
+            if i == 0 and j == 0:
+                pass
+            else:
+                row.append((i,j))
+                matrix.append((i,j))
     return matrix
 
 
@@ -162,8 +165,21 @@ def gauss(x,a=1.0,b=1.0,c=1.0):
     return a * numpy.exp( -1.0 * ( (x-b)**2/2*c**2) )
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
+    #all_scores = {}
+    #for i in xl_graph.nodes():
+    #    all_scores[i] = 0.0
+    #alphas = [0.85]
+    #print pers
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)
+    #for a in alphas:
 
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
+       # ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
+    #    print "Computing PageRank for Alpha:", a
+    #    for node, score in ranked_nodes.iteritems():#
+
+    #        all_scores[node] = all_scores[node] + score
+    #for node, score in pers.iteritems():
+    #    all_scores[node] = all_scores[node]*input_alpha + ( (1.0 -input_alpha)* score)
     #ranked_nodes = nx.degree_centrality(xl_graph)
     #print ranked_nodes
     for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
@@ -392,8 +408,70 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
-def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
-   
+def write_edge_scores( graph, true_contacts ):
+    true_dict = vec_to_dict(true_contacts,0,1)
+    class_neg  = []
+    class_pos  = []
+    class_neg_pos = []
+    all_class = []
+    draw_graph(graph,true_dict)
+    #print graph.nodes(data=True)
+    #print graph.nodes()[96]
+    for e in graph.edges(data=True):
+        #print e
+        #print graph.nodes(data=True)[e[0]-1][1]['xl']
+        #print graph.nodes(data=True)[e[1]-1][1]['xl']
+        all_class.append( (graph[e[0]][e[1]]['weight'], (e[0],e[1])))
+        if true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']) == False and true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl']) == False:
+            class_neg.append( graph[e[0]][e[1]]['weight'] )
+            #graph[e[0]][e[1]]['weight'] = 0.1
+        elif true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']) == True and true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl']) == True:
+            class_pos.append( graph[e[0]][e[1]]['weight'] )
+
+            #graph[e[0]][e[1]]['weight'] = 0.1
+        else:
+            #print true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']), true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl'])
+            class_neg_pos.append( graph[e[0]][e[1]]['weight'] )
+    all_class.sort()
+    """
+    to_rm = []
+    for n in graph.nodes():
+        weight_list = []
+        for nei in nx.neighbors(graph,n):
+
+            weight_list.append((graph.edge[n][nei]['weight'],(n,nei)))
+        weight_list.sort()
+        weight_list.reverse()
+        for i in weight_list[:10]:
+            to_rm.append(i)
+
+    for i,j in to_rm:
+        if graph.has_edge(j[0],j[1]):
+            graph.remove_edge(j[0],j[1])
+    """
+    #for e in graph.edges(data=True):
+    #    if true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']) == True and true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl']) == True:
+    #        #class_pos.append( numpy.mean(class_neg)*2.0 )
+    #        graph[e[0]][e[1]]['weight'] = numpy.mean(class_neg)*2.0
+    #for i,j in all_class[:int(len(all_class)*0.25)]:
+    #    graph.remove_edge(j[0],j[1])
+
+    #all_class.reverse()
+    #med = all_class[int(len(all_class)*0.5)][0]
+    #to_rm = []
+    ##for e in graph.edges(data=True):
+    #    if graph[e[0]][e[1]]['weight'] <= med:
+    #        to_rm.append()
+
+    print "CLASS",  numpy.mean(class_pos), numpy.mean(class_neg), numpy.mean(class_neg_pos)
+    #draw_graph(graph,true_dict)
+
+
+def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, ):
+    tmp_struct = StructureContainer.StructureContainer()
+    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+    true_map = tmp_struct.get_contact_map().print_res_format()
+    #xl_data = true_map
     g = nx.Graph()
     index = 1
     pers = {}
@@ -447,11 +525,12 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
-        test_vec = get_prediction_vector(xl_data[:length*1], n[1]['xl'][0], n[1]['xl'][1])
-
+        #test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
+        #test_vec = get_prediction_vector(true_map, n[1]['xl'][0], n[1]['xl'][1])
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
-        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
+        #sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
+        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
         pseudo_shift = {}
         pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
@@ -460,19 +539,19 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
             for o in g.nodes(data=True):
-                if o[0] > n[0]:
-
+                if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
 
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
-
+                    dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
                     if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
                         if g.has_edge(n[0],o[0]):
                             #if g.edge[n[0]][o[0]]['weight'] < sec_struct_shift_dict[shift_tuple]:
                             old_weight = g.edge[n[0]][o[0]]['weight']
-                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] + old_weight)
+                            if old_weight > sec_struct_shift_dict[shift_tuple]:
+                                g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
                         else:
-                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
 
                     #if helix_shift(n[1]['xl'], o[1]['xl']):
                     #    g.add_edge(n[0],o[0])
@@ -512,11 +591,89 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol,clust_aligns ):
     #add_loops( g )
     #for i in xrange(0,3)
     #add_loops_node_graph( g )
-
+    #write_edge_scores( g, true_map )
+    #nx.draw_spring(g)
+    #plt.show()
     return g, pers
 
 
+def which_clust(i, all_clust):
+    for clust in all_clust:
+        if i in clust:
+            return clust
 
+def clust_graph(graph):
+    from sklearn import metrics
+    from sklearn import cluster
+    A = nx.adjacency_matrix(graph)
+    max_score = 0
+    max_labels = []
+    max_num_clust = 0
+    all_clust = []
+    for i in xrange(2,8):
+        spec = cluster.SpectralClustering(n_clusters=i)
+        labels = spec.fit_predict(A)
+        score = metrics.silhouette_score(A, labels, metric='euclidean')
+        if score > max_score:
+            max_score = score
+            max_labels = labels
+            max_num_clust = i
+    #print max_labels
+    for c in xrange(0,max_num_clust):
+        clust = [i+1 for i,j in enumerate(max_labels) if j == c]
+
+        all_clust.append(clust)
+
+    #print all_clust
+
+    print "CLUST", max_score, max_num_clust
+    if max_num_clust == 2:
+        return None
+    else:
+        return all_clust
+    #print
+    #print len(labels)
+    #print labels
+def draw_graph( graph, true_map ):
+    true_nodes = []
+    false_nodes = []
+    #false_true_nodes = []
+    for n in graph.nodes(data=True):
+        if true_map.has_key(n[1]['xl']):
+            true_nodes.append(n[0])
+        else:
+            false_nodes.append(n[0])
+    pos=nx.spring_layout(graph)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
+
+
+    #clust_1 = [i+1 for i,j in enumerate(labels) if j == 0]
+    #clust_2 = [i+1 for i,j in enumerate(labels) if j == 1]
+    #clust_3 = [i+1 for i,j in enumerate(labels) if j == 2]
+    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_1, node_color='b', node_size=50, alpha=0.8)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_2, node_color='r', node_size=50, alpha=0.9)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_3, node_color='g', node_size=50, alpha=0.9)
+    #all_clust = [clust_1,clust_2,clust_3]
+
+    all_clust = clust_graph(graph)
+    if all_clust != None:
+        to_rm = []
+    #for clust in all_clust:
+        for e in graph.edges(data=True):
+            print e
+            clust = which_clust(e[0], all_clust )
+
+            if e[1] in clust:
+                pass
+            else:
+                to_rm.append((e[0],e[1]))
+        for e in to_rm:
+            graph.remove_edge(e[0],e[1])
+        #same_clust = True
+        #for clust in all_clust:
+    #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
+    #plt.show()
 def clean_sec_structs(sec_struct):
 
     for i in xrange(2,len(sec_struct)-1):
@@ -557,6 +714,7 @@ def get_prediction_vector( contact_list, i,j ):
     #sum_prob = numpy.sum(pred_vec)
     #for i in xrange(0,len(pred_vec)):
     #    pred_vec[i] = pred_vec[i]/sum_prob
+    #print numpy.array(pred_vec)
     return numpy.array(pred_vec)
 
 def get_clustered_aligns( shift_dict ):
@@ -597,7 +755,9 @@ def get_lowest_scoring_clust(vec, clust_aligns):
             #print vec#, values
             #print values
             lowest_score = numpy.dot(vec,values)
+
         #print lowest_score
+
     if clust_aligns.has_key(lowest_clust):
         new_dict = {}
         shift_mat = shift_matrix()
@@ -607,7 +767,38 @@ def get_lowest_scoring_clust(vec, clust_aligns):
     else:
         return False
 
+def normalize_per_position(clust_aligns):
+
+    shift_mat = shift_matrix()
+    shift_dict = {}
+
+    dict_info = []
+    for keys,values in clust_aligns.iteritems():
+        for i in xrange(0,10):
+            dict_info.append((keys,i))
+
+
+    sum_per_stuff = [0]*len(clust_aligns[('H','H')][0])
+
+    for keys in dict_info:
+
+        for i in xrange(0,len(sum_per_stuff)):
+
+            sum_per_stuff[i] = sum_per_stuff[i] + clust_aligns[keys[0]][keys[1]][i]
+
+    for keys in dict_info:
+        #print len(clust_aligns[('H','H')][0])
+        new_val = [0]*len(clust_aligns[('H','H')][0])
+
+        for i in xrange(0,len(sum_per_stuff)):
+
+            new_val[i] = clust_aligns[keys[0]][keys[1]][i] / sum_per_stuff[i]
+
+        clust_aligns[keys[0]][keys[1]] = new_val
+
+
 def get_averaged_dict(vec, clust_aligns):
+   # normalize_per_position(clust_aligns)
     shift_mat = shift_matrix()
     #all_vec = [0]*len(clust_aligns[('H','H')])
     all_vec = [0]*len(clust_aligns[0])
@@ -619,16 +810,18 @@ def get_averaged_dict(vec, clust_aligns):
         res = numpy.dot(vec,values)
         scores[keys] = res
         sum_score += res
-
+        #print res, len(vec),len(values), vec
     if sum_score == 0:
         norm_scores = {}
         for keys, values in scores.iteritems():
-            norm_scores[keys] = 0.0
+            norm_scores[keys] = 0.1
     else:
         norm_scores = {}
         for keys, values in scores.iteritems():
-            norm_scores[keys] = scores[keys] / sum_score
-    #print norm_scores
+            norm_scores[keys] = 0.2 #scores[keys] / sum_score
+
+    print norm_scores
+
     for i, s in norm_scores.iteritems():
 
         for v_index in xrange(0,len(all_vec)):
@@ -685,9 +878,11 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    #print shift_dict[('E','H')]
-   clust_aligns = get_clustered_aligns(shift_dict)
+   #clust_aligns = get_clustered_aligns(shift_dict)
+   #normalize_per_position(clust_aligns)
+   #normalize_per_position(clust_aligns)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data
    #print xl_data[0][0]
@@ -696,13 +891,13 @@ def main():
    #print get_lowest_scoring_clust(test_vec, clust_aligns)
 
    #sys.exit()
-   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict,clust_aligns)
+   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
    #add_sec_struct_pseudo_nodes(sec_struct, xl_graph,pers )
 
-   for i in xl_graph.nodes(data=True):
-       print i
-   for e in xl_graph.edges(data=True):
-       print e
+   #for i in xl_graph.nodes(data=True):
+   #    print i
+   #for e in xl_graph.edges(data=True):
+   #    print e
    #return 0
    print xl_graph.number_of_edges()
    #xl_graph,pers = build_xl_graph(xl_data)

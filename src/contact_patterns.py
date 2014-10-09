@@ -18,7 +18,7 @@ import StructureContainer
 import numpy as np
 import pickle
 import cPickle
-from sklearn import cluster, datasets
+from sklearn import cluster, datasets, neighbors
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -83,7 +83,7 @@ def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
         for j in xrange(i+1, structure.get_number_of_residues()+1-9):
             if abs(i-j) >= 12:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
-                if distance <= 9.0:
+                if distance <= 8.0:
                     sec_lower = sec_struct.ss_dict[i]
                     sec_upper = sec_struct.ss_dict[j]
                     if sec_lower == sec_struct_types[0] and sec_upper == sec_struct_types[1]:
@@ -91,10 +91,14 @@ def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
                         for i_shift, j_shift in shift_mat:
                             if abs((i+i_shift)-(j+j_shift)) >= 12:
                                 dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
+                                #print dist_shift
                                 if dist_shift <= 8.0:
                                     contact_vector.append(1.0)
                                 else:
-                                    contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
+                                    contact_vector.append(0.0)
+
+                                #else:
+                                #    contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
                             else:
                                 contact_vector.append(0.0)
 
@@ -131,39 +135,49 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     #return all_contacts
 
 def cluster_shift_maps(shift_map_vector):
-    k_means = cluster.KMeans(n_clusters=10,n_jobs=8)
-    k_means.fit(shift_map_vector)
-    n_clusters = 10
+    #from sk
+    print shift_map_vector[1]
+    print shift_map_vector[2]
+    dist = neighbors.DistanceMetric.get_metric('rogerstanimoto')
+    print dist.pairwise(shift_map_vector[0:10])
+    k_means = cluster.Ward(n_clusters = 5)
+    labels =  k_means.fit_predict(shift_map_vector)
+    n_clusters = 5
     shift_mat = shift_matrix()
-    num_list = []
-    for label in xrange(0,10):
-        num_list.append((list(k_means.labels_).count(label),label))
+    print labels
+    from collections import Counter
+    res = Counter(labels)
+    print res
+    #num_list = []
+    #for label in xrange(0,50):
+    #    num_list.append((list(k_means.labels_).count(label),label))#
 
-    num_list.sort()
-    num_list.reverse()
+    #num_list.sort()
+    #num_list.reverse()
 
-    print num_list
+    #print num_list
     true = []
     false = []
     count = 0
     shift_dict = {}
-    for dummy,label in num_list[:n_clusters]:
-        print list(k_means.labels_).count(label)
+    #for dummy,label in num_list[:n_clusters]:
+    for label in xrange(0,n_clusters):
+        #print list(k_means.labels_).count(label)
         i_0 = numpy.array([0]*shift_map_vector.shape[1])
-        for i in shift_map_vector:
-            if k_means.predict(i)[0] == label:
+        for i,pred in zip(shift_map_vector, labels):
+            if pred == label:
                 i_0 = i_0 + numpy.array(i)
 
         for i in xrange(0,i_0.shape[0]):
-            i_0[i] = i_0[i] / float( list(k_means.labels_).count(label) )
+            i_0[i] = i_0[i] / float( list(labels).count(label) )
         sum_prob = numpy.sum([i for i in i_0])
 
         for i in xrange(0,i_0.shape[0]):
             i_0[i] = i_0[i] / sum_prob
         a = numpy.array(i_0)
 
-        for i in shift_map_vector:
-            if k_means.predict(i)[0] == label:
+        for i,pred in zip(shift_map_vector, labels):
+            if pred == label:
                 true.append(numpy.dot(i,a))
             else:
                 false.append( numpy.dot(i,a))
@@ -212,7 +226,7 @@ def main():
     #print bur_dict
     shift_mat = shift_matrix()
     #
-    sec_struct_types = ["C","H","E"]
+    sec_struct_types = ["H","C","E"]
     bur_types = ["B","A"]
     seq_sep_types = [(12,24),(24,9999)]
     sec_struct_pair_types = {}
@@ -228,6 +242,7 @@ def main():
     #return 0
     new_stuff = {}
     for keys,values in sec_struct_pair_types.iteritems():
+        #if keys == ('H','H'):
         c = load_contact_maps(keys)
 
         shift_dict = cluster_shift_maps(c)
