@@ -544,7 +544,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
                     dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
-                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0 and dist <= 8.5:
+                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
                         if g.has_edge(n[0],o[0]):
                             #if g.edge[n[0]][o[0]]['weight'] < sec_struct_shift_dict[shift_tuple]:
                             old_weight = g.edge[n[0]][o[0]]['weight']
@@ -552,6 +552,8 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                                 g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
                         else:
                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+                    elif sec_struct_shift_dict.has_key(shift_tuple) == False and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
+                        g.add_edge(n[0],o[0], weight=0.001)
     write_edge_scores(g, true_map)
     return g, pers
 
