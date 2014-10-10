@@ -525,12 +525,12 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
-        test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
+        #test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
         #test_vec = get_prediction_vector(true_map, n[1]['xl'][0], n[1]['xl'][1])
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
-        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
-        #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
+       # sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
+        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
         #pseudo_shift = {}
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
@@ -777,7 +777,7 @@ def get_averaged_dict(vec, clust_aligns):
     else:
         norm_scores = {}
         for keys, values in scores.iteritems():
-            norm_scores[keys] = scores[keys] / sum_score
+            norm_scores[keys] = 0.2 #scores[keys] / sum_score
 
     print norm_scores
 
@@ -837,7 +837,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    #print shift_dict[('E','H')]
    clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
