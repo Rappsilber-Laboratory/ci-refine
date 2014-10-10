@@ -552,7 +552,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                                 g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
                         else:
                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-                    elif sec_struct_shift_dict.has_key(shift_tuple) == False and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
+                    elif sec_struct_shift_dict.has_key(shift_tuple) == False and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0 and shift_tuple[0] > 0 and shift_tuple[1] > 0:
                         g.add_edge(n[0],o[0], weight=0.001)
     write_edge_scores(g, true_map)
     return g, pers
