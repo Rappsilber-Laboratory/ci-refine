@@ -2,11 +2,11 @@ import os
 import git_tag
 
 file = open("../../data/datasets/ciss_set.txt")
-
+#file = open("../../data/datasets/compiled_sequences_with_seq_dist.txt")
 #alphas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
 #lens = [1,1.5,2]
 lens = [2.0]
-alphas = [0.4]
+alphas = [0.4,0.5]
 if os.path.exists("../../results/29-08-14/%s/"%git_tag.get_branch()):
     pass
 else:
