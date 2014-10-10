@@ -777,7 +777,7 @@ def get_averaged_dict(vec, clust_aligns):
     else:
         norm_scores = {}
         for keys, values in scores.iteritems():
-            norm_scores[keys] = 0.2 #scores[keys] / sum_score
+            norm_scores[keys] = scores[keys] / sum_score
 
     print norm_scores
 
