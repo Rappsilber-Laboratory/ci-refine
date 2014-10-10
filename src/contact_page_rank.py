@@ -45,9 +45,9 @@ def parse_psipred(psipred_file):
     conf = ''
     for line in open(psipred_file):
         if line.startswith('Conf:'):
-            conf+=(line[6:].strip())
+            conf += (line[6:].strip())
         elif line.startswith('Pred:'):
-             ss+=(line[6:].strip())
+             ss += (line[6:].strip())
         #ss = ''.join(ss)
         #conf = ''.join(conf)
     # turn do dict
@@ -55,7 +55,7 @@ def parse_psipred(psipred_file):
     counter = 1
     for i in ss:
         ss_dict[counter] = i
-        counter+=1
+        counter += 1
 
     return ss_dict
 
@@ -467,7 +467,7 @@ def write_edge_scores( graph, true_contacts ):
     #draw_graph(graph,true_dict)
 
 
-def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, ):
+def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
     tmp_struct = StructureContainer.StructureContainer()
     tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     true_map = tmp_struct.get_contact_map().print_res_format()
@@ -525,14 +525,14 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, ):
            # pos1 = 10
         #if pos2 > 10:
         #    pos2 = 10
-        #test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
+        test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
         #test_vec = get_prediction_vector(true_map, n[1]['xl'][0], n[1]['xl'][1])
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
-        #sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
-        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
-        pseudo_shift = {}
-        pseudo_shift[0] = sec_struct_shift_dict
+        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
+        #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
+        #pseudo_shift = {}
+        #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
         if sec_struct_shift_dict != False:
@@ -837,9 +837,9 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../shifts.p", "rb" ))
    #print shift_dict[('E','H')]
-   #clust_aligns = get_clustered_aligns(shift_dict)
+   clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
    #normalize_per_position(clust_aligns)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
@@ -850,7 +850,7 @@ def main():
    #print get_lowest_scoring_clust(test_vec, clust_aligns)
 
    #sys.exit()
-   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
+   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict, clust_aligns = clust_aligns)
    #add_sec_struct_pseudo_nodes(sec_struct, xl_graph,pers )
 
    #for i in xl_graph.nodes(data=True):
