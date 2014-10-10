@@ -43,9 +43,9 @@ def parse_psipred(psipred_file):
     conf = ''
     for line in open(psipred_file):
         if line.startswith('Conf:'):
-            conf+=(line[6:].strip())
+            conf += (line[6:].strip())
         elif line.startswith('Pred:'):
-             ss+=(line[6:].strip())
+            ss += (line[6:].strip())
         #ss = ''.join(ss)
         #conf = ''.join(conf)
     # turn do dict
@@ -146,8 +146,8 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double = True):
                         is_nei = True
         return is_nei
 
-def gauss(x,a=1.0,b=1.0,c=1.0):
-    return a * numpy.exp( -1.0 * ( (x-b)**2/2*c**2) )
+def gauss(x, a=1.0, b=1.0, c=1.0):
+    return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
 
@@ -181,11 +181,11 @@ def add_loops( xl_graph ):
     for n in xl_graph.nodes(data=True):
         connecting_nodes = []
         for o in xl_graph.nodes(data=True):
-             if o[0] > n[0]:
-                 print o, n
-                 if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):
-                     if len(xl_graph.neighbors(o[0])) > 0:
-                         connecting_nodes.append(o)
+            if o[0] > n[0]:
+                print o, n
+                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):
+                    if len(xl_graph.neighbors(o[0])) > 0:
+                        connecting_nodes.append(o)
                           
         if len(connecting_nodes) >= 1:
             for o in connecting_nodes:
@@ -370,10 +370,10 @@ def get_relative_sec_struct_pos(ss_dict, i):
     anchor = ss_dict[i]
     pos = 1
     #print pos
-    for j in xrange(1,20):
+    for j in xrange(1 ,20):
         if ss_dict.has_key(i-j):
             if anchor == ss_dict[i-j]:
-                pos +=1
+                pos += 1
             else:
                 return pos
         else:
@@ -393,77 +393,13 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol ):
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
-        """
-        if sol[n[1]['xl'][0]] < 0.3:
-            sol_lower = "B"
-        else:
-            sol_lower = "A"
-        if sol[n[1]['xl'][1]] < 0.3:
-            sol_upper = "B"
-        else:
-            sol_upper = "A"
-        """
-        #if (abs( n[1]['xl'][0]- n[1]['xl'][1]) >=12 and abs( n[1]['xl'][0]- n[1]['xl'][1]) <=24 ):
-        #    seq_sep = (12,24)
-        #else:
-        #    seq_sep = (24,9999)
-        #pos1 = get_relative_sec_struct_pos(sec_struct, n[1]['xl'][0])
-        #pos2 = get_relative_sec_struct_pos(sec_struct, n[1]['xl'][1])
 
-        ##if pos1 > 10:
-           # pos1 = 10
-        #if pos2 > 10:
-        #    pos2 = 10
         for o in g.nodes(data=True):
             if o[0] > n[0]:
-
-
-                    shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-                    sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
-
-                    if sec_struct_shift_dict.has_key(shift_tuple):
-                        g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-
-
-                    #if helix_shift(n[1]['xl'], o[1]['xl']):
-                    #    g.add_edge(n[0],o[0])
-
-                 #if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #   pass
-                    #g.add_edge(n[0],o[0],weight=0.2)#, weight =  numpy.min([n[1]['weight'], o[1]['weight']])  )
-                     #g.add_edge(n[0],o[0], weight =   gauss(2.0))
-                    # g.add_edge(n[0],o[0], weight = gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #    g.add_edge(n[0],o[0], weight =   gauss(1.0))
-                 #if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2):
-                 #    g.add_edge(n[0],o[0], weight =   gauss(2.0))
-
-                    #g.add_edge(n[0],o[0], weight = gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #    g.add_edge(n[0],o[0], weight =  gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=3):
-                 #   g.add_edge(n[0],o[0], weight = gauss(3.0))
-                    #g.add_edge(n[0],o[0], weight =  numpy.min([n[1]['weight'], o[1]['weight']])  )
-                    #print  ( n[1]['weight'] + o[1]['weight']) / 2.0
-                #    print 'True'
-                #else:
-                #    print 'False' 
-    """
-    for i in xrange(0,3):
-        to_add = []
-        for n in g.nodes(data=True):
-            for o in g.nodes(data=True):
-                if o[0] > n[0]:
-                    if share_neighbors( o, n,g ):
-                        to_add.append((o[0],n[0]))
-                    #g.add_edge(n[0],o[0])
-        for i,j in to_add:
-            g.add_edge(i,j, weight=1.0)
-    """
-    #add_loops( g )
-    #for i in xrange(0,3)
-    #add_loops_node_graph( g )
-
+                shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
+                sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
+                if sec_struct_shift_dict.has_key(shift_tuple):
+                    g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
     return g, pers
 def clean_sec_structs(sec_struct):
 
