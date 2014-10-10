@@ -839,7 +839,7 @@ def main():
    #return 0
    shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    #print shift_dict[('E','H')]
-   clust_aligns = get_clustered_aligns(shift_dict)
+   #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
    #normalize_per_position(clust_aligns)
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
@@ -850,7 +850,7 @@ def main():
    #print get_lowest_scoring_clust(test_vec, clust_aligns)
 
    #sys.exit()
-   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict, clust_aligns = clust_aligns)
+   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
    #add_sec_struct_pseudo_nodes(sec_struct, xl_graph,pers )
 
    #for i in xl_graph.nodes(data=True):
