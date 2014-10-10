@@ -544,7 +544,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
                     dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
-                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0 and dist <= 8.5:
+                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0 and dist <= 2.0:
                         if g.has_edge(n[0],o[0]):
                             #if g.edge[n[0]][o[0]]['weight'] < sec_struct_shift_dict[shift_tuple]:
                             old_weight = g.edge[n[0]][o[0]]['weight']
@@ -552,7 +552,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                                 g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
                         else:
                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-
+    write_edge_scores(g, true_map)
     return g, pers
 
 
@@ -603,9 +603,9 @@ def draw_graph( graph, true_map ):
         else:
             false_nodes.append(n[0])
     pos=nx.spring_layout(graph)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
-
+    nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
+    nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
+    nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
 
     #clust_1 = [i+1 for i,j in enumerate(labels) if j == 0]
     #clust_2 = [i+1 for i,j in enumerate(labels) if j == 1]
@@ -614,7 +614,7 @@ def draw_graph( graph, true_map ):
     #nx.draw_networkx_nodes(graph,pos, nodelist=clust_2, node_color='r', node_size=50, alpha=0.9)
     #nx.draw_networkx_nodes(graph,pos, nodelist=clust_3, node_color='g', node_size=50, alpha=0.9)
     #all_clust = [clust_1,clust_2,clust_3]
-
+    """
     all_clust = clust_graph(graph)
     if all_clust != None:
         to_rm = []
@@ -632,6 +632,7 @@ def draw_graph( graph, true_map ):
         #same_clust = True
         #for clust in all_clust:
     #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
+    """
     #plt.show()
 def clean_sec_structs(sec_struct):
 
