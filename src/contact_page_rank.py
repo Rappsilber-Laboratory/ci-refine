@@ -606,9 +606,9 @@ def draw_graph( graph, true_map ):
         else:
             false_nodes.append(n[0])
     pos=nx.spring_layout(graph)
-    nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
-    nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
-    nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
+    #nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
+    #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
 
     #clust_1 = [i+1 for i,j in enumerate(labels) if j == 0]
     #clust_2 = [i+1 for i,j in enumerate(labels) if j == 1]
