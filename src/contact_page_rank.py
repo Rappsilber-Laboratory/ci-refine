@@ -553,47 +553,6 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, ):
                         else:
                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
 
-                    #if helix_shift(n[1]['xl'], o[1]['xl']):
-                    #    g.add_edge(n[0],o[0])
-
-                 #if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #   pass
-                    #g.add_edge(n[0],o[0],weight=0.2)#, weight =  numpy.min([n[1]['weight'], o[1]['weight']])  )
-                     #g.add_edge(n[0],o[0], weight =   gauss(2.0))
-                    # g.add_edge(n[0],o[0], weight = gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #    g.add_edge(n[0],o[0], weight =   gauss(1.0))
-                 #if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2):
-                 #    g.add_edge(n[0],o[0], weight =   gauss(2.0))
-
-                    #g.add_edge(n[0],o[0], weight = gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=1):
-                 #    g.add_edge(n[0],o[0], weight =  gauss(1.0))
-                 #elif is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=3):
-                 #   g.add_edge(n[0],o[0], weight = gauss(3.0))
-                    #g.add_edge(n[0],o[0], weight =  numpy.min([n[1]['weight'], o[1]['weight']])  )
-                    #print  ( n[1]['weight'] + o[1]['weight']) / 2.0
-                #    print 'True'
-                #else:
-                #    print 'False' 
-    """
-    for i in xrange(0,3):
-        to_add = []
-        for n in g.nodes(data=True):
-            for o in g.nodes(data=True):
-                if o[0] > n[0]:
-                    if share_neighbors( o, n,g ):
-                        to_add.append((o[0],n[0]))
-                    #g.add_edge(n[0],o[0])
-        for i,j in to_add:
-            g.add_edge(i,j, weight=1.0)
-    """
-    #add_loops( g )
-    #for i in xrange(0,3)
-    #add_loops_node_graph( g )
-    #write_edge_scores( g, true_map )
-    #nx.draw_spring(g)
-    #plt.show()
     return g, pers
 
 
