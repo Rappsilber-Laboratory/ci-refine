@@ -636,7 +636,7 @@ def draw_graph( graph, true_map ):
         #for clust in all_clust:
     #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
     """
-    plt.show()
+    #plt.show()
 def clean_sec_structs(sec_struct):
 
     for i in xrange(2,len(sec_struct)-1):
