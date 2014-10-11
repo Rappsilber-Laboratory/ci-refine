@@ -9,7 +9,7 @@ file = open("../../data/datasets/ciss_set.txt", "r")
 #lens = [2.0]
 #alphas = [0.4]
 lens = [2.0]
-alphas = [0.6]
+alphas = [0.4]
 
 if os.path.exists("../../results/29-08-14/%s/"%git_tag.get_branch()):
     pass
