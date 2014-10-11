@@ -501,6 +501,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         pers[index] = score
         index += 1
     """
+    """
     for i in xrange(0,3):
         to_add = []
         for n in g.nodes(data=True):
@@ -511,7 +512,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     #g.add_edge(n[0],o[0])
         for i,j in to_add:
             g.add_edge(i,j, weight=0.1)
-
+    """
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
