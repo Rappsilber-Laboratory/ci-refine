@@ -501,6 +501,17 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         pers[index] = score
         index += 1
     """
+    for i in xrange(0,3):
+        to_add = []
+        for n in g.nodes(data=True):
+            for o in g.nodes(data=True):
+                if o[0] > n[0]:
+                    if share_neighbors( o, n,g ):
+                        to_add.append((o[0],n[0]))
+                    #g.add_edge(n[0],o[0])
+        for i,j in to_add:
+            g.add_edge(i,j, weight=0.001)
+
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
@@ -535,6 +546,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
+
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
@@ -556,16 +568,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     #    if not sec_struct_shift_dict.has_key(shift_tuple):
                     #        g.add_edge(n[0],o[0], weight=0.001)
 
-    for i in xrange(0,3):
-        to_add = []
-        for n in g.nodes(data=True):
-            for o in g.nodes(data=True):
-                if o[0] > n[0]:
-                    if share_neighbors( o, n,g ):
-                        to_add.append((o[0],n[0]))
-                    #g.add_edge(n[0],o[0])
-        for i,j in to_add:
-            g.add_edge(i,j, weight=0.001)
+
     write_edge_scores(g, true_map)
     return g, pers
 
