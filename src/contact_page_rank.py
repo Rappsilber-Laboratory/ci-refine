@@ -510,7 +510,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                         to_add.append((o[0],n[0]))
                     #g.add_edge(n[0],o[0])
         for i,j in to_add:
-            g.add_edge(i,j, weight=0.001)
+            g.add_edge(i,j, weight=0.1)
 
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
