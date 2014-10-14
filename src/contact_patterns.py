@@ -87,7 +87,7 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     sec_upper = sec_struct.ss_dict[j]
                     all_shifts = sec_struct_pair_types[(sec_lower,sec_upper)][0]
                     for i_shift, j_shift in shift_mat:
-                        if abs((i+i_shift)-(j+j_shift)) >= 12:
+                        if abs((i+i_shift)-(j+j_shift)) >= 1:
                             dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
                             if dist_shift <= 9.0:
                                 if all_shifts.has_key((i_shift, j_shift)):
