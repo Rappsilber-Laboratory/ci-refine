@@ -80,7 +80,7 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     all_contacts = 0
     for i in xrange(9, structure.get_number_of_residues()+1-9):
         for j in xrange(i+1, structure.get_number_of_residues()+1-9):
-            if abs(i-j) >= 12:
+            if abs(i-j) >= 1:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
                 if distance <= 8.0:
                     sec_lower = sec_struct.ss_dict[i]
