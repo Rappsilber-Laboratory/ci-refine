@@ -8,9 +8,10 @@ file = open("../../data/datasets/ciss_set.txt", "r")
 #lens = [1.0,1.5,2.0]
 #lens = [2.0]
 #alphas = [0.4]
-lens = [2.0]
-alphas = [0.4]
-
+#lens = [2.0]
+#alphas = [0.4]
+alphas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
+lens = [1.0,1.5,2.0,2.5,3.0]
 if os.path.exists("../../results/29-08-14/%s/"%git_tag.get_branch()):
     pass
 else:

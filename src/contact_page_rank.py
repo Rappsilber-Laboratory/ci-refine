@@ -468,9 +468,9 @@ def write_edge_scores( graph, true_contacts ):
 
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
-    tmp_struct = StructureContainer.StructureContainer()
-    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    true_map = tmp_struct.get_contact_map().print_res_format()
+    #tmp_struct = StructureContainer.StructureContainer()
+    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+    #true_map = tmp_struct.get_contact_map().print_res_format()
     #xl_data = true_map
     g = nx.Graph()
     index = 1
@@ -570,7 +570,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     #        g.add_edge(n[0],o[0], weight=0.001)
 
 
-    write_edge_scores(g, true_map)
+    #write_edge_scores(g, true_map)
     return g, pers
 
 
@@ -856,7 +856,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_4.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts.p", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
