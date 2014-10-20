@@ -34,9 +34,9 @@ options, args  = add_options( parser )
 
 def shift_matrix():
     matrix = []
-    for i in xrange(-8,9):
+    for i in xrange(-7,8):
         row = []
-        for j in xrange(-8,9):
+        for j in xrange(-7,8):
             if i == 0 and j == 0:
                 pass
             else:
@@ -94,7 +94,7 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                                     if dist_shift <= 8.0:
                                         all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + 1.0
                                     elif dist_shift <= 50.0:
-                                        all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + np.exp(-1.0* ((dist_shift-8.0)**2/0.01))
+                                        all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + np.exp(-1.0* ((dist_shift-8.0)**2/0.05))
                                 else:
                                     all_shifts[(i_shift, j_shift)] = 1.0
                     all_contacts += 1
