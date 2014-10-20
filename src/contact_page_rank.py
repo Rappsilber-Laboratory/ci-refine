@@ -466,6 +466,29 @@ def write_edge_scores( graph, true_contacts ):
     print "CLASS",  numpy.mean(class_pos), numpy.mean(class_neg), numpy.mean(class_neg_pos)
     #draw_graph(graph,true_dict)
 
+def get_sec_struct_limits(ss_dict,i):
+    anchor = ss_dict[i]
+    pos = i
+    lower_pos = i
+    upper_pos = i
+    #pdb.set_trace()
+    for j in xrange(1,20):
+        if ss_dict.has_key(i-j):
+            if anchor == ss_dict[i-j]:
+                lower_pos-=1
+            else:
+                pass
+        else:
+            break
+    for j in xrange(1,20):
+        if ss_dict.has_key(i+j):
+            if anchor == ss_dict[i+j]:
+                upper_pos+=1
+            else:
+                pass
+        else:
+            return [ i for i in xrange(lower_pos, upper_pos+1) ]
+    return [ i for i in xrange(lower_pos, upper_pos+1) ]
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
     #tmp_struct = StructureContainer.StructureContainer()
@@ -516,6 +539,19 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
+        ss_lim_i = get_sec_struct_limits(sec_struct,n[1]['xl'][0])
+        ss_lim_j = get_sec_struct_limits(sec_struct,n[1]['xl'][1])
+        ss_len_i = ss_lim_i[-1] - ss_lim_i[0]
+        ss_len_j = ss_lim_j[-1] - ss_lim_j[0]
+        if ss_len_i > 20:
+            ss_len_i = 20
+        if ss_len_j > 20:
+            ss_len_j = 20
+        if ss_len_i < 1:
+            ss_len_i = 1
+        if ss_len_j < 1:
+            ss_len_j = 1
+        print ss_len_i, ss_len_j
         """
         if sol[n[1]['xl'][0]] < 0.3:
             sol_lower = "B"
@@ -542,12 +578,13 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
        # sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
-        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
+        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,ss_len_i,ss_len_j)]
+       # print sec_struct_shift_dict
         #pseudo_shift = {}
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
-
+        print sec_struct_shift_dict
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
@@ -897,7 +934,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_sigma_0.05.txt", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts_ss_len.p", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
