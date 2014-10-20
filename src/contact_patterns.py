@@ -34,9 +34,9 @@ options, args  = add_options( parser )
 
 def shift_matrix():
     matrix = []
-    for i in xrange(-7,8):
+    for i in xrange(-9,10):
         row = []
-        for j in xrange(-7,8):
+        for j in xrange(-9,10):
             if i == 0 and j == 0:
                 pass
             else:
