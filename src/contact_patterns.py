@@ -80,7 +80,7 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     all_contacts = 0
     for i in xrange(9, structure.get_number_of_residues()+1-9):
         for j in xrange(i+1, structure.get_number_of_residues()+1-9):
-            if abs(i-j) >= 1:
+            if abs(i-j) >= 12:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
                 if distance <= 8.0:
                     sec_lower = sec_struct.ss_dict[i]
@@ -89,12 +89,12 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     for i_shift, j_shift in shift_mat:
                         if abs((i+i_shift)-(j+j_shift)) >= 1:
                             dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
-                            if dist_shift <= 9.0:
+                            if dist_shift <= 8.5:
                                 if all_shifts.has_key((i_shift, j_shift)):
                                     if dist_shift <= 8.0:
                                         all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + 1.0
-                                    elif dist_shift <= 9.0:
-                                        all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + np.exp(-1.0* ((dist_shift-8.0)**2/0.2))
+                                    elif dist_shift <= 50.0:
+                                        all_shifts[(i_shift, j_shift)] = all_shifts[(i_shift, j_shift)] + np.exp(-1.0* ((dist_shift-8.0)**2/0.05))
                                 else:
                                     all_shifts[(i_shift, j_shift)] = 1.0
                     all_contacts += 1
