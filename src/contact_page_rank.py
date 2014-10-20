@@ -897,7 +897,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_sr.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts_sigma_0.05.txt", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
