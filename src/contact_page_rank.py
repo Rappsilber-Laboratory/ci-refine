@@ -570,9 +570,50 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
                     #        g.add_edge(n[0],o[0], weight=0.001)
 
 
+    #print average_weight(g)
+    #g = graph_monte_carlo(g)
+    print len(g.edges())
+    #print average_weight(g)
     #write_edge_scores(g, true_map)
+    #g = remove_weight_percentile(g)
     return g, pers
 
+
+def graph_monte_carlo(g):
+    old_score = average_weight(g)
+    old_graph = nx.Graph(g)
+    #print average_weight(old_graph)
+    for i in xrange(0,500):
+        random_edge = random.sample(g.edges(data=True), 1)
+        #print random_edge
+        g.remove_edge(random_edge[0][0],random_edge[0][1])
+        new_score = average_weight(g)
+        if new_score > old_score:
+            old_graph = nx.Graph(g)
+            old_score = new_score
+            #print len(g.edges())
+           # print "Move accepted"
+        else:
+            g = nx.Graph(old_graph)
+    #print average_weight(g)
+    return g
+
+def average_weight(graph):
+    average_weight = []
+    for i in graph.edges(data=True):
+        average_weight.append(i[2]['weight'])
+    return numpy.mean(average_weight)
+
+def remove_weight_percentile(graph):
+    average_weight = []
+    for i in graph.edges(data=True):
+        average_weight.append(i[2]['weight'])
+
+    perc =  numpy.percentile(average_weight,10)
+    for i in graph.edges(data=True):
+        if i[2]['weight'] < perc:
+            graph.remove_edge(i[0],i[1])
+    return graph
 
 def which_clust(i, all_clust):
     for clust in all_clust:
