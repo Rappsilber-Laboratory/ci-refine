@@ -83,8 +83,8 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
             if abs(i-j) >= 12:
                 distance = structure.get_contact_map().get_mapped_distance(i,j)
                 if distance <= 8.0:
-                    sec_lower = sec_struct.ss_dict[i]
-                    sec_upper = sec_struct.ss_dict[j]
+                    sec_lower = sec_struct[i]
+                    sec_upper = sec_struct[j]
                     all_shifts = sec_struct_pair_types[(sec_lower,sec_upper)][0]
                     for i_shift, j_shift in shift_mat:
                         if abs((i+i_shift)-(j+j_shift)) >= 1:
@@ -101,6 +101,15 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     sec_struct_pair_types[(sec_lower,sec_upper)] = ( all_shifts, all_contacts )
     return all_contacts
     #return all_contacts
+
+def clean_sec_structs(sec_struct):
+
+    for i in xrange(2,len(sec_struct)-1):
+        if sec_struct[i-1] == sec_struct[i+1]:
+            if sec_struct[i-1] == "H" or sec_struct[i-1] == "E":
+                if sec_struct[i] == 'C':
+                    sec_struct[i] = sec_struct[i-1]
+
 def main():
     
     """Generic main function. Executes main functionality of program
@@ -135,7 +144,8 @@ def main():
         pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
         tmp_struct = StructureContainer.StructureContainer()
         sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)
-
+        sec_struct = sec_struct.ss_dict
+        clean_sec_structs(sec_struct)
         print pdb_id
         try:
             tmp_struct.load_structure('xxxx', pdb_id[-1],pdb_file, seqsep =1)
