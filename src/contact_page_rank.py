@@ -477,7 +477,7 @@ def get_sec_struct_limits(ss_dict,i):
             if anchor == ss_dict[i-j]:
                 lower_pos-=1
             else:
-                pass
+                break
         else:
             break
     for j in xrange(1,20):
@@ -485,7 +485,7 @@ def get_sec_struct_limits(ss_dict,i):
             if anchor == ss_dict[i+j]:
                 upper_pos+=1
             else:
-                pass
+                break
         else:
             return [ i for i in xrange(lower_pos, upper_pos+1) ]
     return [ i for i in xrange(lower_pos, upper_pos+1) ]
@@ -934,7 +934,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_len_ss.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts_real_ss.p", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
