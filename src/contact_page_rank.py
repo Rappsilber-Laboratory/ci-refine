@@ -551,7 +551,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
             ss_len_i = 1
         if ss_len_j < 1:
             ss_len_j = 1
-        print ss_len_i, ss_len_j
+        #print ss_len_i, ss_len_j
         """
         if sol[n[1]['xl'][0]] < 0.3:
             sol_lower = "B"
@@ -584,7 +584,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
-        print sec_struct_shift_dict
+        #print sec_struct_shift_dict
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
@@ -934,11 +934,12 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_ss_len.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts_len_ss.p", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
    #normalize_per_position(clust_aligns)
+   #print shift_dict
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
    #print xl_data
    #print xl_data[0][0]
@@ -955,7 +956,7 @@ def main():
    #for e in xl_graph.edges(data=True):
    #    print e
    #return 0
-   print xl_graph.number_of_edges()
+   #print xl_graph.number_of_edges()
    #xl_graph,pers = build_xl_graph(xl_data)
    do_page_rank(xl_graph,pers,xl_data[:int(options.length*options.top)],options.alpha)
 
