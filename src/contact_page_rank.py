@@ -408,6 +408,17 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
+def is_same_sec_struct(tuple1,tuple2,ss_dict):
+
+    ss_i_1 = get_sec_struct_limits(ss_dict,tuple1[0])
+    ss_i_2 = get_sec_struct_limits(ss_dict,tuple1[1])
+
+    if tuple2[0] in ss_i_1 or tuple2[1] in ss_i_1:
+        if tuple2[1] in ss_i_2 or tuple2[0] in ss_i_2:
+            return True
+
+    return False
+
 def write_edge_scores( graph, true_contacts ):
     true_dict = vec_to_dict(true_contacts,0,1)
     class_neg  = []
@@ -579,24 +590,24 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
        # sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
-        #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,ss_len_i,ss_len_j)]
+        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
        # print sec_struct_shift_dict
         #pseudo_shift = {}
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
         #print sec_struct_shift_dict
-        sec_struct_shift_dict = True
+        #sec_struct_shift_dict = True
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
             for o in g.nodes(data=True):
                 if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
-                    if is_same_sec_struct(n[1]['xl'],o[1]['xl'],sec_struct):
-                        same_type = 'same'
-                    else:
-                        same_type = 'not_same'
-                    sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,same_type)]
+                    #if is_same_sec_struct(n[1]['xl'],o[1]['xl'],sec_struct):
+                    #    same_type = 'same'
+                    #else:
+                    #    same_type = 'not_same'
+                    #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,same_type)]
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
                     dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
@@ -916,6 +927,7 @@ def main():
    #sys.exit(main())
    #xl_data = load_xl_data( options.example )
    #sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(options.pdb_file)
+   #sec_struct = sec_struct.ss_dict
    #buried_features = ResidueFeatureRelSasa.ResidueFeatureRelSasa(options.pdb_file)
    bur_dict = {}
    #for i in xrange(1,options.length+1):
@@ -925,7 +937,10 @@ def main():
    #return 0
 
    sec_struct = parse_psipred(options.psipred_file)
-   clean_sec_structs(sec_struct)
+   #print sec_struct.ss_dict
+   #clean_sec_structs(sec_struct)
+   #sec_struct = new_sec_struct
+  # print sec_struct
    #parse_scores(scores_file)
    #print sec_struct
    #
@@ -940,7 +955,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/same_shifts.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/shifts_sigma_0.05.txt", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
