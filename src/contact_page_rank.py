@@ -501,11 +501,30 @@ def get_sec_struct_limits(ss_dict,i):
             return [ i for i in xrange(lower_pos, upper_pos+1) ]
     return [ i for i in xrange(lower_pos, upper_pos+1) ]
 
+def gauss_filter_probs(xl_data, length):
+    x = numpy.array(numpy.zeros((options.length, options.length), numpy.float))
+    for i, score in xl_data[:length]:
+        x[i[0]-1][i[1]-1] = score
+    import scipy.ndimage.filters as filters
+    x = filters.gaussian_filter(x, 0.5)
+    new_data = []
+    for row in xrange(0,x.shape[0]):
+        for col in  xrange(0,x.shape[1]):
+            if col > row:
+                new_data.append((x[row][col], (row+1,col+1)) )
+    new_data.sort()
+    new_data.reverse()
+    return new_data[:length]
+
+
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
     #tmp_struct = StructureContainer.StructureContainer()
     #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     #true_map = tmp_struct.get_contact_map().print_res_format()
     #xl_data = true_map
+    #xl_data = gauss_filter_probs(xl_data, length)
+    #print len(xl_data)
+    #print xl_data
     g = nx.Graph()
     index = 1
     pers = {}
