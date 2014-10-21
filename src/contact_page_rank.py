@@ -539,18 +539,19 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
-        ss_lim_i = get_sec_struct_limits(sec_struct,n[1]['xl'][0])
-        ss_lim_j = get_sec_struct_limits(sec_struct,n[1]['xl'][1])
-        ss_len_i = ss_lim_i[-1] - ss_lim_i[0]
-        ss_len_j = ss_lim_j[-1] - ss_lim_j[0]
-        if ss_len_i > 20:
-            ss_len_i = 20
-        if ss_len_j > 20:
-            ss_len_j = 20
-        if ss_len_i < 1:
-            ss_len_i = 1
-        if ss_len_j < 1:
-            ss_len_j = 1
+
+        #ss_lim_i = get_sec_struct_limits(sec_struct,n[1]['xl'][0])
+        #ss_lim_j = get_sec_struct_limits(sec_struct,n[1]['xl'][1])
+        #ss_len_i = ss_lim_i[-1] - ss_lim_i[0]
+        #ss_len_j = ss_lim_j[-1] - ss_lim_j[0]
+        #if ss_len_i > 20:
+        #    ss_len_i = 20
+        #if ss_len_j > 20:
+        #    ss_len_j = 20
+        #if ss_len_i < 1:
+        #    ss_len_i = 1
+        #if ss_len_j < 1:
+        #    ss_len_j = 1
         #print ss_len_i, ss_len_j
         """
         if sol[n[1]['xl'][0]] < 0.3:
@@ -578,19 +579,24 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
         #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
         #print clust_aligns[(sec_lower, sec_upper)]
        # sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
-        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,ss_len_i,ss_len_j)]
+        #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,ss_len_i,ss_len_j)]
        # print sec_struct_shift_dict
         #pseudo_shift = {}
         #pseudo_shift[0] = sec_struct_shift_dict
         #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
         #break
         #print sec_struct_shift_dict
+        sec_struct_shift_dict = True
         if sec_struct_shift_dict != False:
             #sec_struct_shift_dict = shift_dict[(lowest_clust)]
             a = 'a'
             for o in g.nodes(data=True):
                 if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
-
+                    if is_same_sec_struct(n[1]['xl'],o[1]['xl'],sec_struct):
+                        same_type = 'same'
+                    else:
+                        same_type = 'not_same'
+                    sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,same_type)]
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
                     dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
@@ -934,7 +940,7 @@ def main():
    #print
    #print i
    #return 0
-   shift_dict = cPickle.load(open( "../probabilities/shifts_real_ss.p", "rb" ))
+   shift_dict = cPickle.load(open( "../probabilities/same_shifts.p", "rb" ))
    #print shift_dict[('E','H')]
    #clust_aligns = get_clustered_aligns(shift_dict)
    #normalize_per_position(clust_aligns)
