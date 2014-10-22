@@ -1,8 +1,8 @@
 import os 
 import git_tag
 
-file = open("../../data/datasets/ciss_set.txt")
-#file = open("../../data/datasets/compiled_sequences_with_seq_dist.txt")
+#file = open("../../data/datasets/ciss_set.txt")
+file = open("../../data/datasets/compiled_sequences_with_seq_dist.txt")
 #alphas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
 #lens = [1,1.5,2,2.5,3.0]
 lens = [2.0]
@@ -25,8 +25,9 @@ for line in file:
                             #"-c ../../../rbocon_2.0/results/phy_cm_results/%sRRPCM_1"%(pdb), 
                             "-l %s"%l,
                             "-p %s"%pdb,
-                            "-f /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
-                            "-s /scratch/schneider/projects/rbocon_2.0/data/rbo_test/sec_struct/%s.psipred"%pdb,
+                            #"-f /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
+                            "-f /scratch/schneider/projects/pagerank_refinement/data/pdb/%s.pdb"%(pdb),
+                            "-s /scratch/schneider/projects/rbocon_2.0/data/rbo_test/sec_struct2/%s.psipred"%pdb,
                             "-t %s"%t,
                             "-a %s"%a,
                             "-o ../../results/29-08-14/%s/"%git_tag.get_branch()])
