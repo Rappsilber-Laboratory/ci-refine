@@ -528,7 +528,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
     g = nx.Graph()
     index = 1
     pers = {}
-    for i, score in xl_data[:length]:
+    for score, i in xl_data[:length]:
         g.add_node(index, xl=i, weight = score)
         pers[index] = score
         index += 1    

@@ -156,12 +156,15 @@ class InputOutput:
                              if counter == 0:
                                 norm = float(strline[-1])
                              #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
-                             res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1])  )))
+                             res.append( ((float(strline[-1]) , ( int(strline[0]), int(strline[1])))))
                              res_dict[(int(strline[0]), int(strline[1]))] = 1
                              res_dict[(int(strline[1]), int(strline[0]))] = 1
                              counter += 1
+
+
         file.close()
-        #res.sort()
-        #res.reverse()
+        res.sort()
+        res.reverse()
+       # print res
         return res
 

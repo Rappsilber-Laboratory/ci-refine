@@ -10,5 +10,5 @@ source /scratch/schneider/projects/casp_infra/src/casp/.bashrc
 #which python
 #/scratch/mahmoud/local/bin/python2.7 contact_patterns.py  -p ../data/datasets/h_1.txt
 #/scratch/mahmoud/local/bin/python2.7 contact_patterns.py  -p ../data/datasets/epc_map_trainset_before_casp10.txt
-#/scratch/mahmoud/local/bin/python2.7 do_all.py
+/scratch/mahmoud/local/bin/python2.7 do_all.py
 /scratch/mahmoud/local/bin/python2.7 check_con.py
