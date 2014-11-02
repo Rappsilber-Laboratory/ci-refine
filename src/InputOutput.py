@@ -57,7 +57,7 @@ class InputOutput:
         return xls
     """
 
-
+    @staticmethod
     def read_fasta( fasta_file ):
         file = open( fasta_file,'r' )
         sequence = ''
@@ -69,21 +69,24 @@ class InputOutput:
         return sequence
     
     @staticmethod
-    def write_restraint_file( restraint_object, restraint_file_name ):
+    def write_restraint_file( restraint_object, restraint_file_name, backbone = True, upper_distance = 8.0, sigma = 2.0 ):
         file = open( restraint_file_name, 'w' )
         for c_lower, atom_lower, c_upper, atom_upper, prob in restraint_object:
+            if backbone == True:
+                if atom_lower == 'G':
+                    atom_1 = "CA"
+                else:
+                    atom_1 = "CB"
             
-            if atom_lower == 'G':
-                atom_1 = "CA"
+                if atom_upper == 'G':
+                    atom_2 = "CA"
+                else:
+                    atom_2 = "CB"
             else:
-                atom_1 = "CB"
-            
-            if atom_upper == 'G':
-                atom_2 = "CA"
-            else:
-                atom_2 = "CB"
-            
-            file.write( "AtomPair %s  %s %s  %s BOUNDED  %s %s %s NOE \n"%(atom_1,c_lower,atom_2, c_upper, 1.5 ,8.0, 2.0) )
+                atom_1 = atom_lower
+                atom_2 = atom_upper
+
+            file.write( "AtomPair %s  %s %s  %s BOUNDED  %s %s %s NOE \n"%(atom_1,c_lower,atom_2, c_upper, 1.5, upper_distance, sigma) )
         file.close()
     
     @staticmethod
@@ -98,6 +101,26 @@ class InputOutput:
                                  "\n"]))
         file.close()
     
+    @staticmethod
+    def load_rosetta_restraints( restraint_file, seq_sep_min = 24, seq_sep_max=9999 ):
+        file = open(restraint_file,"r")
+        res = []
+        res_dict = {}
+        for line in file:
+            strline = str(line).strip().split()
+            if len(strline) > 2:
+                if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
+                    #if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
+                    #if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1]))) == False:
+                    res.append( (int(strline[2]), int(strline[4]) ) )
+                    # res_dict[(int(strline[0]), int(strline[1]))] = 1
+                    # res_dict[(int(strline[1]), int(strline[0]))] = 1
+        file.close()
+        res.sort()
+        res.reverse()
+        return res
+
+
     @staticmethod
     def load_restraints( restraint_file, seq_sep_min = 24, seq_sep_max=9999 ):
         file = open(restraint_file,"r")
@@ -117,6 +140,8 @@ class InputOutput:
         res.reverse()
         return res
 
+
+    """
     @staticmethod
     def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):
         file = open(restraint_file,"r")
@@ -140,6 +165,7 @@ class InputOutput:
         #res.sort()
         #res.reverse()
         return res
+    """
 
     @staticmethod
     def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):

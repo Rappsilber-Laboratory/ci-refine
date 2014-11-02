@@ -1,8 +1,8 @@
 import os
 import git_tag
 
-file = open("../../data/datasets/casp10_len_seq.txt")
-#file = open("../../data/datasets/ciss_set.txt", "r")
+#file = open("../../data/datasets/casp10_len_seq.txt")
+file = open("../../data/datasets/ciss_set.txt", "r")
 #file = open("../../data/datasets/compiled_sequences_with_seq_dist.txt")
 
 #alphas = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8]
@@ -35,8 +35,8 @@ for line in file:
                             #"--restraint_file /scratch/schneider/results/graph_kernel_svm/bin_features/psicov_1/gamma_0.001/mi_mid_test/filtered_results/verify_test/%sRRNone_1"%(pdb),
                             "--restraint_file ../../results/29-08-14/%s/%sRRPAR_%s_%s"%(git_tag.get_branch(),pdb,a,t),
                             #"--restraint_file ../../../rbocon_2.0/results/phy_cm_results/%sRRPCM_1"%(pdb),
-                            #"--pdb /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
-                            "--pdb /scratch/schneider/projects/pagerank_refinement/data/pdb/%s.pdb"%(pdb),
+                            "--pdb /scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb[0:4],pdb),
+                            #"--pdb /scratch/schneider/projects/pagerank_refinement/data/pdb/%s.pdb"%(pdb),
                             "--len %s"%l,
                             "--pdb_id %s"%pdb,
                             "--top 2",
