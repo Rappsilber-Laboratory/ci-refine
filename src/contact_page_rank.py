@@ -167,16 +167,16 @@ def gauss(x,a=1.0,b=1.0,c=1.0):
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #all_scores = {}
     #edge_denom = float(2 * len(xl_graph.edges()))
-    ranked_nodes = xl_graph.degree()
+    degrees = xl_graph.degree()
 
     #for i in xl_graph.nodes():
     #    all_scores[i] = 0.0
     #alphas = [0.85]
     #print pers
-    #ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=degrees)
     #for a in alphas:
-
-       # ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
+#
+    #ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
     #    print "Computing PageRank for Alpha:", a
     #    for node, score in ranked_nodes.iteritems():#
 
