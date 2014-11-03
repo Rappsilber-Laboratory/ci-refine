@@ -166,6 +166,9 @@ def gauss(x,a=1.0,b=1.0,c=1.0):
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #all_scores = {}
+    edge_denom = float(2 * len(xl_graph.edges()))
+    degrees = xl_graph.degree()
+
     #for i in xl_graph.nodes():
     #    all_scores[i] = 0.0
     #alphas = [0.85]
@@ -182,7 +185,7 @@ def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #    all_scores[node] = all_scores[node]*input_alpha + ( (1.0 -input_alpha)* score)
     #ranked_nodes = nx.degree_centrality(xl_graph)
     #print ranked_nodes
-    for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
+    for_sorting = [ (score / (degrees[node] / edge_denom), node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
     for_comp = []
     for_sorting.sort()
     for_sorting.reverse()
