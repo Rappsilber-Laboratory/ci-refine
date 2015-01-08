@@ -165,6 +165,9 @@ def gauss(x,a=1.0,b=1.0,c=1.0):
     return a * numpy.exp( -1.0 * ( (x-b)**2/2*c**2) )
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
+    tmp_struct = StructureContainer.StructureContainer()
+    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+    true_map = tmp_struct.get_contact_map().print_res_format()
     #all_scores = {}
     #edge_denom = float(2 * len(xl_graph.edges()))
     #degrees = xl_graph.degree()
@@ -173,11 +176,12 @@ def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #    all_scores[i] = 0.0
     #alphas = [0.85]
     #print pers
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)
+    #ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=0.85, tol=1e-04,personalization=pers)
+    #print ranked_nodes
+
     #for a in alphas:
 #
-    #ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
-    #    print "Computing PageRank for Alpha:", a
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
     #    for node, score in ranked_nodes.iteritems():#
 
     #        all_scores[node] = all_scores[node] + score
@@ -185,6 +189,9 @@ def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #    all_scores[node] = all_scores[node]*input_alpha + ( (1.0 -input_alpha)* score)
     #ranked_nodes = nx.degree_centrality(xl_graph)
     #print ranked_nodes
+    true_dict = vec_to_dict(true_map,0,1)
+    print clust_graph(xl_graph)
+    draw_graph(xl_graph, true_dict, ranked_nodes, clust = None)
     for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
     for_comp = []
     for_sorting.sort()
@@ -422,13 +429,13 @@ def is_same_sec_struct(tuple1,tuple2,ss_dict):
 
     return False
 
-def write_edge_scores( graph, true_contacts ):
+def write_edge_scores( graph, true_contacts, pers ):
     true_dict = vec_to_dict(true_contacts,0,1)
     class_neg  = []
     class_pos  = []
     class_neg_pos = []
     all_class = []
-    draw_graph(graph,true_dict)
+    #draw_graph(graph,true_dict, pers)
     #print graph.nodes(data=True)
     #print graph.nodes()[96]
     for e in graph.edges(data=True):
@@ -521,9 +528,9 @@ def gauss_filter_probs(xl_data, length):
 
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
-    #tmp_struct = StructureContainer.StructureContainer()
-    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    #true_map = tmp_struct.get_contact_map().print_res_format()
+    tmp_struct = StructureContainer.StructureContainer()
+    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+    true_map = tmp_struct.get_contact_map().print_res_format()
     #xl_data = true_map
     #xl_data = gauss_filter_probs(xl_data, length)
     #print len(xl_data)
@@ -650,7 +657,7 @@ def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
     #g = graph_monte_carlo(g)
     print len(g.edges())
     #print average_weight(g)
-    #write_edge_scores(g, true_map)
+    #write_edge_scores(g, true_map, pers)
     #g = remove_weight_percentile(g)
     return g, pers
 
@@ -705,7 +712,7 @@ def clust_graph(graph):
     max_num_clust = 0
     all_clust = []
     for i in xrange(2,8):
-        spec = cluster.SpectralClustering(n_clusters=i)
+        spec = cluster.KMeans(n_clusters=i)
         labels = spec.fit_predict(A)
         score = metrics.silhouette_score(A, labels, metric='euclidean')
         if score > max_score:
@@ -728,26 +735,30 @@ def clust_graph(graph):
     #print
     #print len(labels)
     #print labels
-def draw_graph( graph, true_map ):
+def draw_graph( graph, true_map, pers, clust=None ):
     true_nodes = []
     false_nodes = []
     #false_true_nodes = []
+    true_pers = []
+    false_pers = []
     for n in graph.nodes(data=True):
         if true_map.has_key(n[1]['xl']):
             true_nodes.append(n[0])
+            true_pers.append( int(pers[n[0]]*10000))
         else:
             false_nodes.append(n[0])
+            false_pers.append( int(pers[n[0]]*10000))
     pos=nx.spring_layout(graph)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=50, alpha=0.8)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=50, alpha=0.9)
-    #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
+    #if clust != None:
+
+    nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=true_pers, alpha=0.8)
+    nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=false_pers, alpha=0.9)
+    nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
 
     #clust_1 = [i+1 for i,j in enumerate(labels) if j == 0]
     #clust_2 = [i+1 for i,j in enumerate(labels) if j == 1]
     #clust_3 = [i+1 for i,j in enumerate(labels) if j == 2]
-    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_1, node_color='b', node_size=50, alpha=0.8)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_2, node_color='r', node_size=50, alpha=0.9)
-    #nx.draw_networkx_nodes(graph,pos, nodelist=clust_3, node_color='g', node_size=50, alpha=0.9)
+
     #all_clust = [clust_1,clust_2,clust_3]
     """
     all_clust = clust_graph(graph)
@@ -768,7 +779,7 @@ def draw_graph( graph, true_map ):
         #for clust in all_clust:
     #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
     """
-    #plt.show()
+    plt.show()
 def clean_sec_structs(sec_struct):
 
     for i in xrange(2,len(sec_struct)-1):
