@@ -8,7 +8,7 @@ class InputOutput:
 
 
     @staticmethod
-    def load_xl_data( xl_file ):
+    def load_xl_data( xl_file, offset ):
         col_names = {}
         max_score = 0
         xls = []
@@ -20,14 +20,14 @@ class InputOutput:
             else:
                 line = line.split(',')
 
-                from_site = int(line[col_names['fromSite']])
-                to_site = int(line[col_names['ToSite']])
+                from_site = int(line[col_names['fromSite']]) + offset
+                to_site = int(line[col_names['ToSite']]) + offset
                 score = float(line[col_names['Score']])
                 is_decoy = line[col_names['isDecoy']]
 
 
 
-                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and (is_decoy == 'false' or is_decoy=='FALSE'):
+                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
                     xls.append(((from_site, to_site), score/max_score))

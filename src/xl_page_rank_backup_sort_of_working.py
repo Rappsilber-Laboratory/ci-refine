@@ -19,6 +19,8 @@ def add_options( parser ):
     """Generic options function to specify command line inputs
     """
     parser.add_option("-e", type="string", dest="example", help="An example")
+    parser.add_option("-o", type="int", dest="offset", help="offset")
+
     options, args = parser.parse_args()
     return options, args 
 
@@ -157,7 +159,7 @@ def build_xl_graph( xl_data ):
     pers = {}
     for i, score in xl_data:
         #print i
-        g.add_node(index, xl=i, weight = score)
+        g.add_node(index, xl=i)#, weight = score)
         pers[index] = score
         index += 1    
 
@@ -186,7 +188,7 @@ def main():
    #tg = toy_graph()
    #has_loop(2,4,tg)
    #sys.exit()
-   xl_data, gt_data = InputOutput.InputOutput.load_xl_data( options.example )
+   xl_data, gt_data = InputOutput.InputOutput.load_xl_data( options.example,options.offset )
    InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
 
    #sys.exit()
