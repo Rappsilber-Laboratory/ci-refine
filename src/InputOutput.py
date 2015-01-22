@@ -27,7 +27,7 @@ class InputOutput:
 
 
 
-                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and is_decoy == 'false':
+                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
                     xls.append(((from_site, to_site), score/max_score))
