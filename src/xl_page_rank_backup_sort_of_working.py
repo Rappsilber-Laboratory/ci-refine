@@ -191,29 +191,18 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
     is_nei = False
     t_1 = return_sorted_tuple(tuple_1)
     t_2 = return_sorted_tuple(tuple_2)
-    t_1_lower = t_1[0]
-    t_2_lower =	t_2[0]
-    t_1_upper =	t_1[1]
-    t_2_upper =	t_2[1]
-    #pdb.set_trace()
-    t_1_low_nei = [ t_1_lower + i for i in xrange(-1*delta, 1*delta+1)]
-    t_2_low_nei = [ t_2_lower + i for i in xrange(-1*delta, 1*delta+1)]
-    t_1_up_nei =  [ t_1_upper + i for i in xrange(-1*delta, 1*delta+1)]
-    t_2_up_nei	= [ t_2_upper + i for i in xrange(-1*delta, 1*delta+1)]
     m_1 = 0
-    for i in t_1_low_nei:
-        for j in t_2_low_nei:
-            if i == j:
-                m_1 = 1
-    m_2	= 0
-    for	i in t_1_up_nei:
-        for j in t_2_up_nei:
-            if i == j:
-                m_2 = 1
+    m_2 = 0
+
+    if abs(t_1[0] - t_2[0]) <= delta:
+        m_1 = 1
+    if abs(t_1[1] - t_2[1]) <= delta:
+        m_2 = 1
 
     if double:
         if m_1 == 1 and m_2 == 1:
             is_nei = True
+            print t_1, t_2, t_1[0] - t_2[0], t_1[1] - t_2[1]
     else:
         if m_1 == 1 or m_2 == 1:
             is_nei = True
@@ -287,7 +276,7 @@ def build_xl_graph( xl_data ):
     for n in g.nodes(data=True):
         for o in g.nodes(data=True):
             if o[0] > n[0]:
-                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=3):
+                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=6, double=True):
                     g.add_edge(n[0],o[0])#, weight =  numpy.max([n[1]['weight'], o[1]['weight']])  )
 
     #add_loops( g )
