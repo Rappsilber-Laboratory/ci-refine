@@ -18,6 +18,7 @@ import StructureContainer
 import numpy as np
 import pickle
 import cPickle
+from sklearn import cluster, datasets, neighbors
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -76,6 +77,37 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
+def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
+    all_contacts = []
+    for i in xrange(9, structure.get_number_of_residues()+1-9):
+        for j in xrange(i+1, structure.get_number_of_residues()+1-9):
+            if abs(i-j) >= 12:
+                distance = structure.get_contact_map().get_mapped_distance(i,j)
+                if distance <= 8.0:
+                    sec_lower = sec_struct.ss_dict[i]
+                    sec_upper = sec_struct.ss_dict[j]
+                    if sec_lower == sec_struct_types[0] and sec_upper == sec_struct_types[1]:
+                        contact_vector = []
+                        for i_shift, j_shift in shift_mat:
+                            if abs((i+i_shift)-(j+j_shift)) >= 12:
+                                dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
+                                #print dist_shift
+                                if dist_shift <= 8.0:
+                                    contact_vector.append(1.0)
+                                else:
+                                    contact_vector.append(0.0)
+
+                                #else:
+                                #    contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
+                            else:
+                                contact_vector.append(0.0)
+
+                        all_contacts.append(contact_vector)
+    return np.array(all_contacts)
+
+
+
+
 def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     all_contacts = 0
     for i in xrange(9, structure.get_number_of_residues()+1-9):
@@ -110,6 +142,91 @@ def clean_sec_structs(sec_struct):
                 if sec_struct[i] == 'C':
                     sec_struct[i] = sec_struct[i-1]
 
+
+def cluster_shift_maps(shift_map_vector):
+    #from sk
+    print shift_map_vector[1]
+    print shift_map_vector[2]
+    dist = neighbors.DistanceMetric.get_metric('rogerstanimoto')
+    print dist.pairwise(shift_map_vector[0:10])
+    k_means = cluster.Ward(n_clusters = 5)
+    labels =  k_means.fit_predict(shift_map_vector)
+    n_clusters = 5
+    shift_mat = shift_matrix()
+    print labels
+    from collections import Counter
+    res = Counter(labels)
+    print res
+    #num_list = []
+    #for label in xrange(0,50):
+    #    num_list.append((list(k_means.labels_).count(label),label))#
+
+    #num_list.sort()
+    #num_list.reverse()
+
+    #print num_list
+    true = []
+    false = []
+    count = 0
+    shift_dict = {}
+    #for dummy,label in num_list[:n_clusters]:
+    for label in xrange(0,n_clusters):
+        #print list(k_means.labels_).count(label)
+        i_0 = numpy.array([0]*shift_map_vector.shape[1])
+        for i,pred in zip(shift_map_vector, labels):
+            if pred == label:
+                i_0 = i_0 + numpy.array(i)
+
+        for i in xrange(0,i_0.shape[0]):
+            i_0[i] = i_0[i] / float( list(labels).count(label) )
+        sum_prob = numpy.sum([i for i in i_0])
+
+        for i in xrange(0,i_0.shape[0]):
+            i_0[i] = i_0[i] / sum_prob
+        a = numpy.array(i_0)
+
+        for i,pred in zip(shift_map_vector, labels):
+            if pred == label:
+                true.append(numpy.dot(i,a))
+            else:
+                false.append( numpy.dot(i,a))
+
+        all_values = {}
+        for shift, val in zip(shift_mat, a):
+            all_values[shift] = val
+        shift_dict[count] = all_values
+        count+=1
+    return shift_dict
+    #print sec_struct_pair_types
+    #print numpy.mean(true)
+    #print numpy.mean(false)
+
+def load_contact_maps(sec_struct_type):
+    all_c = []
+    shift_mat = shift_matrix()
+    file = open(options.pdb_id_list)
+    all_contacts = 0
+    for line in file:
+        pdb_id = str(line).strip().split()[0][0:5]
+
+        pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
+        tmp_struct = StructureContainer.StructureContainer()
+        sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)
+
+        print pdb_id
+        try:
+            tmp_struct.load_structure('xxxx', pdb_id[-1],pdb_file, seqsep =1)
+        except:
+            tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
+
+        """Buried features"""
+        c = get_contact_vectors(tmp_struct, sec_struct,sec_struct_type, shift_mat)
+        for i in c:
+            all_c.append(i)
+    c = numpy.array(all_c)
+    file.close()
+    return c
+
 def main():
     
     """Generic main function. Executes main functionality of program
@@ -119,7 +236,7 @@ def main():
     #print bur_dict
     shift_mat = shift_matrix()
     #
-    sec_struct_types = ["C","H","E"]
+    sec_struct_types = ["H","C","E"]
     bur_types = ["B","A"]
     seq_sep_types = [(12,24),(24,9999)]
     sec_struct_pair_types = {}
@@ -133,8 +250,17 @@ def main():
 
     print sec_struct_pair_types
     #return 0
+    new_stuff = {}
+    for keys,values in sec_struct_pair_types.iteritems():
+        #if keys == ('H','H'):
+        c = load_contact_maps(keys)
 
+        shift_dict = cluster_shift_maps(c)
+        print shift_dict
+        new_stuff[keys] = shift_dict
 
+    print new_stuff
+    cPickle.dump(new_stuff, open( "shifts.p", "wb" ),protocol=2 )
 
     file = open(options.pdb_id_list)
     all_contacts = 0
@@ -152,37 +278,24 @@ def main():
         except:
             tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
 
-        #buried_features = ResidueFeatureRelSasa.ResidueFeatureRelSasa(pdb_file)
-        bur_dict = {}
-        #for i in xrange(1,tmp_struct.get_number_of_residues()+1):
-        #    buried_features.calculate_feature(i,pdb_file)
-        #    bur_dict[i] = buried_features.get_feature()
-        all_contacts += add_contacts(tmp_struct, sec_struct_pair_types, shift_mat, sec_struct, bur_dict)
-    #print all_contacts
-    super_sum_prob = 0.0
+
     for keys, values in sec_struct_pair_types.iteritems():
         all_shifts = values[0]
-        #all_contacts  = values[1]
+
         sum_prob = 0
         for shifts, counts in all_shifts.iteritems():
             all_shifts[shifts] = counts / float(all_contacts)
             sum_prob += counts / float(all_contacts)
-        #    super_sum_prob+=sum_prob
+
         for shifts, counts in all_shifts.iteritems():
             all_shifts[shifts] = counts / float(sum_prob)
             #sum_prob += counts / float(all_contacts)
         sec_struct_pair_types[keys] = all_shifts
-    #for keys, values in sec_struct_pair_types.iteritems():
-    #    all_shifts = values#
 
-    #    for shifts, counts in all_shifts.iteritems():
-    #        all_shifts[shifts] = counts / float(super_sum_prob)
-    #        #sum_prob += counts / float(all_contacts)
-    #    sec_struct_pair_types[keys] = all_shifts
 
     for keys, values in sec_struct_pair_types.iteritems():
         print keys, values
-        #print keys, values
+
 
     """
     for keys, values in all_shifts.iteritems():
