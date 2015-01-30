@@ -176,15 +176,18 @@ def return_sorted_tuple(tuple):
     return tuple
 
 # Version that already worked!
-def has_loop(node_1, node_2, graph, loop_len = 1):
+def has_shared_neighbors(node_1, node_2, graph, number_of_neighbors=1):
     loop = False
+    shared_nodes = []
     for e in graph.neighbors(node_1[0]):
         for f in graph.neighbors(node_2[0]):
             if e == f:
             #if is_neighbourhood(graph.node[e]['xl'], graph.node[f]['xl'], delta=2):
-
-                loop = True
-    #print loop
+                shared_nodes.append(e)
+                #loop = True
+    if len(shared_nodes) >= number_of_neighbors:
+        #print loop
+        loop = True
     return loop
  
 def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
@@ -211,7 +214,7 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
    
 def do_page_rank (xl_graph,pers):
 
-    ranked_nodes, error = pagerank(xl_graph,max_iter=10000, alpha=0.85, tol=1e-06,personalization=pers)#, weight = 'weight')
+    ranked_nodes, error = pagerank(xl_graph, max_iter=10000, alpha=0.85, tol=1e-06, personalization=pers)#, weight = 'weight')
     print (0.85 / (1-0.85))* error
     for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems()]
     for_sorting.sort()
@@ -221,35 +224,26 @@ def do_page_rank (xl_graph,pers):
         print score, n
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
-        xl_ranked.append((res_lower,'CA', res_upper,'CA', score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, 'foo', upper_distance = 20)
+        xl_ranked.append((res_lower, 'CA', res_upper, 'CA', score))
+    InputOutput.InputOutput.write_contact_file(xl_ranked, 'foo', upper_distance=20)
 
-def add_loops( xl_graph ):
+
+def add_loops(xl_graph):
     import itertools
     all_connections = []
     for n in xl_graph.nodes(data=True):
         connecting_nodes = []
         for o in xl_graph.nodes(data=True):
             if o[0] > n[0]:
-                 if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):
-                     if len(xl_graph.neighbors(o[0])) > 0:
-                         connecting_nodes.append(o)
+                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):
+                    if len(xl_graph.neighbors(o[0])) > 0:
+                        connecting_nodes.append(o)
         if len(connecting_nodes) >= 2:
             for o in connecting_nodes:
-                all_connections.append((n,o))
-    for n,o in all_connections:
-        xl_graph.add_edge(n[0],o[0])
-                #xl_graph.add_edge(n[0],o[0])
-            #if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):
-            #    connecting_nodes.append(o)
-    #for n in xl_graph.nodes(data=True):
-    #    connecting_nodes =[]
-#	   for o in xl_graph.nodes(data=True):
-#	      if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=2, double=False):#
-#	         connecting_nodes.append(o)	
-#	   if len(connecting_nodes) >= 2:
-#	      for o in connecting_nodes:
-#	         g.add_edge(n[0],o[0])
+                all_connections.append((n, o))
+    for n, o in all_connections:
+        xl_graph.add_edge(n[0], o[0])
+
 
 def toy_graph():
     y = nx.Graph()
@@ -276,20 +270,22 @@ def build_xl_graph( xl_data ):
     for n in g.nodes(data=True):
         for o in g.nodes(data=True):
             if o[0] > n[0]:
-                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=6, double=True):
+                if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=6, double=True): # good results with delta=6
                     g.add_edge(n[0],o[0])#, weight =  numpy.max([n[1]['weight'], o[1]['weight']])  )
 
     #add_loops( g )
-    for i in xrange(0,2):
+
+    for i in xrange(0, 2): # good results with 2 iterations
         to_add = []
         for n in g.nodes(data=True):
             for o in g.nodes(data=True):
                 if o[0] > n[0]:
-                    if has_loop(o, n, g):
-                        to_add.append((o[0],n[0]))
+                    if has_shared_neighbors(o, n, g, number_of_neighbors=1): # good results with number_of_neighbors=1
+                        to_add.append((o[0], n[0]))
                         #g.add_edge(n[0],o[0])
-        for i,j in to_add:
-            g.add_edge(i,j)
+        for i, j in to_add:
+            g.add_edge(i, j)
+
     return g, pers
 
 def main():        
