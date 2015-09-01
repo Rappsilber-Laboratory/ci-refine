@@ -24,14 +24,15 @@ class InputOutput:
                 to_site = int(line[col_names['ToSite']]) + offset
                 score = float(line[col_names['Score']])
                 is_decoy = line[col_names['isDecoy']]
-
-
+		site_list = [from_site, to_site]
+                site_list.sort()
+		
 
                 if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
-                    xls.append(((from_site, to_site), score/max_score))
-                    gt_data.append((from_site, 'CA', to_site, 'CA', score / max_score))
+                    xls.append(((site_list[0], site_list[1]), score/max_score))
+                    gt_data.append((site_list[0], 'CA', site_list[1], 'CA', score / max_score))
 
         return xls, gt_data
 
