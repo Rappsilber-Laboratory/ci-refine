@@ -20,6 +20,7 @@ def add_options( parser ):
     """
     parser.add_option("-e", type="string", dest="example", help="An example")
     parser.add_option("-o", type="int", dest="offset", help="offset")
+    parser.add_option("-n", type="string", dest="id", help="id")
 
     options, args = parser.parse_args()
     return options, args
@@ -225,7 +226,7 @@ def do_page_rank (xl_graph,pers):
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
         xl_ranked.append((res_lower, 'CA', res_upper, 'CA', score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, 'foo', upper_distance=20)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, options.id + "_PR.txt", upper_distance=20)
 
 
 def add_loops(xl_graph):
@@ -298,7 +299,7 @@ def main():
    #pagerank(tg)
    #sys.exit()
    xl_data, gt_data = InputOutput.InputOutput.load_xl_data( options.example,options.offset )
-   InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
+   InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20)
 
    #sys.exit()
    #break

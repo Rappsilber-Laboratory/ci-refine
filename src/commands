@@ -1,0 +1,9 @@
+# XL example commands 
+python xl_page_rank_backup_sort_of_working.py -e /scratch/schneider/projects/pagerank_refinement/data/xl_data/10PercentFDR_xiFDR0.csv -o -28 -n HSA_10Perc
+python xl_page_rank_backup_sort_of_working.py -e /scratch/schneider/projects/pagerank_refinement/data/xl_data/20PercentFDR_xiFDR0.csv -o -28 -n HSA_20Perc
+python xl_page_rank_backup_sort_of_working.py -e /scratch/schneider/projects/pagerank_refinement/data/xl_data/50PercentFDR_xiFDR0.csv -o -28 -n HSA_50Perc
+
+
+# XL example analysis commands
+python /scratch/schneider/Software/epc-map/rbocon/release/analysis/write_checked_distances.py --pdb /scratch/schneider/projects/xl_project/data/hsa/1ao6/1ao6A.pdb --pdb_id 1ao6A --len 99999 --dom_ass 1-578 --atom CA --restraint_file HSA_10Perc_PSM.txt > HSA_10Perc_PSM_distances.txt
+python /scratch/schneider/Software/epc-map/rbocon/release/analysis/write_checked_distances.py --pdb /scratch/schneider/projects/xl_project/data/hsa/1ao6/1ao6A.pdb --pdb_id 1ao6A --len 99999 --dom_ass 1-578 --atom CA --restraint_file HSA_10Perc_PR.txt > HSA_10Perc_PR_distances.txt
