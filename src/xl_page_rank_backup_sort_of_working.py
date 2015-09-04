@@ -298,7 +298,7 @@ def main():
    #rint tg.edges()
    #pagerank(tg)
    #sys.exit()
-   xl_data, gt_data = InputOutput.InputOutput.load_xl_data( options.example,options.offset )
+   xl_data, gt_data = InputOutput.InputOutput.load_xl_data(options.example,options.offset)
    InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20)
 
    #sys.exit()
