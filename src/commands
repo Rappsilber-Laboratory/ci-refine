@@ -1,3 +1,5 @@
+export PYTHONPATH=$PYTHONPATH:/scratch/schneider/Software/epc-map/rbocon/release/structure/
+
 # XL example commands 
 python xl_page_rank_backup_sort_of_working.py -e /scratch/schneider/projects/pagerank_refinement/data/xl_data/10PercentFDR_xiFDR0.csv -o -28 -n HSA_10Perc
 python xl_page_rank_backup_sort_of_working.py -e /scratch/schneider/projects/pagerank_refinement/data/xl_data/20PercentFDR_xiFDR0.csv -o -28 -n HSA_20Perc
