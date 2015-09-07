@@ -6,7 +6,7 @@ import matplotlib.pyplot as pylab
 from sklearn.metrics import roc_curve, auc
 from matplotlib.ticker import NullFormatter
 import sys
-
+import seaborn as sns
 sys.path.append("/home/michael/scripts/")
 sys.path.append("/scratch/schneider/old_scratch/scripts")
 
@@ -67,11 +67,11 @@ def accuracy(y_true, y_predict, n_top):
 #energy_new = [ -165.5, -119.6, -150.2, -190.2, -136.2, -205.95]  
 #data = GENERAL.file2list("analysis_results/HSA_10Perc_PSM_distances.txt")
 #data2 = GENERAL.file2list("analysis_results/HSA_10Perc_PR_distances.txt")
+sns.set(style="white", palette="muted")
+protein = "1GST"
 
-protein = "HSA"
-
-y_true, y_predict, y_distances = load_XL_result_data("analysis_results/%s_20Perc_PSM_distances.txt"%protein)
-y_true_2, y_predict_2, y_distances_2 = load_XL_result_data("analysis_results/%s_20Perc_PR_distances.txt"%protein)
+y_true, y_predict, y_distances = load_XL_result_data("%s_20Perc_PSM_distances.txt"%protein)
+y_true_2, y_predict_2, y_distances_2 = load_XL_result_data("%s_20Perc_PR_distances.txt"%protein)
 fpr, tpr, _ = roc_curve(y_true, y_predict)
 fpr_2, tpr_2, _ = roc_curve(y_true_2, y_predict_2)
 n_top = int(len(y_true)*0.5)
@@ -81,7 +81,10 @@ print accuracy(y_true, y_predict, int(len(y_true)*0.5)), accuracy(y_true, y_pred
 print accuracy(y_true_2, y_predict_2, int(len(y_true)*0.5)), accuracy(y_true, y_predict, int(len(y_true)*0.8)), auc(fpr_2, tpr_2)
 #print np.mean(y_distances[:358]), np.mean(y_distances_2[:358])
 fig = matplotlib.pyplot.gcf()
+sns.distplot(y_distances[:139], hist=False, rug=False, color="b")
 
+# Plot a kernel density estimate and rug plot
+sns.distplot(y_distances_2[:139], hist=False, rug=False, color="r")
 #y_true = [0 for d in data if (float(d.split()[-1]) <= float(d.split()[-1]))]
 #print y_true
 #print y_predict
@@ -91,11 +94,11 @@ fig = matplotlib.pyplot.gcf()
 #x2 = [float(d.split()[0]) for d in data2 if len(d.split()) > 1 ]
 
 #y2 = [float(d.split()[1]) for d in data2 if len(d.split()) > 1 ]
-pylab.plot(fpr,tpr, '#3B4CC0' , linewidth=1.0)
-pylab.plot(fpr_2,tpr_2,'#B40426' , linewidth=1.0)
+#pylab.plot(fpr,tpr, '#3B4CC0' , linewidth=1.0)
+#pylab.plot(fpr_2,tpr_2,'#B40426' , linewidth=1.0)
 
-pylab.ylabel("True positive rate")
-pylab.xlabel("False positive rate")
+#pylab.ylabel("True positive rate")
+#pylab.xlabel("False positive rate")
 #plot([-1000,1],[-1000,1])
 #fig.set_size_inches(4.0,3.0)
 #print fig.patches
@@ -104,22 +107,20 @@ pylab.xlabel("False positive rate")
 #pylab.legend(('Pagerank', 'PSM'),loc='lower right')
 
 ax = pylab.gca()
-ax.set_xticks([0, 0.5, 1])
-ax.set_yticks([0, 0.5, 1])
-ax.set_xticklabels(["0", "0.5", "1"])
-ax.set_yticklabels(["0", "0.5", "1"])
-[i.set_linewidth(0.4) for i in ax.spines.itervalues()]
+#ax.set_xticks([0, 0.5, 1])
+#ax.set_yticks([0, 0.5, 1])
+#ax.set_xticklabels(["0", "0.5", "1"])
+#ax.set_yticklabels(["0", "0.5", "1"])
+#[i.set_linewidth(0.4) for i in ax.spines.itervalues()]
 #ax[0].legend(loc='lower right', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
 
 
 #pylab.savefig("rmsd_score_test.svg",bbox_inches="tight",pad_inches=0.02,dpi=300)
-pylab.plot([0, 100], [0, 100], '-k', linewidth = 0.3)
-pylab.xlim((0,1))
+#pylab.plot([0, 100], [0, 100], '-k', linewidth = 0.3)
+#pylab.xlim((0,1))
 
 fig.set_size_inches(2.0,2.0)
 
-pylab.ylim((0,1.00))
-pylab.savefig("%s_20Perc_ROC_test.svg"%protein,bbox_inches="tight",pad_inches=0.02,dpi=300)
-
-
-#pylab.show()
+#pylab.ylim((0,1.00))
+#pylab.savefig("%s_20Perc_ROC_test.svg"%protein,bbox_inches="tight",pad_inches=0.02,dpi=300)
+pylab.show()
