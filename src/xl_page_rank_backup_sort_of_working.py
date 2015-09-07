@@ -21,6 +21,7 @@ def add_options( parser ):
     parser.add_option("-e", type="string", dest="example", help="An example")
     parser.add_option("-o", type="int", dest="offset", help="offset")
     parser.add_option("-n", type="string", dest="id", help="id")
+    parser.add_option("-m", type="int", dest="max_links", help="max_links")
 
     options, args = parser.parse_args()
     return options, args
@@ -298,6 +299,7 @@ def main():
    #rint tg.edges()
    #pagerank(tg)
    #sys.exit()
+   #xl_data, gt_data = InputOutput.InputOutput.load_xl_data_random(options.example,options.offset, max_links = options.max_links) 
    xl_data, gt_data = InputOutput.InputOutput.load_xl_data(options.example,options.offset)
    InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20)
 
