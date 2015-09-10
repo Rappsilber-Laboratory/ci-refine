@@ -1,3 +1,4 @@
+top,acc,algorithm,protein
 0.2,0.833,EPC-map,2kjpA
 0.3,0.741,EPC-map,2kjpA
 0.4,0.778,EPC-map,2kjpA
