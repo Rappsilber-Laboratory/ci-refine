@@ -41,7 +41,7 @@ def load_file(data_file, psm=1):
             x.append(tag + ' PSM')
             y1.append(acc_05)
             y2.append(auc)
-            average_y1.append(auc)
+            average_y1.append(acc_05)
             #average_y2.append(auc)
             print acc_05,
         #else:
@@ -56,7 +56,7 @@ def load_file(data_file, psm=1):
             y1.append(0.0)
             y2.append(0.0)
             #average_y1.append(acc_05)
-            average_y2.append(auc)
+            average_y2.append(acc_05)
             counter +=1
 
     x.append('Mean PSM')
