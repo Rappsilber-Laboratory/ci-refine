@@ -70,8 +70,10 @@ def accuracy(y_true, y_predict, n_top):
 
 protein = "HSA"
 
-y_true, y_predict, y_distances = load_XL_result_data("analysis_results/%s_20Perc_PSM_distances.txt"%protein)
-y_true_2, y_predict_2, y_distances_2 = load_XL_result_data("analysis_results/%s_20Perc_PR_distances.txt"%protein)
+#y_true, y_predict, y_distances = load_XL_result_data("analysis_results/%s_20Perc_PSM_distances.txt"%protein)
+#y_true_2, y_predict_2, y_distances_2 = load_XL_result_data("analysis_results/%s_20Perc_PR_distances.txt"%protein)
+y_true, y_predict, y_distances = load_XL_result_data("analysis_results/%s_0.25L_1_PSM_distances.txt"%protein)
+y_true_2, y_predict_2, y_distances_2 = load_XL_result_data("analysis_results/%s_0.25L_1_PR_distances.txt"%protein)
 fpr, tpr, _ = roc_curve(y_true, y_predict)
 fpr_2, tpr_2, _ = roc_curve(y_true_2, y_predict_2)
 n_top = int(len(y_true)*0.5)
@@ -119,7 +121,7 @@ pylab.xlim((0,1))
 fig.set_size_inches(2.0,2.0)
 
 pylab.ylim((0,1.00))
-pylab.savefig("%s_20Perc_ROC_test.svg"%protein,bbox_inches="tight",pad_inches=0.02,dpi=300)
+pylab.savefig("%s_20Perc_ROC_test_test.svg"%protein,bbox_inches="tight",pad_inches=0.02,dpi=300)
 
 
 #pylab.show()
