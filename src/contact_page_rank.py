@@ -38,6 +38,7 @@ options, args  = add_options( parser )
 
 """Add edges for all the "double" cross-links AND loops"""
 
+
 def parse_psipred(psipred_file):
     ss = ''
     conf = ''
@@ -47,9 +48,6 @@ def parse_psipred(psipred_file):
         elif line.startswith('Pred:'):
             ss += (line[6:].strip())
 
-        #ss = ''.join(ss)
-        #conf = ''.join(conf)
-    # turn do dict
     ss_dict = {}
     counter = 1
     for i in ss:
@@ -99,7 +97,7 @@ def return_sorted_tuple(tuple):
     list_tup.sort()
     tuple = (list_tup[0], list_tup[1])
     return tuple
-#def toy_trans()
+
 
 def helix_shift(tuple1, tuple2):
 
@@ -118,6 +116,7 @@ def helix_shift(tuple1, tuple2):
         return True
     return False
 
+
 def share_neighbors(node_1, node_2, graph, loop_len = 1):
     loop = False
     for e in graph.neighbors(node_1[0]):
@@ -128,6 +127,7 @@ def share_neighbors(node_1, node_2, graph, loop_len = 1):
                 loop = True
         #print loop
     return loop
+
 
 def is_neighbourhood(tuple_1, tuple_2, delta = 1, double = True):
     is_nei = False
@@ -180,6 +180,7 @@ def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
         for_comp.append(((res_lower,res_upper),score))
     InputOutput.InputOutput.write_contact_file(xl_ranked, "%s/%sRRPAR_%s_%s"%(options.out_folder,options.pdb_id,input_alpha,options.top), upper_distance = 8)
 
+
 def add_loops( xl_graph ):
     #pdb.set_trace()
     import itertools
@@ -199,11 +200,14 @@ def add_loops( xl_graph ):
     for n,o in all_connections:
         xl_graph.add_edge(n[0],o[0])
 
+
 def get_node_map( xl_graph ):
     node_map = {}
     for i in xl_graph.nodes(data=True):
         node_map[i[1]['xl']] = i[0]
-    return node_map	
+    return node_map
+
+
 def add_cycles_to_graph( cycles, xl_graph, cycle_len=3 ):
     node_map = get_node_map(xl_graph)
     to_sort = [ (len(c), c) for c in cycles ]
@@ -215,32 +219,22 @@ def add_cycles_to_graph( cycles, xl_graph, cycle_len=3 ):
         print c
         if len(c) <= cycle_len:
             link_tuples = []
-            """This does full connection!"""
-            """
-            for i in c:
-                for j in c:
-                    if j > i:	
-                        link_tuples.append((i,j))
-            """
+
             for i in xrange(0,len(c)):
                 slice = c[i:i+2]
-    #print a[i:i+2]
+
                 if len(slice) == 2:
                     link_tuples.append(return_sorted_tuple((slice[0],slice[1])))
-                    #c_tuple = return_sorted_tuple((slice[0],slice[1]))
-                    #xl_graph.add_edge(node_map[c_tuple[0]])
+
                 else:
                     slice.append(c[0])
                     link_tuples.append(return_sorted_tuple((slice[0],slice[1])))
-               # print slice
-        #for node in xl_graph.nodes(data=True):
 
             for i in xrange(0,len(link_tuples)):
                 slice = link_tuples[i:i+2]
-    #print a[i:i+2]
+
                 if len(slice) == 2:
-                    #link_tuples.append(return_sorted_tuple((slice[0],slice[1])))
-                    #c_tuple = return_sorted_tuple((slice[0],slice[1]))
+
 
                     if node_map.has_key ( slice[0] ) and  node_map.has_key ( slice[1] ):
                         xl_graph.add_edge(node_map[slice[0]], node_map[slice[1]],weight=1.0)#, weight=gauss(float(len(c)),b=6.0,c=0.5))
@@ -252,28 +246,13 @@ def add_cycles_to_graph( cycles, xl_graph, cycle_len=3 ):
                 print slice
 
 
-            """
-            for l1 in xrange(0,len(link_tuples)):
-                for l2 in xrange(l1+1, len(link_tuples)):
-
-                    if node_map.has_key(link_tuples[l1]) and node_map.has_key( link_tuples[l2]):
-
-
-                        if xl_graph.has_edge(node_map[link_tuples[l1]],node_map[link_tuples[l2]]):
-                            pass
-                        else:
-                            xl_graph.add_edge(node_map[link_tuples[l1]],node_map[link_tuples[l2]],weight=1.0)
-
-                #print xl_graph.has_edge(node_map[link_tuples[l1]],node_map[link_tuples[l2]])
-		    """
-		#print xl_graph.has_edge
-            #print link_tuples
 
 def vec_to_dict(vector,pos1,pos2):
     return_dict = {}
     for v in vector:
         return_dict[v[pos1]] = v[pos2]
     return return_dict
+
 
 def linear_combination(original_vector, new_vector, alpha):
     orig_dict = vec_to_dict(original_vector,0,1)
@@ -286,54 +265,10 @@ def linear_combination(original_vector, new_vector, alpha):
     output_scores = [(keys[0], 'CA',keys[1],'CA', score) for score, keys in new_scores]
     return output_scores
 
-def add_sec_struct_pseudo_nodes( ss_struct_dict, xl_graph,pers ):
-
-    ss_string = [ ss_struct_dict.ss_dict[i] for i in  xrange(1,int(options.length+1))]
-
-    helix = []
-    sheet = []
-    sec_structs = []
-    #print ss_string
-    #print ss_string.index('H')
-    for i in xrange(0,len(ss_string)):
-        if ss_string[i] == 'H':
-            helix.append(i)
-        if len(helix) > 1 and ss_string[i] != 'H':
-            sec_structs.append(helix)
-            helix = []
-        #if ss_string[i] == 'E':
-        #    sheet.append(i)
-        #if len(sheet) > 1 and ss_string[i] != 'E':
-        #    sec_structs.append(sheet)
-        #    sheet = []
-   #print sec_structs
-    return sec_structs
-
-    nodes_so_far = xl_graph.number_of_nodes()
-    offset = 1
-    for i in xrange(0,len(sec_structs)):
-        for j in xrange(i+1,len(sec_structs)):
-           # print i,j
-
-            xl_graph.add_node(nodes_so_far+offset, res_lower=sec_structs[i], res_upper=sec_structs[j])
-            pers[nodes_so_far+offset] = 1.0
-            #print i,j
-            offset+=1
-    for i in xrange(nodes_so_far+1, nodes_so_far+offset):
-        print xl_graph.node[i]
-        for j in xrange(1,nodes_so_far):
-            if xl_graph.node[j]['xl'][0] in xl_graph.node[i]['res_lower'] and xl_graph.node[j]['xl'][1] in xl_graph.node[i]['res_upper']:
-                xl_graph.add_edge(i,j,weight = 1.0)
-
 
 def add_loops_node_graph(xl_graph):
     ng = nx.Graph()
-    counter = 1
-    #for i in xrange(1,options.length+1):
-    #    ng.add_node(i)
-    #for i in xrange(1,options.length+1):
-    #    if ng.has_node(i+1):
-    #        ng.add_edge(i,i+1)
+
     for i in xl_graph.nodes(data=True):
         r_lower = i[1]['xl'][0]
         r_upper = i[1]['xl'][1]
@@ -346,18 +281,10 @@ def add_loops_node_graph(xl_graph):
         else:
             ng.add_node(r_upper)
         ng.add_edge(r_lower,r_upper)
-    #for i in ng.nodes():
-    #    print i
-        #print nx.cycle_basis(ng,root=i)
-    #for i in ng.edges():
-    #    print i
+
     cycles = nx.cycle_basis(ng)
 
     add_cycles_to_graph( cycles, xl_graph, cycle_len=4 )
-    #print nx.cycle_basis(ng,40)
- 
-        #ng.add_node(counter)
-            
 
 
 def toy_graph():
@@ -371,6 +298,7 @@ def toy_graph():
     y.add_edge(2,3)
     #y.add_edge(1,5)
     return y
+
 
 def get_relative_sec_struct_pos(ss_dict, i):
     anchor = ss_dict[i]
@@ -386,6 +314,7 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
+
 def is_same_sec_struct(tuple1,tuple2,ss_dict):
 
     ss_i_1 = get_sec_struct_limits(ss_dict,tuple1[0])
@@ -396,6 +325,7 @@ def is_same_sec_struct(tuple1,tuple2,ss_dict):
             return True
 
     return False
+
 
 def write_edge_scores( graph, true_contacts, pers ):
     true_dict = vec_to_dict(true_contacts,0,1)
@@ -422,38 +352,10 @@ def write_edge_scores( graph, true_contacts, pers ):
             #print true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']), true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl'])
             class_neg_pos.append( graph[e[0]][e[1]]['weight'] )
     all_class.sort()
-    """
-    to_rm = []
-    for n in graph.nodes():
-        weight_list = []
-        for nei in nx.neighbors(graph,n):
 
-            weight_list.append((graph.edge[n][nei]['weight'],(n,nei)))
-        weight_list.sort()
-        weight_list.reverse()
-        for i in weight_list[:10]:
-            to_rm.append(i)
-
-    for i,j in to_rm:
-        if graph.has_edge(j[0],j[1]):
-            graph.remove_edge(j[0],j[1])
-    """
-    #for e in graph.edges(data=True):
-    #    if true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']) == True and true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl']) == True:
-    #        #class_pos.append( numpy.mean(class_neg)*2.0 )
-    #        graph[e[0]][e[1]]['weight'] = numpy.mean(class_neg)*2.0
-    #for i,j in all_class[:int(len(all_class)*0.25)]:
-    #    graph.remove_edge(j[0],j[1])
-
-    #all_class.reverse()
-    #med = all_class[int(len(all_class)*0.5)][0]
-    #to_rm = []
-    ##for e in graph.edges(data=True):
-    #    if graph[e[0]][e[1]]['weight'] <= med:
-    #        to_rm.append()
 
     print "CLASS",  numpy.mean(class_pos), numpy.mean(class_neg), numpy.mean(class_neg_pos)
-    #draw_graph(graph,true_dict)
+
 
 def get_sec_struct_limits(ss_dict,i):
     anchor = ss_dict[i]
@@ -478,6 +380,7 @@ def get_sec_struct_limits(ss_dict,i):
         else:
             return [ i for i in xrange(lower_pos, upper_pos+1) ]
     return [ i for i in xrange(lower_pos, upper_pos+1) ]
+
 
 def gauss_filter_probs(xl_data, length):
     x = numpy.array(numpy.zeros((options.length, options.length), numpy.float))
@@ -530,27 +433,8 @@ def build_ce_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = N
 
 
     print len(g.edges())
+
     return g, pers
-
-
-def graph_monte_carlo(g):
-    old_score = average_weight(g)
-    old_graph = nx.Graph(g)
-    #print average_weight(old_graph)
-    for i in xrange(0,500):
-        random_edge = random.sample(g.edges(data=True), 1)
-        #print random_edge
-        g.remove_edge(random_edge[0][0],random_edge[0][1])
-        new_score = average_weight(g)
-        if new_score > old_score:
-            old_graph = nx.Graph(g)
-            old_score = new_score
-            #print len(g.edges())
-           # print "Move accepted"
-        else:
-            g = nx.Graph(old_graph)
-    #print average_weight(g)
-    return g
 
 def average_weight(graph):
     average_weight = []
@@ -574,6 +458,7 @@ def which_clust(i, all_clust):
         if i in clust:
             return clust
 
+
 def clust_graph(graph):
     from sklearn import metrics
     from sklearn import cluster
@@ -590,26 +475,22 @@ def clust_graph(graph):
             max_score = score
             max_labels = labels
             max_num_clust = i
-    #print max_labels
     for c in xrange(0,max_num_clust):
         clust = [i+1 for i,j in enumerate(max_labels) if j == c]
 
         all_clust.append(clust)
-
-    #print all_clust
 
     print "CLUST", max_score, max_num_clust
     if max_num_clust == 2:
         return None
     else:
         return all_clust
-    #print
-    #print len(labels)
-    #print labels
+
+
 def draw_graph( graph, true_map, pers, clust=None ):
     true_nodes = []
     false_nodes = []
-    #false_true_nodes = []
+
     true_pers = []
     false_pers = []
     for n in graph.nodes(data=True):
@@ -620,36 +501,11 @@ def draw_graph( graph, true_map, pers, clust=None ):
             false_nodes.append(n[0])
             false_pers.append( int(pers[n[0]]*10000))
     pos=nx.spring_layout(graph)
-    #if clust != None:
+
 
     nx.draw_networkx_nodes(graph,pos, nodelist=true_nodes, node_color='b', node_size=true_pers, alpha=0.8)
     nx.draw_networkx_nodes(graph,pos, nodelist=false_nodes, node_color='r', node_size=false_pers, alpha=0.9)
     nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
-
-    #clust_1 = [i+1 for i,j in enumerate(labels) if j == 0]
-    #clust_2 = [i+1 for i,j in enumerate(labels) if j == 1]
-    #clust_3 = [i+1 for i,j in enumerate(labels) if j == 2]
-
-    #all_clust = [clust_1,clust_2,clust_3]
-    """
-    all_clust = clust_graph(graph)
-    if all_clust != None:
-        to_rm = []
-    #for clust in all_clust:
-        for e in graph.edges(data=True):
-            print e
-            clust = which_clust(e[0], all_clust )
-
-            if e[1] in clust:
-                pass
-            else:
-                to_rm.append((e[0],e[1]))
-        for e in to_rm:
-            graph.remove_edge(e[0],e[1])
-        #same_clust = True
-        #for clust in all_clust:
-    #nx.draw_networkx_edges(graph,pos,width=0.2,alpha=0.5)
-    """
     plt.show()
 
 def clean_sec_structs(sec_struct):
@@ -662,14 +518,12 @@ def clean_sec_structs(sec_struct):
 
 def parse_scores(scores_file):
     ss_dict = {}
-    residues = []
     for line in open(scores_file):
         if line.startswith('#') or not line.strip():
             continue
         else:
             line = line.split()
             rank = int(line[0])
-            residue = line[1]
             coil, helix, strand = map(float, line[3:6])
             ss_dict[ rank] = ( coil,helix,strand )
     return ss_dict
@@ -689,10 +543,6 @@ def get_prediction_vector( contact_list, i,j ):
             #pred_vec.append(1.0)
         else:
             pred_vec.append(0.0)
-    #sum_prob = numpy.sum(pred_vec)
-    #for i in xrange(0,len(pred_vec)):
-    #    pred_vec[i] = pred_vec[i]/sum_prob
-    #print numpy.array(pred_vec)
     return numpy.array(pred_vec)
 
 def get_clustered_aligns( shift_dict ):
