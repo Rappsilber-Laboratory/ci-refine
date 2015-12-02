@@ -189,8 +189,8 @@ def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
     #ranked_nodes = nx.degree_centrality(xl_graph)
     #print ranked_nodes
     true_dict = vec_to_dict(true_map,0,1)
-    print clust_graph(xl_graph)
-    draw_graph(xl_graph, true_dict, ranked_nodes, clust = None)
+    #print clust_graph(xl_graph)
+   # draw_graph(xl_graph, true_dict, ranked_nodes, clust = None)
     for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
     for_comp = []
     for_sorting.sort()
@@ -956,62 +956,11 @@ def main():
 
    """Generic main function. Executes main functionality of program
    """
-   #print is_neighbourhood((3,10), (4,11), delta = 1)
-   #sys.exit(main())
-   #xl_data = load_xl_data( options.example )
-   #sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(options.pdb_file)
-   #sec_struct = sec_struct.ss_dict
-   #buried_features = ResidueFeatureRelSasa.ResidueFeatureRelSasa(options.pdb_file)
    bur_dict = {}
-   #for i in xrange(1,options.length+1):
-   #    buried_features.calculate_feature(i,options.pdb_file)
-   #    bur_dict[i] = buried_features.get_feature()
-   #print bur_dict
-   #return 0
-
    sec_struct = parse_psipred(options.psipred_file)
-   #print sec_struct.ss_dict
-   #clean_sec_structs(sec_struct)
-   #sec_struct = new_sec_struct
-  # print sec_struct
-   #parse_scores(scores_file)
-   #print sec_struct
-   #
-
-   #print sec_struct
-   #print
-   #return 0
-   #print sec_struct.ss_dict
-   #return 0
-   #print sec_struct.ss_dict
-   #add_sec_struct_pseudo_nodes(sec_struct)
-   #print
-   #print i
-   #return 0
    shift_dict = cPickle.load(open( "/scratch/schneider/projects/pagerank_refinement/src/probabilities/shifts_sigma_0.05.txt", "rb" ))
-   #print shift_dict[('E','H')]
-   #clust_aligns = get_clustered_aligns(shift_dict)
-   #normalize_per_position(clust_aligns)
-   #normalize_per_position(clust_aligns)
-   #print shift_dict
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
-   #print xl_data
-   #print xl_data[0][0]
-   #test_vec = get_prediction_vector(xl_data[:int(options.length*options.top)], xl_data[0][0][0], xl_data[0][0][1])
-   #print test_vec, clust_aligns[0]
-   #print get_lowest_scoring_clust(test_vec, clust_aligns)
-
-   #sys.exit()
    xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
-   #add_sec_struct_pseudo_nodes(sec_struct, xl_graph,pers )
-
-   #for i in xl_graph.nodes(data=True):
-   #    print i
-   #for e in xl_graph.edges(data=True):
-   #    print e
-   #return 0
-   #print xl_graph.number_of_edges()
-   #xl_graph,pers = build_xl_graph(xl_data)
    do_page_rank(xl_graph,pers,xl_data[:int(options.length*options.top)],options.alpha)
 
 
