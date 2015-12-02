@@ -163,52 +163,21 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double = True):
 def gauss(x, a=1.0, b=1.0, c=1.0):
     return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
-def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
+
+def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
     tmp_struct = StructureContainer()
     tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    true_map = tmp_struct.get_contact_map().print_res_format()
-    #all_scores = {}
-    #edge_denom = float(2 * len(xl_graph.edges()))
-    #degrees = xl_graph.degree()
-
-    #for i in xl_graph.nodes():
-    #    all_scores[i] = 0.0
-    #alphas = [0.85]
-    #print pers
-    #ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=0.85, tol=1e-04,personalization=pers)
-    #print ranked_nodes
-
-    #for a in alphas:
-#
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
-    #    for node, score in ranked_nodes.iteritems():#
-
-    #        all_scores[node] = all_scores[node] + score
-    #for node, score in pers.iteritems():
-    #    all_scores[node] = all_scores[node]*input_alpha + ( (1.0 -input_alpha)* score)
-    #ranked_nodes = nx.degree_centrality(xl_graph)
-    #print ranked_nodes
-    true_dict = vec_to_dict(true_map,0,1)
-    #print clust_graph(xl_graph)
-   # draw_graph(xl_graph, true_dict, ranked_nodes, clust = None)
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
     for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
     for_comp = []
     for_sorting.sort()
     for_sorting.reverse()
     xl_ranked = []
     for score, n in for_sorting:
-        #print node
-        #print xl_graph.node[n]       
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
-        #print res_upper
-        xl_ranked.append((res_lower,'CA', res_upper,'CA', score))
+        xl_ranked.append((res_lower,'CB', res_upper,'CB', score))
         for_comp.append(((res_lower,res_upper),score))
-    #print xl_ranked
-    #return for_sorting
-    #new_stuff = linear_combination(orig_scores, for_comp, 0.5)
-
-
     InputOutput.InputOutput.write_contact_file(xl_ranked, "%s/%sRRPAR_%s_%s"%(options.out_folder,options.pdb_id,input_alpha,options.top), upper_distance = 8)
 
 def add_loops( xl_graph ):
@@ -526,138 +495,41 @@ def gauss_filter_probs(xl_data, length):
     return new_data[:length]
 
 
-def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
+def build_ce_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
     tmp_struct = StructureContainer()
     tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    true_map = tmp_struct.get_contact_map().print_res_format()
-    #xl_data = true_map
-    #xl_data = gauss_filter_probs(xl_data, length)
-    #print len(xl_data)
-    #print xl_data
     g = nx.Graph()
+
     index = 1
     pers = {}
     for score, i in xl_data[:length]:
         g.add_node(index, xl=i, weight = score)
         pers[index] = score
         index += 1    
-    #add_loops_node_graph( g )
-    nodes_to_add = []
-    """
-    for n in g.nodes(data=True):
-        test_vec = get_prediction_vector(xl_data[:length], n[1]['xl'][0], n[1]['xl'][1])
 
-        #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
-        sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns)
-
-        max_val = 0
-        max_key = 0
-        for keys, values in sec_struct_shift_dict.iteritems():
-            if values > max_val:
-                max_val = values
-                max_key = keys
-        nodes_to_add.append(( (n[1]['xl'][0] + max_key[0],n[1]['xl'][1] + max_key[1]), n[1]['weight']) )
-
-    for i, score in nodes_to_add:
-        g.add_node(index, xl=i, weight = score)
-        pers[index] = score
-        index += 1
-    """
-    """
-    for i in xrange(0,3):
-        to_add = []
-        for n in g.nodes(data=True):
-            for o in g.nodes(data=True):
-                if o[0] > n[0]:
-                    if share_neighbors( o, n,g ):
-                        to_add.append((o[0],n[0]))
-                    #g.add_edge(n[0],o[0])
-        for i,j in to_add:
-            g.add_edge(i,j, weight=0.1)
-    """
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
 
-        #ss_lim_i = get_sec_struct_limits(sec_struct,n[1]['xl'][0])
-        #ss_lim_j = get_sec_struct_limits(sec_struct,n[1]['xl'][1])
-        #ss_len_i = ss_lim_i[-1] - ss_lim_i[0]
-        #ss_len_j = ss_lim_j[-1] - ss_lim_j[0]
-        #if ss_len_i > 20:
-        #    ss_len_i = 20
-        #if ss_len_j > 20:
-        #    ss_len_j = 20
-        #if ss_len_i < 1:
-        #    ss_len_i = 1
-        #if ss_len_j < 1:
-        #    ss_len_j = 1
-        #print ss_len_i, ss_len_j
-        """
-        if sol[n[1]['xl'][0]] < 0.3:
-            sol_lower = "B"
-        else:
-            sol_lower = "A"
-        if sol[n[1]['xl'][1]] < 0.3:
-            sol_upper = "B"
-        else:
-            sol_upper = "A"
-        """
-        #if (abs( n[1]['xl'][0]- n[1]['xl'][1]) >=12 and abs( n[1]['xl'][0]- n[1]['xl'][1]) <=24 ):
-        #    seq_sep = (12,24)
-        #else:
-        #    seq_sep = (24,9999)
-        #pos1 = get_relative_sec_struct_pos(sec_struct, n[1]['xl'][0])
-        #pos2 = get_relative_sec_struct_pos(sec_struct, n[1]['xl'][1])
-
-        ##if pos1 > 10:
-           # pos1 = 10
-        #if pos2 > 10:
-        #    pos2 = 10
-        #test_vec = get_prediction_vector(xl_data[:int(length*1.0)], n[1]['xl'][0], n[1]['xl'][1])
-        #test_vec = get_prediction_vector(true_map, n[1]['xl'][0], n[1]['xl'][1])
-        #lowest_clust =  get_lowest_scoring_clust(test_vec, clust_aligns)
-        #print clust_aligns[(sec_lower, sec_upper)]
-       # sec_struct_shift_dict = get_averaged_dict(test_vec, clust_aligns[(sec_lower, sec_upper)])
         sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
-       # print sec_struct_shift_dict
-        #pseudo_shift = {}
-        #pseudo_shift[0] = sec_struct_shift_dict
-        #cPickle.dump(pseudo_shift, open( "../pseudo_shift.p", "wb" ),protocol=2 )
-        #break
-        #print sec_struct_shift_dict
-        #sec_struct_shift_dict = True
+
         if sec_struct_shift_dict != False:
-            #sec_struct_shift_dict = shift_dict[(lowest_clust)]
-            a = 'a'
             for o in g.nodes(data=True):
                 if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
-                    #if is_same_sec_struct(n[1]['xl'],o[1]['xl'],sec_struct):
-                    #    same_type = 'same'
-                    #else:
-                    #    same_type = 'not_same'
-                    #sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper,same_type)]
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
-                    dist = numpy.sqrt(shift_tuple[0]**2+shift_tuple[1]**2)
                     if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
                         if g.has_edge(n[0],o[0]):
-                            #if g.edge[n[0]][o[0]]['weight'] < sec_struct_shift_dict[shift_tuple]:
+
                             old_weight = g.edge[n[0]][o[0]]['weight']
                             if old_weight > sec_struct_shift_dict[shift_tuple]:
                                 g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
                         else:
                             g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-                    #elif shift_tuple[0] > 0 and shift_tuple[1] > 0 and dist < 23.0:
-                    #    if not sec_struct_shift_dict.has_key(shift_tuple):
-                    #        g.add_edge(n[0],o[0], weight=0.001)
 
 
-    #print average_weight(g)
-    #g = graph_monte_carlo(g)
+
     print len(g.edges())
-    #print average_weight(g)
-    #write_edge_scores(g, true_map, pers)
-    #g = remove_weight_percentile(g)
     return g, pers
 
 
@@ -903,54 +775,6 @@ def normalize_per_position(clust_aligns):
         clust_aligns[keys[0]][keys[1]] = new_val
 
 
-def get_averaged_dict(vec, clust_aligns):
-   # normalize_per_position(clust_aligns)
-    shift_mat = shift_matrix()
-    #all_vec = [0]*len(clust_aligns[('H','H')])
-    all_vec = [0]*len(clust_aligns[0])
-    new_dict = {}
-    #pdb.set_trace()
-    sum_score = 0.0
-    scores = {}
-    for keys, values in clust_aligns.iteritems():
-        res = numpy.dot(vec,values)
-        scores[keys] = res
-        sum_score += res
-        #print res, len(vec),len(values), vec
-    if sum_score == 0:
-        norm_scores = {}
-        for keys, values in scores.iteritems():
-            norm_scores[keys] = 0.1
-    else:
-        norm_scores = {}
-        for keys, values in scores.iteritems():
-            norm_scores[keys] = 0.2 #scores[keys] / sum_score
-
-    print norm_scores
-
-    for i, s in norm_scores.iteritems():
-
-        for v_index in xrange(0,len(all_vec)):
-            if s > 0.0:
-                all_vec[v_index]= all_vec[v_index] + s * clust_aligns[i][v_index]
-
-    n_sum = numpy.sum(all_vec)
-
-    for shifts, val in zip(shift_mat, all_vec):
-        new_dict[shifts] = val / n_sum
-        #for shifts,values in zip(shift_mat,clust_aligns[i]):
-           # all_vec
-            #if new_dict.has_key((i_shift,j_shift)):
-            #    new_dict[(i_shift,j_shift)] = new_dict(i_shift,j_shift) + s*
-
-        #if numpy.dot(vec,values) > lowest_score:
-            #lowest_clust = keys
-            #print vec#, values
-            #print values
-            #lowest_score = numpy.dot(vec,values)
-        #print lowest_score
-    return new_dict
-
 
 def main():
 
@@ -958,9 +782,9 @@ def main():
    """
    bur_dict = {}
    sec_struct = parse_psipred(options.psipred_file)
-   shift_dict = cPickle.load(open( "/scratch/schneider/projects/pagerank_refinement/src/probabilities/shifts_sigma_0.05.txt", "rb" ))
+   shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
    xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
-   xl_graph,pers = build_xl_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
+   xl_graph,pers = build_ce_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
    do_page_rank(xl_graph,pers,xl_data[:int(options.length*options.top)],options.alpha)
 
 
