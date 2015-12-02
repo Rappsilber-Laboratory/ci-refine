@@ -6,16 +6,14 @@ import sys
 import random
 sys.path.append("../src")
 sys.path.append("/scratch/schneider/libs/lib/python2.7/site-packages")
-sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/features/")
-sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/structure/")
 import networkx as nx
 import InputOutput
 import numpy
 from optparse import OptionParser
 import pdb
-import ResidueFeatureSecStruct
-import ResidueFeatureRelSasa
-import StructureContainer
+from features.ResidueFeatureSecStruct import ResidueFeatureSecStruct
+from features.ResidueFeatureRelSasa  import ResidueFeatureRelSasa
+from structure.StructureContainer import StructureContainer
 import cPickle
 import matplotlib.pyplot as plt
 ## @var parser
@@ -166,7 +164,7 @@ def gauss(x, a=1.0, b=1.0, c=1.0):
     return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
 def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
-    tmp_struct = StructureContainer.StructureContainer()
+    tmp_struct = StructureContainer()
     tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     true_map = tmp_struct.get_contact_map().print_res_format()
     #all_scores = {}
@@ -182,7 +180,7 @@ def do_page_rank (xl_graph,pers, orig_scores,input_alpha):
 
     #for a in alphas:
 #
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=a, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
+    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04)#,personalization=pers)#,weight=None)#, weight = 'weight')
     #    for node, score in ranked_nodes.iteritems():#
 
     #        all_scores[node] = all_scores[node] + score
@@ -529,7 +527,7 @@ def gauss_filter_probs(xl_data, length):
 
 
 def build_xl_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
-    tmp_struct = StructureContainer.StructureContainer()
+    tmp_struct = StructureContainer()
     tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     true_map = tmp_struct.get_contact_map().print_res_format()
     #xl_data = true_map
