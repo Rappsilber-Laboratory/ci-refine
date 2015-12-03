@@ -179,56 +179,28 @@ class InputOutput:
         return res
 
 
-    """
     @staticmethod
     def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):
         file = open(restraint_file,"r")
         res = []
         res_dict = {}
-        counter = 0
+        #counter = 0
         for line in file:
             strline = str(line).strip().split()
             if len(strline) > 2:
                 if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
                     if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
                         if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1])))==False:
-                             if counter == 0:
-                                norm = float(strline[-1])
-                             #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
-                             res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1])  )))
-                             res_dict[(int(strline[0]), int(strline[1]))] = 1
-                             res_dict[(int(strline[1]), int(strline[0]))] = 1
-                             counter += 1
-        file.close()
-        #res.sort()
-        #res.reverse()
-        return res
-    """
-
-    @staticmethod
-    def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):
-        file = open(restraint_file,"r")
-        res = []
-        res_dict = {}
-        counter = 0
-        for line in file:
-            strline = str(line).strip().split()
-            if len(strline) > 2:
-                if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
-                    if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
-                        if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1])))==False:
-                             if counter == 0:
-                                norm = float(strline[-1])
+                             #if counter == 0:
+                                #norm = float(strline[-1])
                              #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
                              res.append( ((float(strline[-1]) , ( int(strline[0]), int(strline[1])))))
                              res_dict[(int(strline[0]), int(strline[1]))] = 1
                              res_dict[(int(strline[1]), int(strline[0]))] = 1
-                             counter += 1
-
+                             #counter += 1
 
         file.close()
         res.sort()
         res.reverse()
-       # print res
         return res
 

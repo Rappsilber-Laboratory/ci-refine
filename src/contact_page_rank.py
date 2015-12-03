@@ -32,14 +32,14 @@ def parse_arguments():
     global options
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", dest="contact_file", help="contact file", required=True)
-    parser.add_argument("-l", type=int, dest="length", help="number of residues", required=True)
+    parser.add_argument("-c", dest="contact_file", help="predicted contacts file in CASP format", required=True)
+    parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
     parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (5 letters)", required=True)
-    parser.add_argument("-f", dest="pdb_file", help="pdb file used for reference, not calculation", required=True)
-    parser.add_argument("-s", dest="psipred_file", help="secondary structure as psipred file", required=True)
-    parser.add_argument("-t", type=float, dest="top", help="top number of contacts", required=True)
-    parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter", required=True)
-    parser.add_argument("-o", dest="out_folder", help="output folder", default="../../results/29-08-14/")
+    parser.add_argument("-f", dest="pdb_file", help="pdb file. used for reference, not calculation", required=True)
+    parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
+    parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
+    parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
+    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/2015-12-04/")
     options = parser.parse_args()
 
 
@@ -170,8 +170,8 @@ def gauss(x, a=1.0, b=1.0, c=1.0):
 
 
 def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
-    tmp_struct = StructureContainer()
-    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+    #tmp_struct = StructureContainer()
+    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
     for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
     for_comp = []
@@ -183,7 +183,7 @@ def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
         res_upper = xl_graph.node[n]['xl'][1]
         xl_ranked.append((res_lower,'CB', res_upper,'CB', score))
         for_comp.append(((res_lower,res_upper),score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, "%s/%sRRPAR_%s_%s"%(options.out_folder,options.pdb_id,input_alpha,options.top), upper_distance = 8)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, "%s%s_RRPAR_%s_%s"%(options.out_folder, options.pdb_id, input_alpha, options.top), upper_distance = 8)
 
 
 def add_loops( xl_graph ):
@@ -403,9 +403,9 @@ def gauss_filter_probs(xl_data, length):
     return new_data[:length]
 
 
-def build_ce_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
-    tmp_struct = StructureContainer()
-    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
+def build_ce_graph( xl_data, length, shift_dict, sec_struct):
+    #tmp_struct = StructureContainer()
+    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
     g = nx.Graph()
 
     index = 1
