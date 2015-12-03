@@ -15,7 +15,7 @@ If you need secondary structure predictions, you can convienienly generate them 
 
 http://bioinf.cs.ucl.ac.uk/psipred/
 
-They should look like the files in sec_struct/. The code requires the psipred file as input. 
+They should look like the files in sec_struct/. The code requires the .psipred file as input. 
 
 
 python contact_page_rank.py -c <contact_file> -l <number of residues> -p <pdb id + chain id (5 letters) e.g. 1se7A> -f <pdb_file (used for reference, not for calculation>  -s <psipred file> -t <top number of contacts> -a <damping parameter> -o <output folder>
