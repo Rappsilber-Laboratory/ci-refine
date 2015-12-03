@@ -1,7 +1,8 @@
 """Author: Michael Schneider
-""" 
-import os 
-import sys 
+"""
+import datetime
+import os
+import sys
 import random
 import networkx as nx
 import InputOutput
@@ -23,14 +24,16 @@ def main():
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, pers = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
-    do_page_rank(xl_graph, pers, xl_data[:int(options.length*options.top)], options.alpha)
+    xl_ranked = do_page_rank(xl_graph, pers, xl_data[:int(options.length*options.top)], options.alpha)
+    output_file = os.path.abspath(os.path.join(options.out_folder, "%s_RRPAR_%s_%s"%(options.pdb_id, options.alpha, options.top)))
+    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file, upper_distance = 8)
 
 
 def parse_arguments():
     """Specify and parse command line inputs
     """
     global options
-    
+
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", dest="contact_file", help="predicted contacts file in CASP format", required=True)
     parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
@@ -39,7 +42,7 @@ def parse_arguments():
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
     parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
-    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/2015-12-04/")
+    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/"+ datetime.datetime.today().date().isoformat() +"/")
     options = parser.parse_args()
 
 
@@ -183,7 +186,7 @@ def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
         res_upper = xl_graph.node[n]['xl'][1]
         xl_ranked.append((res_lower,'CB', res_upper,'CB', score))
         for_comp.append(((res_lower,res_upper),score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, "%s%s_RRPAR_%s_%s"%(options.out_folder, options.pdb_id, input_alpha, options.top), upper_distance = 8)
+    return xl_ranked
 
 
 def add_loops( xl_graph ):
