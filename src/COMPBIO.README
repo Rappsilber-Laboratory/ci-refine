@@ -1,0 +1,26 @@
+Please note that this is experimental code and the reporisitory contains a lot of code that you will NOT need (e.g. everything related to cross-links (XL)). 
+
+You should be fine with only touching contact_page_rank.py.
+
+IMPORTANT!
+Please push all your changes to the compbio2015 branch. 
+
+Dependencies:
+
+python 2.7
+Scientific python libraries (numpy, scipy etc., I recommend the anaconda installation). 
+Biopython
+
+If you need secondary structure predictions, you can convienienly generate them with the PSIPRED server:
+
+http://bioinf.cs.ucl.ac.uk/psipred/
+
+They should look like the files in sec_struct/. The code requires the psipred file as input. 
+
+
+python contact_page_rank.py -c <contact_file> -l <number of residues> -p <pdb id + chain id (5 letters) e.g. 1se7A> -f <pdb_file (used for reference, not for calculation>  -s <psipred file> -t <top number of contacts> -a <damping parameter> -o <output folder>
+
+
+Have fun!
+
+
