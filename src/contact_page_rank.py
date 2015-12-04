@@ -25,8 +25,7 @@ def main():
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, pers = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
     xl_ranked = do_page_rank(xl_graph, pers, xl_data[:int(options.length*options.top)], options.alpha)
-    output_file = os.path.abspath(os.path.join(options.out_folder, "%s_RRPAR_%s_%s"%(options.pdb_id, options.alpha, options.top)))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file, upper_distance = 8)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file(), upper_distance = 8)
 
 
 def parse_arguments():
@@ -42,9 +41,22 @@ def parse_arguments():
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
     parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
-    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/"+ datetime.datetime.today().date().isoformat() +"/")
+    parser.add_argument("-o", dest="out_folder", help="output folder", default=default_output_folder())
     options = parser.parse_args()
 
+def default_output_folder():
+    return "../results/"+ datetime.datetime.today().date().isoformat() +"/"
+
+def output_file():
+    output_directory = os.path.abspath(options.out_folder)
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    i = 0
+    output_file_name = "%s_RRPAR_%s_%s__%s"%(options.pdb_id, options.alpha, options.top, i)
+    while os.path.exists(os.path.join(output_directory, output_file_name)):
+        i += 1
+        output_file_name = "%s_RRPAR_%s_%s__%s"%(options.pdb_id, options.alpha, options.top, i)
+    return os.path.join(output_directory, output_file_name)
 
 def parse_psipred(psipred_file):
     ss = ''

@@ -129,9 +129,6 @@ class InputOutput:
 
     @staticmethod
     def write_contact_file(  contacts, contact_file_name, upper_distance = 8 ):
-        output_directory = os.path.dirname(contact_file_name)
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory)
         file = open( contact_file_name, 'w' )
         for c_lower, atom_lower, c_upper, atom_upper, prob in contacts:
             file.write(" ".join(["%s"%(c_lower),
