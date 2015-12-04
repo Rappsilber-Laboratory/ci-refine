@@ -1,7 +1,8 @@
 """Author: Michael Schneider
-""" 
-import os 
-import sys 
+"""
+import datetime
+import os
+import sys
 import random
 import networkx as nx
 import InputOutput
@@ -41,7 +42,7 @@ def parse_arguments():
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
     parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
-    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/2015-12-04/")
+    parser.add_argument("-o", dest="out_folder", help="output folder", default="../results/"+ datetime.datetime.today().date().isoformat() +"/")
     options = parser.parse_args()
 
 
