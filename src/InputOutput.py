@@ -24,10 +24,9 @@ class InputOutput:
                 to_site = int(line[col_names['ToSite']]) + offset
                 score = float(line[col_names['Score']])
                 is_decoy = line[col_names['isDecoy']]
-		site_list = [from_site, to_site]
+                site_list = [from_site, to_site]
                 site_list.sort()
 		
-
                 if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
@@ -67,8 +66,8 @@ class InputOutput:
         sampled_xls = []
         sampled_xls = random.sample(xls, max_links)
         print sampled_xls
-	for i, score in sampled_xls: 
-            gt_data.append((i[0],'CA',i[1],'CA',score))
+        for i, score in sampled_xls:
+                gt_data.append((i[0],'CA',i[1],'CA',score))
         return sampled_xls, gt_data
 
 
@@ -133,7 +132,7 @@ class InputOutput:
         if not os.path.exists(output_directory):
             os.makedirs(output_directory)
         file = open( contact_file_name, 'w' )
-        for c_lower, atom_lower, c_upper, atom_upper, prob in contacts:
+        for c_lower, c_upper, prob in contacts:
             file.write(" ".join(["%s"%(c_lower),
                                  "%s"%(c_upper),
                                  "%s"%(0),

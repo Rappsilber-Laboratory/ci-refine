@@ -15,6 +15,7 @@ import pdb
 from features.ResidueFeatureSecStruct import ResidueFeatureSecStruct
 from features.ResidueFeatureRelSasa  import ResidueFeatureRelSasa
 from structure.StructureContainer import StructureContainer
+from structure.ContactMap import ContactMap
 
 options = {}
 
@@ -25,9 +26,8 @@ def main():
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, pers = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
     xl_ranked = do_page_rank(xl_graph, pers, xl_data[:int(options.length*options.top)], options.alpha)
-    output_file = os.path.abspath(os.path.join(options.out_folder, "%s_RRPAR_%s_%s"%(options.pdb_id, options.alpha, options.top)))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file, upper_distance = 8)
-
+    save_ranked_contacts(xl_ranked)
+    save_native_contacts()
 
 def parse_arguments():
     """Specify and parse command line inputs
@@ -37,7 +37,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", dest="contact_file", help="predicted contacts file in CASP format", required=True)
     parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
-    parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (5 letters)", required=True)
+    parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (4+1 letters)", required=True)
     parser.add_argument("-f", dest="pdb_file", help="pdb file. used for reference, not calculation", required=True)
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
@@ -172,20 +172,16 @@ def gauss(x, a=1.0, b=1.0, c=1.0):
     return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
 
-def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
-    #tmp_struct = StructureContainer()
-    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
+def do_page_rank(xl_graph, pers, orig_scores, input_alpha):
+    ranked_nodes = nx.pagerank(xl_graph, max_iter=1000, alpha=input_alpha, tol=1e-04, personalization=pers)#,weight=None)#, weight = 'weight')
     for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
-    for_comp = []
     for_sorting.sort()
     for_sorting.reverse()
     xl_ranked = []
     for score, n in for_sorting:
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
-        xl_ranked.append((res_lower,'CB', res_upper,'CB', score))
-        for_comp.append(((res_lower,res_upper),score))
+        xl_ranked.append((res_lower, res_upper, score))
     return xl_ranked
 
 
@@ -632,6 +628,20 @@ def normalize_per_position(clust_aligns):
 
         clust_aligns[keys[0]][keys[1]] = new_val
 
+
+def save_ranked_contacts(xl_ranked):
+    output_file = os.path.abspath(os.path.join(options.out_folder, "%s_RRPAR_%s_%s"%(options.pdb_id, options.alpha, options.top)))
+    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file, upper_distance = 8)
+
+def save_native_contacts():
+    contact_threshold = 8
+
+    native_contacts = ContactMap(contact_threshold)
+    native_contacts.load_cm_from_pdb(options.pdb_id[:4], options.pdb_id[-1], options.pdb_file)
+    native_contact_list = native_contacts.contact_list()
+
+    native_contact_file_path = os.path.abspath(os.path.join(options.out_folder, options.pdb_id + "_native_contacts"))
+    InputOutput.InputOutput.write_contact_file(native_contact_list, native_contact_file_path, contact_threshold)
 
 
 
