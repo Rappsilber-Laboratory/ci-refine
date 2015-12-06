@@ -21,13 +21,12 @@ options = {}
 
 def main():
     parse_arguments()
-    sec_struct = parse_psipred(options.psipred_file)
+    sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
-    xl_graph, pers = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
-    xl_ranked = do_page_rank(xl_graph, pers, xl_data[:int(options.length*options.top)], options.alpha)
+    xl_graph, node_weights = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
+    xl_ranked = do_page_rank(xl_graph, node_weights)
     InputOutput.InputOutput.write_contact_file(xl_ranked, output_file_name(), upper_distance = 8)
-    save_native_contacts()
 
 def parse_arguments():
     """Specify and parse command line inputs
@@ -37,8 +36,8 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", dest="contact_file", help="predicted contacts file in CASP format", required=True)
     parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
-    parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (4+1 letters)", required=True)
-    parser.add_argument("-f", dest="pdb_file", help="pdb file. used for reference, not calculation", required=True)
+    parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (4+1 letters)")
+    parser.add_argument("-f", dest="pdb_file", help="native pdb file. used for reference, not calculation", required=True)
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
     parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
@@ -47,6 +46,60 @@ def parse_arguments():
 
 def default_output_folder():
     return "../results/"+ datetime.datetime.today().date().isoformat() +"/"
+
+
+def build_ce_graph(xl_data, length, shift_dict, sec_struct):
+    g = nx.Graph()
+
+    index = 1
+    pers = {}
+    for score, i in xl_data[:length]:
+        g.add_node(index, xl=i, weight = score)
+        pers[index] = score
+        index += 1
+
+    for n in g.nodes(data=True):
+        sec_lower = sec_struct[n[1]['xl'][0]]
+        sec_upper = sec_struct[n[1]['xl'][1]]
+
+        sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
+
+        if sec_struct_shift_dict != False:
+            for o in g.nodes(data=True):
+                if o[0] != n[0]:
+                    shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
+                    print shift_tuple
+
+                    if (sec_struct_shift_dict.has_key(shift_tuple)
+                        and not numpy.isnan(sec_struct_shift_dict[shift_tuple])
+                        and sec_struct_shift_dict[shift_tuple] != 0.0):
+                        
+                        if g.has_edge(n[0], o[0]):
+                            old_weight = g.edge[n[0]][o[0]]['weight']
+                            if old_weight > sec_struct_shift_dict[shift_tuple]:
+                                g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
+
+                        else:
+                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+
+    print str(len(g.edges())) + " edges in corroboration graph"
+
+    return g, pers
+    
+    
+def do_page_rank(xl_graph, node_weights):
+    ranked_nodes = nx.pagerank(xl_graph, alpha=options.alpha, personalization=node_weights, max_iter=1000, tol=1e-04)
+    
+    for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
+    for_sorting.sort()
+    for_sorting.reverse()
+    xl_ranked = []
+    for score, n in for_sorting:
+        res_lower = xl_graph.node[n]['xl'][0]
+        res_upper = xl_graph.node[n]['xl'][1]
+        xl_ranked.append((res_lower, res_upper, score))
+    return xl_ranked
+
 
 def output_file_name():
     output_directory = os.path.abspath(options.out_folder)
@@ -59,22 +112,16 @@ def output_file_name():
         output_file_name = "%s_RRPAR_%s_%s__%s"%(options.pdb_id, options.alpha, options.top, i)
     return os.path.join(output_directory, output_file_name)
 
-def parse_psipred(psipred_file):
-    ss = ''
-    conf = ''
-    for line in open(psipred_file):
-        if line.startswith('Conf:'):
-            conf += (line[6:].strip())
-        elif line.startswith('Pred:'):
-            ss += (line[6:].strip())
 
-    ss_dict = {}
-    counter = 1
-    for i in ss:
-        ss_dict[counter] = i
-        counter += 1
+    
 
-    return ss_dict
+
+
+
+
+
+
+
 
 
 def shift_matrix():
@@ -185,17 +232,6 @@ def gauss(x, a=1.0, b=1.0, c=1.0):
     return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
 
-def do_page_rank(xl_graph, pers, orig_scores, input_alpha):
-    ranked_nodes = nx.pagerank(xl_graph, max_iter=1000, alpha=input_alpha, tol=1e-04, personalization=pers)#,weight=None)#, weight = 'weight')
-    for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
-    for_sorting.sort()
-    for_sorting.reverse()
-    xl_ranked = []
-    for score, n in for_sorting:
-        res_lower = xl_graph.node[n]['xl'][0]
-        res_upper = xl_graph.node[n]['xl'][1]
-        xl_ranked.append((res_lower, res_upper, score))
-    return xl_ranked
 
 
 def add_loops( xl_graph ):
@@ -415,43 +451,7 @@ def gauss_filter_probs(xl_data, length):
     return new_data[:length]
 
 
-def build_ce_graph( xl_data, length, shift_dict, sec_struct):
-    #tmp_struct = StructureContainer()
-    #tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    g = nx.Graph()
-
-    index = 1
-    pers = {}
-    for score, i in xl_data[:length]:
-        g.add_node(index, xl=i, weight = score)
-        pers[index] = score
-        index += 1    
-
-    for n in g.nodes(data=True):
-        sec_lower = sec_struct[n[1]['xl'][0]]
-        sec_upper = sec_struct[n[1]['xl'][1]]
-
-        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
-
-        if sec_struct_shift_dict != False:
-            for o in g.nodes(data=True):
-                if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
-                    shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-
-                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
-                        if g.has_edge(n[0],o[0]):
-
-                            old_weight = g.edge[n[0]][o[0]]['weight']
-                            if old_weight > sec_struct_shift_dict[shift_tuple]:
-                                g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
-                        else:
-                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-
-
-
-    print len(g.edges())
-
-    return g, pers
+    
 
 def average_weight(graph):
     average_weight = []
@@ -640,22 +640,6 @@ def normalize_per_position(clust_aligns):
             new_val[i] = clust_aligns[keys[0]][keys[1]][i] / sum_per_stuff[i]
 
         clust_aligns[keys[0]][keys[1]] = new_val
-
-
-def save_ranked_contacts(xl_ranked):
-    output_file = os.path.abspath(os.path.join(options.out_folder, "%s_RRPAR_%s_%s"%(options.pdb_id, options.alpha, options.top)))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file, upper_distance = 8)
-
-def save_native_contacts():
-    contact_threshold = 8
-
-    native_contacts = ContactMap(contact_threshold)
-    native_contacts.load_cm_from_pdb(options.pdb_id[:4], options.pdb_id[-1], options.pdb_file)
-    native_contact_list = native_contacts.contact_list()
-
-    native_contact_file_path = os.path.abspath(os.path.join(options.out_folder, options.pdb_id + "_native_contacts"))
-    InputOutput.InputOutput.write_contact_file(native_contact_list, native_contact_file_path, contact_threshold)
-
 
 
 if __name__ == '__main__':

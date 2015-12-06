@@ -65,7 +65,7 @@ class ContactMap:
     col_count = 0
     self.contact_map = numpy.zeros((len(chain_one), len(chain_two)), numpy.float)
     self.distance_map = numpy.zeros((len(chain_one), len(chain_two)), numpy.float)
-    for row, residue_one in enumerate(chain_one) :
+    for row, residue_one in enumerate(chain_one):
 
         for col, residue_two in enumerate(chain_two) :
 

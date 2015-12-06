@@ -5,6 +5,24 @@ class InputOutput:
     
     def __init__(self):
         pass
+        
+    @staticmethod
+    def parse_psipred(psipred_file):
+        ss = ''
+        conf = ''
+        for line in open(psipred_file):
+            if line.startswith('Conf:'):
+                conf += (line[6:].strip())
+            elif line.startswith('Pred:'):
+                ss += (line[6:].strip())
+
+        ss_dict = {}
+        counter = 1
+        for i in ss:
+            ss_dict[counter] = i
+            counter += 1
+
+        return ss_dict
 
 
     @staticmethod
