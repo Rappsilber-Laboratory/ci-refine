@@ -1,60 +1,128 @@
 """Author: Michael Schneider
-   Very important notes
-""" 
-import os 
-import sys 
+"""
+import datetime
+import os
+import sys
 import random
-sys.path.append("../src")
-sys.path.append("/scratch/schneider/libs/lib/python2.7/site-packages")
 import networkx as nx
 import InputOutput
 import numpy
-from optparse import OptionParser
+import argparse
+import cPickle
+import matplotlib.pyplot as plt
 import pdb
+
 from features.ResidueFeatureSecStruct import ResidueFeatureSecStruct
 from features.ResidueFeatureRelSasa  import ResidueFeatureRelSasa
 from structure.StructureContainer import StructureContainer
-import cPickle
-import matplotlib.pyplot as plt
-## @var parser
-#  Global parser object used to call program options from anywhere in the program.
-parser = OptionParser()
+from structure.ContactMap import ContactMap
 
-def add_options( parser ):
-    """Generic options function to specify command line inputs
+options = {}
+
+def main():
+    parse_arguments()
+    sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
+    shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
+    xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
+    xl_graph, node_weights = build_ce_graph(xl_data, int(options.length*options.top), shift_dict, sec_struct)
+    xl_ranked = do_page_rank(xl_graph, node_weights)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file_name(), upper_distance = 8)
+
+def parse_arguments():
+    """Specify and parse command line inputs
     """
-    parser.add_option("-c", type="string", dest="example", help="An example")
-    parser.add_option("-l", type="int", dest="length", help="An example")
-    parser.add_option("-p", type="string", dest="pdb_id", help="An example")
-    parser.add_option("-f", type="string", dest="pdb_file", help="An example")
-    parser.add_option("-s", type="string", dest="psipred_file", help="An example")
-    parser.add_option("-t", type="float", dest="top", help="An example")
-    parser.add_option("-a", type="float", dest="alpha", help="An example")
-    parser.add_option("-o", type="string", dest="out_folder", help="An example", default="../../results/29-08-14/")
-    options, args = parser.parse_args()
-    return options, args 
+    global options
 
-options, args  = add_options( parser )
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", dest="contact_file", help="predicted contacts file in CASP format", required=True)
+    parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
+    parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (4+1 letters)")
+    parser.add_argument("-f", dest="pdb_file", help="native pdb file. used for reference, not calculation", required=True)
+    parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format", required=True)
+    parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1", required=True)
+    parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
+    parser.add_argument("-o", dest="out_folder", help="output folder", default=default_output_folder())
+    options = parser.parse_args()
 
-"""Add edges for all the "double" cross-links AND loops"""
+def default_output_folder():
+    return "../results/"+ datetime.datetime.today().date().isoformat() +"/"
 
 
-def parse_psipred(psipred_file):
-    ss = ''
-    conf = ''
-    for line in open(psipred_file):
-        if line.startswith('Conf:'):
-            conf += (line[6:].strip())
-        elif line.startswith('Pred:'):
-            ss += (line[6:].strip())
+def build_ce_graph(xl_data, length, shift_dict, sec_struct):
+    g = nx.Graph()
 
-    ss_dict = {}
-    counter = 1
-    for i in ss:
-        ss_dict[counter] = i
-        counter += 1
+    index = 1
+    pers = {}
+    for score, i in xl_data[:length]:
+        g.add_node(index, xl=i, weight = score)
+        pers[index] = score
+        index += 1
 
-    return ss_dict
+    for n in g.nodes(data=True):
+        sec_lower = sec_struct[n[1]['xl'][0]]
+        sec_upper = sec_struct[n[1]['xl'][1]]
+
+        sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
+
+        if sec_struct_shift_dict != False:
+            for o in g.nodes(data=True):
+                if o[0] != n[0]:
+                    shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
+                    print shift_tuple
+
+                    if (sec_struct_shift_dict.has_key(shift_tuple)
+                        and not numpy.isnan(sec_struct_shift_dict[shift_tuple])
+                        and sec_struct_shift_dict[shift_tuple] != 0.0):
+                        
+                        if g.has_edge(n[0], o[0]):
+                            old_weight = g.edge[n[0]][o[0]]['weight']
+                            if old_weight > sec_struct_shift_dict[shift_tuple]:
+                                g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
+
+                        else:
+                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
+
+    print str(len(g.edges())) + " edges in corroboration graph"
+
+    return g, pers
+    
+    
+def do_page_rank(xl_graph, node_weights):
+    ranked_nodes = nx.pagerank(xl_graph, alpha=options.alpha, personalization=node_weights, max_iter=1000, tol=1e-04)
+    
+    for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
+    for_sorting.sort()
+    for_sorting.reverse()
+    xl_ranked = []
+    for score, n in for_sorting:
+        res_lower = xl_graph.node[n]['xl'][0]
+        res_upper = xl_graph.node[n]['xl'][1]
+        xl_ranked.append((res_lower, res_upper, score))
+    return xl_ranked
+
+
+def output_file_name():
+    output_directory = os.path.abspath(options.out_folder)
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    i = 0
+    output_file_name = "%s_RRPAR_%s_%s__%s"%(options.pdb_id, options.alpha, options.top, i)
+    while os.path.exists(os.path.join(output_directory, output_file_name)):
+        i += 1
+        output_file_name = "%s_RRPAR_%s_%s__%s"%(options.pdb_id, options.alpha, options.top, i)
+    return os.path.join(output_directory, output_file_name)
+
+
+    
+
+
+
+
+
+
+
+
+
 
 def shift_matrix():
     matrix = []
@@ -134,21 +202,21 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double = True):
     t_1 = return_sorted_tuple(tuple_1)
     t_2 = return_sorted_tuple(tuple_2)
     t_1_lower = t_1[0]
-    t_2_lower =	t_2[0]
-    t_1_upper =	t_1[1]
-    t_2_upper =	t_2[1]
+    t_2_lower =    t_2[0]
+    t_1_upper =    t_1[1]
+    t_2_upper =    t_2[1]
     
     t_1_low_nei = [ t_1_lower + i for i in xrange(-1*delta, 1*delta+1)]    
     t_2_low_nei = [ t_2_lower + i for i in xrange(-1*delta, 1*delta+1)]
     t_1_up_nei =  [ t_1_upper + i for i in xrange(-1*delta, 1*delta+1)]
-    t_2_up_nei	= [ t_2_upper + i for i in xrange(-1*delta, 1*delta+1)]
+    t_2_up_nei    = [ t_2_upper + i for i in xrange(-1*delta, 1*delta+1)]
     m_1 = 0
     for i in t_1_low_nei:
         for j in t_2_low_nei:
             if i == j:
                 m_1 = 1
-    m_2	= 0
-    for	i in t_1_up_nei:
+    m_2    = 0
+    for    i in t_1_up_nei:
         for j in t_2_up_nei:
             if i == j:
                 m_2 = 1
@@ -164,21 +232,6 @@ def gauss(x, a=1.0, b=1.0, c=1.0):
     return a * numpy.exp(-1.0 * ( (x-b)**2/2*c**2))
 
 
-def do_page_rank (xl_graph, pers, orig_scores, input_alpha):
-    tmp_struct = StructureContainer()
-    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    ranked_nodes = nx.pagerank(xl_graph,max_iter=1000, alpha=input_alpha, tol=1e-04,personalization=pers)#,weight=None)#, weight = 'weight')
-    for_sorting = [ (score , node) for node, score in ranked_nodes.iteritems() if node <= options.length*999]
-    for_comp = []
-    for_sorting.sort()
-    for_sorting.reverse()
-    xl_ranked = []
-    for score, n in for_sorting:
-        res_lower = xl_graph.node[n]['xl'][0]
-        res_upper = xl_graph.node[n]['xl'][1]
-        xl_ranked.append((res_lower,'CB', res_upper,'CB', score))
-        for_comp.append(((res_lower,res_upper),score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, "%s/%sRRPAR_%s_%s"%(options.out_folder,options.pdb_id,input_alpha,options.top), upper_distance = 8)
 
 
 def add_loops( xl_graph ):
@@ -398,43 +451,7 @@ def gauss_filter_probs(xl_data, length):
     return new_data[:length]
 
 
-def build_ce_graph( xl_data, length, shift_dict,sec_struct,sol, clust_aligns = None ):
-    tmp_struct = StructureContainer()
-    tmp_struct.load_structure('xxxx', options.pdb_id[-1], options.pdb_file, seqsep =1)
-    g = nx.Graph()
-
-    index = 1
-    pers = {}
-    for score, i in xl_data[:length]:
-        g.add_node(index, xl=i, weight = score)
-        pers[index] = score
-        index += 1    
-
-    for n in g.nodes(data=True):
-        sec_lower = sec_struct[n[1]['xl'][0]]
-        sec_upper = sec_struct[n[1]['xl'][1]]
-
-        sec_struct_shift_dict = shift_dict[(sec_lower,sec_upper)]
-
-        if sec_struct_shift_dict != False:
-            for o in g.nodes(data=True):
-                if o[0] != n[0]:# and sec_lower == sec_struct[o[1]['xl'][0]] and sec_upper == sec_struct[o[1]['xl'][1]]:
-                    shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-
-                    if sec_struct_shift_dict.has_key(shift_tuple) and numpy.isnan(sec_struct_shift_dict[shift_tuple]) == False and sec_struct_shift_dict[shift_tuple] != 0.0:
-                        if g.has_edge(n[0],o[0]):
-
-                            old_weight = g.edge[n[0]][o[0]]['weight']
-                            if old_weight > sec_struct_shift_dict[shift_tuple]:
-                                g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple] )
-                        else:
-                            g.add_edge(n[0],o[0], weight=sec_struct_shift_dict[shift_tuple])
-
-
-
-    print len(g.edges())
-
-    return g, pers
+    
 
 def average_weight(graph):
     average_weight = []
@@ -623,19 +640,6 @@ def normalize_per_position(clust_aligns):
             new_val[i] = clust_aligns[keys[0]][keys[1]][i] / sum_per_stuff[i]
 
         clust_aligns[keys[0]][keys[1]] = new_val
-
-
-
-def main():
-
-   """Generic main function. Executes main functionality of program
-   """
-   bur_dict = {}
-   sec_struct = parse_psipred(options.psipred_file)
-   shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
-   xl_data = InputOutput.InputOutput.load_restraints_pr(options.example,seq_sep_min=12)
-   xl_graph,pers = build_ce_graph(xl_data,int(options.length*options.top), shift_dict, sec_struct,bur_dict)
-   do_page_rank(xl_graph,pers,xl_data[:int(options.length*options.top)],options.alpha)
 
 
 if __name__ == '__main__':

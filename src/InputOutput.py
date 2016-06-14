@@ -5,6 +5,24 @@ class InputOutput:
     
     def __init__(self):
         pass
+        
+    @staticmethod
+    def parse_psipred(psipred_file):
+        ss = ''
+        conf = ''
+        for line in open(psipred_file):
+            if line.startswith('Conf:'):
+                conf += (line[6:].strip())
+            elif line.startswith('Pred:'):
+                ss += (line[6:].strip())
+
+        ss_dict = {}
+        counter = 1
+        for i in ss:
+            ss_dict[counter] = i
+            counter += 1
+
+        return ss_dict
 
 
     @staticmethod
@@ -24,10 +42,9 @@ class InputOutput:
                 to_site = int(line[col_names['ToSite']]) + offset
                 score = float(line[col_names['Score']])
                 is_decoy = line[col_names['isDecoy']]
-		site_list = [from_site, to_site]
+                site_list = [from_site, to_site]
                 site_list.sort()
 		
-
                 if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
@@ -67,8 +84,8 @@ class InputOutput:
         sampled_xls = []
         sampled_xls = random.sample(xls, max_links)
         print sampled_xls
-	for i, score in sampled_xls: 
-            gt_data.append((i[0],'CA',i[1],'CA',score))
+        for i, score in sampled_xls:
+                gt_data.append((i[0],'CA',i[1],'CA',score))
         return sampled_xls, gt_data
 
 
@@ -126,17 +143,16 @@ class InputOutput:
 
             file.write( "AtomPair %s  %s %s  %s BOUNDED  %s %s %s NOE \n"%(atom_1,c_lower,atom_2, c_upper, 1.5, upper_distance, sigma) )
         file.close()
-    
+
     @staticmethod
     def write_contact_file(  contacts, contact_file_name, upper_distance = 8 ):
         file = open( contact_file_name, 'w' )
-        for c_lower, atom_lower, c_upper, atom_upper, prob in contacts:
+        for c_lower, c_upper, prob in contacts:
             file.write(" ".join(["%s"%(c_lower),
                                  "%s"%(c_upper),
                                  "%s"%(0),
                                  "%s"%(upper_distance),
-                                 "%s"%(prob),
-                                 "\n"]))
+                                 "%s\n"%(prob)]))
         file.close()
     
     @staticmethod
@@ -179,56 +195,28 @@ class InputOutput:
         return res
 
 
-    """
     @staticmethod
     def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):
         file = open(restraint_file,"r")
         res = []
         res_dict = {}
-        counter = 0
+        #counter = 0
         for line in file:
             strline = str(line).strip().split()
             if len(strline) > 2:
                 if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
                     if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
                         if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1])))==False:
-                             if counter == 0:
-                                norm = float(strline[-1])
-                             #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
-                             res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1])  )))
-                             res_dict[(int(strline[0]), int(strline[1]))] = 1
-                             res_dict[(int(strline[1]), int(strline[0]))] = 1
-                             counter += 1
-        file.close()
-        #res.sort()
-        #res.reverse()
-        return res
-    """
-
-    @staticmethod
-    def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999 ):
-        file = open(restraint_file,"r")
-        res = []
-        res_dict = {}
-        counter = 0
-        for line in file:
-            strline = str(line).strip().split()
-            if len(strline) > 2:
-                if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
-                    if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
-                        if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1])))==False:
-                             if counter == 0:
-                                norm = float(strline[-1])
+                             #if counter == 0:
+                                #norm = float(strline[-1])
                              #res.append( ((( int(strline[0]), int(strline[1])) , float(strline[-1]) / norm )))
                              res.append( ((float(strline[-1]) , ( int(strline[0]), int(strline[1])))))
                              res_dict[(int(strline[0]), int(strline[1]))] = 1
                              res_dict[(int(strline[1]), int(strline[0]))] = 1
-                             counter += 1
-
+                             #counter += 1
 
         file.close()
         res.sort()
         res.reverse()
-       # print res
         return res
 
