@@ -33,12 +33,12 @@ def parse_arguments():
     parser.add_argument("-l", type=int, dest="length", help="number of residues in the protein", required=True)
     parser.add_argument("-p", dest="pdb_id", help="pdb id + chain id (4+1 letters)")
     parser.add_argument("-f", dest="pdb_file", help="native pdb file. used for reference, not calculation",
-                        required=True)
+                        required=False)
     parser.add_argument("-s", dest="psipred_file", help="sequence and secondary structure file in psipred format",
                         required=True)
     parser.add_argument("-t", type=float, dest="top", help="fraction of top probable contacts to use. 0 < x < 1",
                         required=True)
-    parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", required=True)
+    parser.add_argument("-a", type=float, dest="alpha", help="dampening parameter alpha", default=0.4, required=False)
     parser.add_argument("-o", dest="out_folder", help="output folder", default=default_output_folder())
     options = parser.parse_args()
 
