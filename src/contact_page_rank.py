@@ -13,16 +13,6 @@ import matplotlib.pyplot as plt
 options = {}
 
 
-def main():
-    parse_arguments()
-    sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
-    shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
-    xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
-    xl_graph, node_weights = build_ce_graph(xl_data, int(options.length * options.top), shift_dict, sec_struct)
-    xl_ranked = do_page_rank(xl_graph, node_weights)
-    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file_name(), upper_distance=8)
-
-
 def parse_arguments():
     """Specify and parse command line inputs
     """
@@ -63,11 +53,10 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
 
         sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
 
-        if sec_struct_shift_dict != False:
+        if sec_struct_shift_dict:
             for o in g.nodes(data=True):
                 if o[0] != n[0]:
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-                    print shift_tuple
 
                     if (sec_struct_shift_dict.has_key(shift_tuple)
                         and not numpy.isnan(sec_struct_shift_dict[shift_tuple])
@@ -80,8 +69,6 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
 
                         else:
                             g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
-
-    print str(len(g.edges())) + " edges in corroboration graph"
 
     return g, pers
 
@@ -625,6 +612,15 @@ def normalize_per_position(clust_aligns):
 
         clust_aligns[keys[0]][keys[1]] = new_val
 
+
+def main():
+    parse_arguments()
+    sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
+    shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
+    xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
+    xl_graph, node_weights = build_ce_graph(xl_data, int(options.length * options.top), shift_dict, sec_struct)
+    xl_ranked = do_page_rank(xl_graph, node_weights)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, output_file_name(), upper_distance=8)
 
 if __name__ == '__main__':
     sys.exit(main())
