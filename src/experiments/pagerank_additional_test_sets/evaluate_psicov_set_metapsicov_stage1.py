@@ -16,12 +16,13 @@ def main():
                              pdb_id,
                              ".pdb"])
 
-        contact_file= "".join(["/scratch/schneider/projects/pagerank_refinement/results/pagerank_refinement/psicov_set/epc-map_new_par/",
+        contact_file= "".join([test_set_folder,
+                             "stage1/",
                              pdb_id,
-                             "_RRPAR_0.4_3.0__0"])
+                             ".prediction"])
 
         dom_ass = "1-%s" % length
-        out_file = "/scratch/schneider/projects/pagerank_refinement/src/experiments/pagerank_additional_test_sets/epc-map_new_par.txt"
-        evaluate_contact_file(pdb_file, pdb_id, contact_file, length, dom_ass, out_file)
+        
+        evaluate_contact_file(pdb_file, pdb_id, contact_file, length, dom_ass)
 
 main()
