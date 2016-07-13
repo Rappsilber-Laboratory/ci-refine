@@ -77,6 +77,7 @@ def get_relative_sec_struct_pos(ss_dict, i):
             return pos
     return pos
 
+
 def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
     all_contacts = []
     for i in xrange(9, structure.get_number_of_residues()+1-9):
@@ -90,15 +91,12 @@ def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
                         contact_vector = []
                         for i_shift, j_shift in shift_mat:
                             if abs((i+i_shift)-(j+j_shift)) >= 12:
-                                dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
-                                #print dist_shift
+                                dist_shift = structure.get_contact_map().get_mapped_distance(i+i_shift, j+j_shift)
+
                                 if dist_shift <= 8.0:
                                     contact_vector.append(1.0)
                                 else:
                                     contact_vector.append(0.0)
-
-                                #else:
-                                #    contact_vector.append(np.exp(-1.0* ((dist_shift-8.0)**2/0.2)))
                             else:
                                 contact_vector.append(0.0)
 
@@ -132,7 +130,6 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     all_contacts += 1
                     sec_struct_pair_types[(sec_lower,sec_upper)] = ( all_shifts, all_contacts )
     return all_contacts
-    #return all_contacts
 
 def clean_sec_structs(sec_struct):
 
@@ -311,6 +308,7 @@ def main():
     pickle.dump(all_shifts, open( "shifts.p", "wb" ) )
     """
     cPickle.dump(sec_struct_pair_types, open( "shifts.p", "wb" ),protocol=2 )
+
 if __name__ == '__main__':
     sys.exit(main())
 else:

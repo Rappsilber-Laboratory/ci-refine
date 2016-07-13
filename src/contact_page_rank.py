@@ -8,7 +8,7 @@ import InputOutput
 import numpy
 import argparse
 import cPickle
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 options = {}
 
@@ -38,13 +38,13 @@ def default_output_folder():
 
 
 def build_ce_graph(xl_data, length, shift_dict, sec_struct):
-    g = nx.Graph()
+    g = nx.DiGraph()
 
     index = 1
     pers = {}
     for score, i in xl_data[:length]:
         g.add_node(index, xl=i, weight=score)
-        pers[index] = score
+        pers[index] = float(score)
         index += 1
 
     for n in g.nodes(data=True):
@@ -52,15 +52,13 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
         sec_upper = sec_struct[n[1]['xl'][1]]
 
         sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
-
         if sec_struct_shift_dict:
             for o in g.nodes(data=True):
                 if o[0] != n[0]:
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
-                    if (sec_struct_shift_dict.has_key(shift_tuple)
-                        and not numpy.isnan(sec_struct_shift_dict[shift_tuple])
-                        and sec_struct_shift_dict[shift_tuple] != 0.0):
+                    if (sec_struct_shift_dict.has_key(shift_tuple) and not
+                    numpy.isnan(sec_struct_shift_dict[shift_tuple]) and sec_struct_shift_dict[shift_tuple] != 0.0):
 
                         if g.has_edge(n[0], o[0]):
                             old_weight = g.edge[n[0]][o[0]]['weight']
@@ -69,14 +67,16 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
 
                         else:
                             g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
-
     return g, pers
 
 
-def do_page_rank(xl_graph, node_weights):
-    ranked_nodes = nx.pagerank(xl_graph, alpha=options.alpha, personalization=node_weights, max_iter=1000, tol=1e-04)
+def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
+    """
+    This runs pagerank.
+    """
+    ranked_nodes = nx.pagerank(xl_graph, alpha=input_alpha, personalization=node_weights, max_iter=100, tol=1e-08)
 
-    for_sorting = [(score, node) for node, score in ranked_nodes.iteritems() if node <= options.length * 999]
+    for_sorting = [(score, node) for node, score in ranked_nodes.iteritems() if node <= input_len * 999]
     for_sorting.sort()
     for_sorting.reverse()
     xl_ranked = []
@@ -359,25 +359,16 @@ def write_edge_scores(graph, true_contacts, pers):
     class_pos = []
     class_neg_pos = []
     all_class = []
-    # draw_graph(graph,true_dict, pers)
-    # print graph.nodes(data=True)
-    # print graph.nodes()[96]
+
     for e in graph.edges(data=True):
-        # print e
-        # print graph.nodes(data=True)[e[0]-1][1]['xl']
-        # print graph.nodes(data=True)[e[1]-1][1]['xl']
         all_class.append((graph[e[0]][e[1]]['weight'], (e[0], e[1])))
         if true_dict.has_key(graph.nodes(data=True)[e[0] - 1][1]['xl']) == False and true_dict.has_key(
                 graph.nodes(data=True)[e[1] - 1][1]['xl']) == False:
             class_neg.append(graph[e[0]][e[1]]['weight'])
-            # graph[e[0]][e[1]]['weight'] = 0.1
         elif true_dict.has_key(graph.nodes(data=True)[e[0] - 1][1]['xl']) == True and true_dict.has_key(
                 graph.nodes(data=True)[e[1] - 1][1]['xl']) == True:
             class_pos.append(graph[e[0]][e[1]]['weight'])
-
-            # graph[e[0]][e[1]]['weight'] = 0.1
         else:
-            # print true_dict.has_key(graph.nodes(data=True)[e[0]-1][1]['xl']), true_dict.has_key(graph.nodes(data=True)[e[1]-1][1]['xl'])
             class_neg_pos.append(graph[e[0]][e[1]]['weight'])
     all_class.sort()
 
@@ -619,7 +610,7 @@ def main():
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, node_weights = build_ce_graph(xl_data, int(options.length * options.top), shift_dict, sec_struct)
-    xl_ranked = do_page_rank(xl_graph, node_weights)
+    xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, options.length)
     InputOutput.InputOutput.write_contact_file(xl_ranked, output_file_name(), upper_distance=8)
 
 if __name__ == '__main__':

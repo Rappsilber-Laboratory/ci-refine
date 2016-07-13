@@ -25,7 +25,7 @@ def parse_arguments():
     parser.add_argument("-c", dest="contact_file_list", help="PDB ID list", required=True)
     parser.add_argument("-p", dest="prediction_folder", required=True)
     parser.add_argument("-s", dest="secondary_structure_folder", required=True)
-
+    parser.add_argument("-m", dest="method_name", required=True)
     options = parser.parse_args()
 
 def load_native_map(pdb_id):
@@ -38,7 +38,7 @@ def load_native_map(pdb_id):
     return native_dict
 
 
-def evaluate_ranking(xl_ranked, native_dict, num_top_contacts, seq_sep = 12):
+def evaluate_ranking(xl_ranked, native_dict, num_top_contacts, seq_sep = 24):
     prediction_labels = []
     true_labels = []
     long_range_contacts = []
@@ -84,6 +84,7 @@ def write_results_csv(value_dict, out_file):
         file.write("%.3f,%.3f,%.3f\n"%(parameters[0], parameters[1], numpy.mean(values)))
     file.close()
 
+
 def main():
     
     parse_arguments()
@@ -91,9 +92,9 @@ def main():
     protein_data = load_pdb_ids(options.contact_file_list)
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
 
-    alpha_range = numpy.linspace(0.1, 1.0, 10)
-    beta_range = numpy.linspace(1., 3.0, 3)
-
+    alpha_range = numpy.linspace(0.1, 0.85, 16)
+    beta_range = numpy.linspace(2., 3.0, 3)
+    
     print alpha_range
     print beta_range
 
@@ -102,32 +103,32 @@ def main():
         for beta in beta_range:
             all_values[(alpha, beta)] = []
     counter = 1
-    for pdb_id, length in protein_data:  
-       native_map = load_native_map(pdb_id)
-       contacts, sec_struct = load_files(pdb_id)
-       for alpha in alpha_range:
-           for beta in beta_range:
-               xl_ranked = run_pagerank(contacts, sec_struct, alpha, beta, shift_dict, length)
-               native_map = load_native_map(pdb_id)
-               acc = evaluate_ranking(xl_ranked, native_map, int(float(length) * 0.2))
-               all_values[(alpha, beta)].append(acc)
+    for pdb_id, length in protein_data:
+        native_map = load_native_map(pdb_id)
+        contacts, sec_struct = load_files(pdb_id)
+        for alpha in alpha_range:
+            for beta in beta_range:
+                xl_ranked = run_pagerank(contacts, sec_struct, alpha, beta, shift_dict, length)
+                native_map = load_native_map(pdb_id)
+                acc = evaluate_ranking(xl_ranked, native_map, int(float(length) * 0.2))
+                all_values[(alpha, beta)].append(acc)
     
-       print "Best parameters after %s proteins" % counter
-       best_acc = 0
-       best_alpha = 0
-       best_beta = 0
-       for parameters, values in all_values.iteritems():
-           if numpy.mean(values) > best_acc:
-               best_alpha = parameters[0]
-               best_beta = parameters[1]
-               best_acc = numpy.mean(values)
+        print "Best parameters after %s proteins" % counter
+        best_acc = 0
+        best_alpha = 0
+        best_beta = 0
+        for parameters, values in all_values.iteritems():
+            if numpy.mean(values) > best_acc:
+                best_alpha = parameters[0]
+                best_beta = parameters[1]
+                best_acc = numpy.mean(values)
     
-       print "Accuracy", round(best_acc,3)
-       print "alpha", best_alpha
-       print "beta", best_beta
-       counter += 1   
+        print "Accuracy", round(best_acc,3)
+        print "alpha", best_alpha
+        print "beta", best_beta
+        counter += 1
             
-    write_results_csv(all_values, "epc_parameter_tuning.csv")    
+    write_results_csv(all_values, "%s_parameter_tuning.csv"%options.method_name)
 if __name__ == '__main__':
     sys.exit(main())
 else:
