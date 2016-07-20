@@ -44,3 +44,17 @@ def refine_contacts_with_pagerank(pdb_id, contact_file, length, psipred_file, to
     print cmd
     os.system(cmd)
 
+
+def refine_contacts_with_pagerank_classifier(pdb_id, contact_file, length, psipred_file, top_ratio, output_folder, alpha=0.4):
+    cmd = " ".join(["python",
+                    "contact_page_rank_classifier.py",
+                    "-p", pdb_id,
+                    "-c", contact_file,
+                    "-l", str(length),
+                    "-s", psipred_file,
+                    "-t", top_ratio,
+                    "-o", output_folder,
+                    "-a", str(alpha)])
+    print cmd
+    os.system(cmd)
+

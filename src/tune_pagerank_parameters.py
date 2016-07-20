@@ -9,7 +9,7 @@ import numpy
 import argparse
 import cPickle
 sys.path.append("experiments/pagerank_additional_test_sets/")
-from contact_page_rank import build_ce_graph, do_page_rank
+from contact_page_rank_classifier import build_ce_graph, do_page_rank
 options = {}
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.metrics import roc_auc_score
@@ -54,26 +54,36 @@ def evaluate_ranking(xl_ranked, native_dict, num_top_contacts, seq_sep = 24):
             prediction_labels.append(1)
             true_labels.append(0)
     try:
+        #print true_labels, prediction_labels
+        #out_score = roc_auc_score(true_labels, prediction_labels)
         out_score = precision_score(true_labels, prediction_labels)
-    except: 
+
+    except:
         out_score = 0
     return out_score
 
 def run_pagerank(xl_data, sec_struct, alpha, beta, shift_dict, input_length):
-    xl_graph, node_weights = build_ce_graph(xl_data, int( int(input_length) * beta), shift_dict, sec_struct)
+    xl_graph, node_weights = build_ce_graph(xl_data, int(int(input_length) * beta), shift_dict, sec_struct)
+    xl_ranked = do_page_rank(xl_graph, node_weights, alpha, int(input_length))
+    return xl_ranked
+
+def run_pagerank_classifier(xl_data, sec_struct, alpha, beta, shift_dict, input_length, contact_dict):
+    xl_graph, node_weights = build_ce_graph(xl_data, int(int(input_length) * beta), shift_dict, sec_struct, contact_dict)
     xl_ranked = do_page_rank(xl_graph, node_weights, alpha, int(input_length))
     return xl_ranked
 
 
-def load_files(pdb_id):
-    psipred_file = "".join([options.secondary_structure_folder,
+def load_files(pdb_id, sec_struct_folder=None, pred_folder=None):
+
+    psipred_file = "".join([sec_struct_folder,
                             pdb_id,
                             ".horiz"])
-    contact_file = "".join([options.prediction_folder,
+    contact_file = "".join([pred_folder,
                             pdb_id,
                             ".prediction"])
     sec_struct = InputOutput.InputOutput.parse_psipred(psipred_file)
-    xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=12)
+
+    xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=24)
     return xl_data, sec_struct
 
 
@@ -93,8 +103,10 @@ def main():
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
 
     alpha_range = numpy.linspace(0.1, 0.85, 16)
-    beta_range = numpy.linspace(2., 3.0, 3)
-    
+    beta_range = numpy.linspace(1.5, 3.0, 13)
+    #alpha_range = [ 0.3, 0.4, 0.5, 0.6]
+    #beta_range = [1.5, 2.5]
+    #beta_range = [1.5]
     print alpha_range
     print beta_range
 
@@ -105,7 +117,8 @@ def main():
     counter = 1
     for pdb_id, length in protein_data:
         native_map = load_native_map(pdb_id)
-        contacts, sec_struct = load_files(pdb_id)
+        contacts, sec_struct = load_files(pdb_id, sec_struct_folder=options.secondary_structure_folder,
+                                                  pred_folder=options.prediction_folder)
         for alpha in alpha_range:
             for beta in beta_range:
                 xl_ranked = run_pagerank(contacts, sec_struct, alpha, beta, shift_dict, length)

@@ -14,18 +14,18 @@ for d in datasets:
         os.system("mkdir -p %s" % experiment_folder)
 
 
-#os.system("qsub -o tmp/ epc-map_psicov.sh")
-#os.system("qsub -o tmp/ evfold_psicov.sh")
-#os.system("qsub -o tmp/ metapsicov_stage2_psicov.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_psicov.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ evfold_psicov.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_psicov.sh")
 
-#os.system("qsub -o tmp/ epc-map_svmcon.sh")       
-#os.system("qsub -o tmp/ evfold_svmcon.sh")
-#os.system("qsub -o tmp/ metapsicov_stage2_svmcon.sh")        
+os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_svmcon.sh")       
+os.system("qsub -o /scratch/schneider/run_tmp/ evfold_svmcon.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_svmcon.sh")        
 
-#os.system("qsub -o tmp/ epc-map_d329.sh")       
-#os.system("qsub -o tmp/ evfold_d329.sh")
-#os.system("qsub -o tmp/ metapsicov_stage2_d329.sh")  
+os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_d329.sh")       
+os.system("qsub -o /scratch/schneider/run_tmp/ evfold_d329.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_d329.sh")  
 
-os.system("qsub -o tmp/ epc-map_metapsicov_test.sh")       
-os.system("qsub -o tmp/ evfold_metapsicov_test.sh")
-os.system("qsub -o tmp/ metapsicov_stage2_metapsicov_test.sh")  
+os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_metapsicov_test.sh")       
+os.system("qsub -o /scratch/schneider/run_tmp/ evfold_metapsicov_test.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_metapsicov_test.sh")  #

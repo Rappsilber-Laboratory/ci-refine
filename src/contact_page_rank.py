@@ -38,33 +38,37 @@ def default_output_folder():
 
 
 def build_ce_graph(xl_data, length, shift_dict, sec_struct):
-    g = nx.DiGraph()
 
+    # Initialize graph datastructure. The score of the contact will be used as node weights and also the personalization
+    # vector will be set to the contact scores
+    g = nx.Graph()
     index = 1
     pers = {}
     for score, i in xl_data[:length]:
         g.add_node(index, xl=i, weight=score)
         pers[index] = float(score)
         index += 1
-
+    # Iterate over the nodes (contacts) and get the co-occurance probability matrix for the secondary structure of the
+    # centered contact
     for n in g.nodes(data=True):
         sec_lower = sec_struct[n[1]['xl'][0]]
         sec_upper = sec_struct[n[1]['xl'][1]]
-
         sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
+        # Iterate over pairs of nodes
         if sec_struct_shift_dict:
             for o in g.nodes(data=True):
                 if o[0] != n[0]:
+                    # Compute the relative shift between the contacts in i,j position
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
-
+                    # Some exception handling
                     if (sec_struct_shift_dict.has_key(shift_tuple) and not
                     numpy.isnan(sec_struct_shift_dict[shift_tuple]) and sec_struct_shift_dict[shift_tuple] != 0.0):
-
+                        # If there is already this edge, keep the edge with the lower weight
                         if g.has_edge(n[0], o[0]):
                             old_weight = g.edge[n[0]][o[0]]['weight']
                             if old_weight > sec_struct_shift_dict[shift_tuple]:
                                 g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
-
+                        # If the edge does not exist, draw the edge
                         else:
                             g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
     return g, pers
@@ -441,33 +445,6 @@ def which_clust(i, all_clust):
             return clust
 
 
-def clust_graph(graph):
-    from sklearn import metrics
-    from sklearn import cluster
-    A = nx.adjacency_matrix(graph)
-    max_score = 0
-    max_labels = []
-    max_num_clust = 0
-    all_clust = []
-    for i in xrange(2, 8):
-        spec = cluster.KMeans(n_clusters=i)
-        labels = spec.fit_predict(A)
-        score = metrics.silhouette_score(A, labels, metric='euclidean')
-        if score > max_score:
-            max_score = score
-            max_labels = labels
-            max_num_clust = i
-    for c in xrange(0, max_num_clust):
-        clust = [i + 1 for i, j in enumerate(max_labels) if j == c]
-
-        all_clust.append(clust)
-
-    print "CLUST", max_score, max_num_clust
-    if max_num_clust == 2:
-        return None
-    else:
-        return all_clust
-
 
 def draw_graph(graph, true_map, pers, clust=None):
     true_nodes = []
@@ -524,84 +501,6 @@ def get_prediction_vector(contact_list, i, j):
         else:
             pred_vec.append(0.0)
     return numpy.array(pred_vec)
-
-
-def get_clustered_aligns(shift_dict):
-    shift_mat = shift_matrix()
-    vec_dict = {}
-    for keys, values in shift_dict.iteritems():
-        vec_dict[keys] = 1
-
-        # print values
-        pred_dict = {}
-        for i in xrange(0, len(values)):
-            # print values
-            pred_vec = []
-            # print i
-            for i_shift, j_shift in shift_mat:
-                # print i_shift
-                # if i_shift != 0 and j_shift != 0:
-                # print i_shift, j_shift, values[(i_shift,j_shift)]
-                #  try:
-                #       if values
-                if values[i].has_key((i_shift, j_shift)):
-                    pred_vec.append(values[i][(i_shift, j_shift)])
-                else:
-                    pred_vec.append(0.0)
-                    # except:
-                    #    pred_vec.append(0.0)
-                    # print keys, values
-            pred_dict[i] = numpy.array(pred_vec)
-        vec_dict[keys] = pred_dict
-    return vec_dict
-
-
-def get_lowest_scoring_clust(vec, clust_aligns):
-    lowest_score = 0.0
-    lowest_clust = 99
-    for keys, values in clust_aligns.iteritems():
-        if numpy.dot(vec, values) > lowest_score:
-            lowest_clust = keys
-            # print vec#, values
-            # print values
-            lowest_score = numpy.dot(vec, values)
-
-            # print lowest_score
-
-    if clust_aligns.has_key(lowest_clust):
-        new_dict = {}
-        shift_mat = shift_matrix()
-        for shifts, val in zip(shift_mat, clust_aligns[lowest_clust]):
-            new_dict[shifts] = val
-        return new_dict
-    else:
-        return False
-
-
-def normalize_per_position(clust_aligns):
-    shift_mat = shift_matrix()
-    shift_dict = {}
-
-    dict_info = []
-    for keys, values in clust_aligns.iteritems():
-        for i in xrange(0, 10):
-            dict_info.append((keys, i))
-
-    sum_per_stuff = [0] * len(clust_aligns[('H', 'H')][0])
-
-    for keys in dict_info:
-
-        for i in xrange(0, len(sum_per_stuff)):
-            sum_per_stuff[i] = sum_per_stuff[i] + clust_aligns[keys[0]][keys[1]][i]
-
-    for keys in dict_info:
-        # print len(clust_aligns[('H','H')][0])
-        new_val = [0] * len(clust_aligns[('H', 'H')][0])
-
-        for i in xrange(0, len(sum_per_stuff)):
-            new_val[i] = clust_aligns[keys[0]][keys[1]][i] / sum_per_stuff[i]
-
-        clust_aligns[keys[0]][keys[1]] = new_val
 
 
 def main():

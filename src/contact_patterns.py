@@ -235,7 +235,7 @@ def main():
     #
     sec_struct_types = ["H","C","E"]
     bur_types = ["B","A"]
-    seq_sep_types = [(12,24),(24,9999)]
+    seq_sep_types = [(12, 24),(24, 9999)]
     sec_struct_pair_types = {}
     for i in xrange(0,len(sec_struct_types)):
         for j in xrange(0,len(sec_struct_types)):
@@ -243,7 +243,7 @@ def main():
                 #for l in xrange(0,len(seq_sep_types)):
             all_shifts = {}
             all_contacts = 0
-            sec_struct_pair_types[(sec_struct_types[i],sec_struct_types[j])] = (all_shifts,all_contacts)
+            sec_struct_pair_types[(sec_struct_types[i], sec_struct_types[j])] = (all_shifts, all_contacts)
 
     print sec_struct_pair_types
     #return 0
@@ -257,7 +257,7 @@ def main():
         new_stuff[keys] = shift_dict
 
     print new_stuff
-    cPickle.dump(new_stuff, open( "shifts.p", "wb" ),protocol=2 )
+    cPickle.dump(new_stuff, open( "shifts_test.p", "wb" ),protocol=2 )
 
     file = open(options.pdb_id_list)
     all_contacts = 0
@@ -307,7 +307,7 @@ def main():
                 #print distance
     pickle.dump(all_shifts, open( "shifts.p", "wb" ) )
     """
-    cPickle.dump(sec_struct_pair_types, open( "shifts.p", "wb" ),protocol=2 )
+    cPickle.dump(sec_struct_pair_types, open( "shifts_test.p", "wb" ),protocol=2 )
 
 if __name__ == '__main__':
     sys.exit(main())

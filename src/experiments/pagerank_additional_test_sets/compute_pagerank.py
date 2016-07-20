@@ -1,7 +1,7 @@
 import os
 import sys
 import argparse
-from evaluation_helper import load_pdb_ids, refine_contacts_with_pagerank
+from evaluation_helper import load_pdb_ids, refine_contacts_with_pagerank, refine_contacts_with_pagerank_classifier
 
 
 options = {}
@@ -41,5 +41,6 @@ def main():
                              pdb_id,
                              ".horiz"])
 
-        refine_contacts_with_pagerank(pdb_id, contact_file, length, psipred_file, str(options.beta), output_folder, alpha=options.alpha)         
+        #refine_contacts_with_pagerank(pdb_id, contact_file, length, psipred_file, str(options.beta), output_folder, alpha=options.alpha)         
+        refine_contacts_with_pagerank_classifier(pdb_id, contact_file, length, psipred_file, str(options.beta), output_folder, alpha=options.alpha)
 main()
