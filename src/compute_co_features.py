@@ -96,10 +96,17 @@ def co_occurence_feature_with_label(contacts, sec_struct, shift_dict, feature_ma
                 sec_upper_j = sec_struct[contacts[j][1][0]]
                 sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
                 if shift_tuple in sec_struct_shift_dict:
+                    #contacts[i][0], contacts[j][0]
+                    feature_vector = [contacts[i][0], contacts[j][0], shift_tuple[0], shift_tuple[1],
+                                      sec_struct_shift_dict[shift_tuple],
+                                      i,
+                                      j,
+                                      abs(i-j)] # ,
                     #,
-                    vector_i = neighborhood_vector(contacts, contacts[i][1][0], contacts[i][1][1], shift_dict, sec_struct)
-                    vector_j = neighborhood_vector(contacts, contacts[j][1][0], contacts[j][1][1], shift_dict, sec_struct)
-                    feature_vector = list(itertools.chain(vector_i, vector_j))
+                    #vector_i = neighborhood_vector(contacts, contacts[i][1][0], contacts[i][1][1], shift_dict, sec_struct)
+                    #vector_j = neighborhood_vector(contacts, contacts[j][1][0], contacts[j][1][1], shift_dict, sec_struct)
+
+                   # feature_vector = list(itertools.chain(vector_i, vector_j))
                                       #sec_struct_encoding(sec_lower)[0],
                                       #sec_struct_encoding(sec_lower)[1],
                                       #sec_struct_encoding(sec_lower)[2],
@@ -238,7 +245,7 @@ def load_files(pdb_id, length):
                             ".prediction"])
     sec_struct = InputOutput.InputOutput.parse_psipred(psipred_file)
     xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=12,
-                                                         max_contacts=int(int(length)*0.2))
+                                                         max_contacts=int(int(length)*0.1))
     return xl_data, sec_struct
 
 
@@ -252,7 +259,7 @@ def write_results_csv(value_dict, out_file):
 
 
 def main():
-    folder = "/scratch/schneider/projects/pagerank_refinement/data/co-occurence_features_extensive/"
+    folder = "/scratch/schneider/projects/pagerank_refinement/data/co-occurence_features_easy_both/"
     parse_arguments()
     feature_matrix = []
     labels = []
