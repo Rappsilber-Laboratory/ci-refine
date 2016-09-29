@@ -1,0 +1,470 @@
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1a1hA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1amxA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1bmgA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1buoA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1c75A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1cewI.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1chdA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1cqyA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1ctjA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1cxqA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1d2sA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1dbuA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1dmgA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1dzoA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1e29A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1e87A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1e9mA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1ecaA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1ejgA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1elrA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1es8A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1f4pA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1fioA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1fueA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1g2rA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1g3pA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1grjA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1h9oA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1hcrA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1he7A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1hxiA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1idoA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1ig5A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1j75A.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1jsfA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1maiA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1mscA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1mwpA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1qgvA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1qjpA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1rsyA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1sknP.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1vhhA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1whiA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/1xerA.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/2madL.prediction'
+/scratch/schneider/local/lib/anaconda/lib/python2.7/site-packages/setuptools-23.0.0-py2.7.egg/pkg_resources/__init__.py:1268: UserWarning: /home/schneider/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+  File "check_contacts.py", line 271, in <module>
+    sys.exit(main())
+  File "check_contacts.py", line 235, in main
+    res_long = load_restraints(options.restraint_file, seq_sep_min=24, dom_ass=options.dom_ass)
+  File "check_contacts.py", line 93, in load_restraints
+    file = open(restraint_file, "r")
+IOError: [Errno 2] No such file or directory: '/scratch/schneider/projects/pagerank_refinement/data/predictor_results/svmcon/ccmpred/9wgaB.prediction'
