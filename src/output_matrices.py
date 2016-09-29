@@ -1,7 +1,7 @@
 
 import cPickle
 import numpy as np 
-shift_dict = cPickle.load(open( "shifts.p", "rb" ))
+shift_dict = cPickle.load(open( "shifts_test_double.p", "rb" ))
 
 #print shift_dict[("H", "H")]
 
@@ -33,9 +33,11 @@ print s
 
 for e in ele:
     for f in ele:
-        print e, f
-        mat = to_matrix(shift_dict[(e, f)])
-        print mat.shape
-        np.savetxt("%s_%s_matrix.txt"%(e,f), mat)
+        for g in ele:
+            for h in ele:    
+                print e, f
+                mat = to_matrix(shift_dict[(e, f, g, h)])
+                print mat.shape
+                np.savetxt("%s_%s_%s_%s_matrix.txt"%(e,f, g, h), mat)
         
 

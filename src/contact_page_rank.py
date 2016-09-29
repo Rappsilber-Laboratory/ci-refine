@@ -64,6 +64,7 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
                     if (sec_struct_shift_dict.has_key(shift_tuple) and not
                     numpy.isnan(sec_struct_shift_dict[shift_tuple]) and sec_struct_shift_dict[shift_tuple] != 0.0):
                         # If there is already this edge, keep the edge with the lower weight
+                        
                         if g.has_edge(n[0], o[0]):
                             old_weight = g.edge[n[0]][o[0]]['weight']
                             if old_weight > sec_struct_shift_dict[shift_tuple]:
@@ -71,6 +72,7 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
                         # If the edge does not exist, draw the edge
                         else:
                             g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
+                        
     return g, pers
 
 
@@ -507,6 +509,8 @@ def main():
     parse_arguments()
     sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
+    #shift_dict = cPickle.load(open("probabilities/shifts_test_metapsicov.p", "rb"))
+
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, node_weights = build_ce_graph(xl_data, int(options.length * options.top), shift_dict, sec_struct)
     xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, options.length)

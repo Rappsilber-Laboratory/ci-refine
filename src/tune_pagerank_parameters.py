@@ -9,7 +9,7 @@ import numpy
 import argparse
 import cPickle
 sys.path.append("experiments/pagerank_additional_test_sets/")
-from contact_page_rank_classifier import build_ce_graph, do_page_rank
+from contact_page_rank import build_ce_graph, do_page_rank
 options = {}
 from sklearn.metrics import accuracy_score, precision_score
 from sklearn.metrics import roc_auc_score
@@ -48,10 +48,10 @@ def evaluate_ranking(xl_ranked, native_dict, num_top_contacts, seq_sep = 24):
             long_range_contacts.append((i, j, score))
     for i, j, score in long_range_contacts[:num_top_contacts]:
         if native_dict.has_key((i, j)):
-            prediction_labels.append(1)
+            prediction_labels.append(1.0)
             true_labels.append(1)
         else:
-            prediction_labels.append(1)
+            prediction_labels.append(1.0)
             true_labels.append(0)
     try:
         #print true_labels, prediction_labels
@@ -83,7 +83,25 @@ def load_files(pdb_id, sec_struct_folder=None, pred_folder=None):
                             ".prediction"])
     sec_struct = InputOutput.InputOutput.parse_psipred(psipred_file)
 
-    xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=24)
+    xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=12)
+    return xl_data, sec_struct
+
+
+def load_files_bur(pdb_id, sec_struct_folder=None, pred_folder=None, solv_folder=None):
+
+    psipred_file = "".join([sec_struct_folder,
+                            pdb_id,
+                            ".horiz"])
+    contact_file = "".join([pred_folder,
+                            pdb_id,
+                            ".prediction"])
+    solv_file = "".join([solv_folder,
+                              pdb_id,
+                              ".solv"])
+
+    sec_struct = InputOutput.InputOutput.parse_psipred(psipred_file)
+    bur_dict = InputOutput.InputOutput.parse_psipred(solv_file)
+    xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=12)
     return xl_data, sec_struct
 
 
@@ -95,28 +113,35 @@ def write_results_csv(value_dict, out_file):
     file.close()
 
 
+
 def main():
     
     parse_arguments()
     
     protein_data = load_pdb_ids(options.contact_file_list)
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
-
-    alpha_range = numpy.linspace(0.1, 0.85, 16)
-    beta_range = numpy.linspace(1.5, 3.0, 13)
-    #alpha_range = [ 0.3, 0.4, 0.5, 0.6]
-    #beta_range = [1.5, 2.5]
+    #shift_dict = cPickle.load(open("shifts_moep.p", "rb"))
+    #shift_dict = cPickle.load(open("shifts_test_double.p", "rb"))
+    #shift_dict = cPickle.load(open("probabilities/shifts_predictor.p", "rb"))
+    #shift_dict = cPickle.load(open("shifts_test_metapsicov.p", "rb"))
+    #alpha_range = numpy.linspace(0.2, 0.65, 10)
+    #beta_range = numpy.linspace(1.5, 3.0, 4)
+    #Test:
+    #alpha_range = [0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65]
+    #beta_range = [2.0, 2.5]
     #beta_range = [1.5]
+    alpha_range = [0.6]
+    beta_range = [2.5]
     print alpha_range
     print beta_range
-
+    #for keys, values in shift_dict.iteritems():
+    #    print keys, values
     all_values = {}
     for alpha in alpha_range:
         for beta in beta_range:
             all_values[(alpha, beta)] = []
     counter = 1
     for pdb_id, length in protein_data:
-        native_map = load_native_map(pdb_id)
         contacts, sec_struct = load_files(pdb_id, sec_struct_folder=options.secondary_structure_folder,
                                                   pred_folder=options.prediction_folder)
         for alpha in alpha_range:
@@ -136,7 +161,7 @@ def main():
                 best_beta = parameters[1]
                 best_acc = numpy.mean(values)
     
-        print "Accuracy", round(best_acc,3)
+        print "Accuracy", round(best_acc, 3)
         print "alpha", best_alpha
         print "beta", best_beta
         counter += 1

@@ -216,7 +216,7 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
    
 def do_page_rank (xl_graph,pers):
 
-    ranked_nodes, error = pagerank(xl_graph, max_iter=10000, alpha=0.85, tol=1e-06, personalization=pers)#, weight = 'weight')
+    ranked_nodes, error = pagerank(xl_graph, max_iter=10000, alpha=0.85, tol=1e-08, personalization=pers)#, weight = 'weight')
     print (0.85 / (1-0.85))* error
     for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems()]
     for_sorting.sort()
@@ -226,7 +226,7 @@ def do_page_rank (xl_graph,pers):
         print score, n
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
-        xl_ranked.append((res_lower, 'CA', res_upper, 'CA', score))
+        xl_ranked.append((res_lower, res_upper, score))
     InputOutput.InputOutput.write_contact_file(xl_ranked, options.id + "_PR.txt", upper_distance=20)
 
 
@@ -275,7 +275,6 @@ def build_xl_graph( xl_data ):
                 if is_neighbourhood(n[1]['xl'], o[1]['xl'], delta=6, double=True): # good results with delta=6
                     g.add_edge(n[0],o[0])#, weight =  numpy.max([n[1]['weight'], o[1]['weight']])  )
 
-    #add_loops( g )
 
     for i in xrange(0, 2): # good results with 2 iterations
         to_add = []
@@ -293,14 +292,16 @@ def build_xl_graph( xl_data ):
 def main():        
    """Generic main function. Executes main functionality of program
    """
-   tg = toy_graph()
+   #tg = toy_graph()
    #has_loop(2,4,tg)
    #sys.exit()
    #rint tg.edges()
    #pagerank(tg)
    #sys.exit()
    #xl_data, gt_data = InputOutput.InputOutput.load_xl_data_random(options.example,options.offset, max_links = options.max_links) 
-   xl_data, gt_data = InputOutput.InputOutput.load_xl_data(options.example,options.offset)
+   xl_data, gt_data = InputOutput.InputOutput.load_xl_data(options.example, options.offset)
+   print len(gt_data)
+   #print gt_data
    InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20)
 
    #sys.exit()

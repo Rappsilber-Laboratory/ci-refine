@@ -46,8 +46,10 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct, contact_co_dict):
     g = nx.Graph()
     index = 1
     pers = {}
+    node_dict = {}
     for score, i in xl_data[:length]:
         g.add_node(index, xl=i, weight=score)
+        node_dict[i] = index
         pers[index] = float(score)
         index += 1
 
@@ -61,25 +63,51 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct, contact_co_dict):
                 if o[0] != n[0]:
                     shift_tuple = (n[1]['xl'][0] - o[1]['xl'][0], n[1]['xl'][1] - o[1]['xl'][1])
 
+                    # Some exception handling
                     if (sec_struct_shift_dict.has_key(shift_tuple) and not
                     numpy.isnan(sec_struct_shift_dict[shift_tuple]) and sec_struct_shift_dict[shift_tuple] != 0.0):
+                        # If there is already this edge, keep the edge with the lower weight
 
                         if g.has_edge(n[0], o[0]):
                             old_weight = g.edge[n[0]][o[0]]['weight']
-                            #if old_weight > min(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], sec_struct_shift_dict[shift_tuple]):
-                            if old_weight > max(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], 0.00000000001):
-                            #if old_weight > contact_co_dict[(n[1]['xl'], o[1]['xl'])]:
-                                if contact_co_dict.has_key((n[1]['xl'], o[1]['xl'])):
-                                    #g.add_edge(n[0], o[0], weight=min(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], sec_struct_shift_dict[shift_tuple]))
-                                    g.add_edge(n[0], o[0], weight=max(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], 0.00000000001))
-                                    #g.add_edge(n[0], o[0], weight=contact_co_dict[(n[1]['xl'], o[1]['xl'])])
+                            if old_weight > sec_struct_shift_dict[shift_tuple]:
+                                g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
+                        # If the edge does not exist, draw the edge
                         else:
-                            if contact_co_dict.has_key((n[1]['xl'], o[1]['xl'])):
-                                g.add_edge(n[0], o[0], weight=max(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], 0.0000000001))
-                                #g.add_edge(n[0], o[0], weight=contact_co_dict[(n[1]['xl'], o[1]['xl'])])
-                                #g.add_edge(n[0], o[0], weight=min(contact_co_dict[(n[1]['xl'], o[1]['xl'])]*sec_struct_shift_dict[shift_tuple], sec_struct_shift_dict[shift_tuple]))
-    return g, pers
+                            g.add_edge(n[0], o[0], weight=sec_struct_shift_dict[shift_tuple])
+    # Draw "shortcut" edges between high-scoring nodes
 
+    edge_scores = [n[2]['weight'] for n in g.edges(data=True)]
+
+    edge_scores.sort(reverse=True)
+    high_scores = numpy.mean(edge_scores[0:int(len(edge_scores) * 0.001)])
+    co_scores = []
+    for key, values in contact_co_dict.iteritems():
+        co_scores.append((values, key))
+
+    co_scores.sort(reverse=True)
+    #print co_scores
+    #co_scores = [(values, keys) in contact_co_dict.iteritems()]
+    counter = 0
+    for values, keys in co_scores[:20]:
+        if values >= 0.6:
+            if not g.has_edge(node_dict[keys[0]], node_dict[keys[1]]):
+                g.add_edge(node_dict[keys[0]], node_dict[keys[1]], weight=high_scores)
+        #print keys, values
+            counter +=1
+    print "added edges:", counter
+
+
+
+    """
+    scores = [(n[1]['weight'], n[0]) for n in g.nodes(data=True)]
+    scores.sort()
+    scores.reverse()
+    for score, i in scores[:(length / 10)]:
+        for score_2, j in scores[:(length / 10)]:
+            g.add_edge(i, j, weight=high_scores)
+    """
+    return g, pers
 
 def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
     """
@@ -631,8 +659,8 @@ def main():
         clf = cPickle.load(infile)
     with open('normalizer', 'rb') as infile:
         norm = cPickle.load(infile)
-    X = norm.transform(feature_matrix)
-    probs = clf.predict_proba(X)
+    #X = norm.transform(feature_matrix)
+    probs = clf.predict_proba(feature_matrix)
 
     contact_score_dict = {}
     #sum_probs = 0

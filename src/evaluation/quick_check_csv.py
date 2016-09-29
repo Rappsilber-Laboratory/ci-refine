@@ -22,21 +22,25 @@ file = open(options.score_file)
 acc_10 = []
 acc_5 = []
 acc_2 = []
+acc_1 = []
 acc_1_5 = []
 
 acc_10_mid = []
 acc_5_mid = []
 acc_2_mid = []
+acc_1_mid = []
 acc_1_5_mid = []
 
 cov_10 = []
 cov_5 = []
 cov_2 = []
+cov_1 = []
 cov_1_5 = []
 
 cov_10_mid = []
 cov_5_mid = []
 cov_2_mid = []
+cov_1_mid = []
 cov_1_5_mid = []
 
 
@@ -57,18 +61,22 @@ for line in file:
         cov_5.append(float(strline[9]))
         acc_2.append(float(strline[14]))
         cov_2.append(float(strline[15]))
-        acc_1_5.append(float(strline[20]))
-        acc_1_5.append(float(strline[21]))
+        acc_1.append(float(strline[20]))
+        cov_1.append(float(strline[21]))
+        acc_1_5.append(float(strline[26]))
+        acc_1_5.append(float(strline[27]))
 
 
-        acc_10_mid.append(float(strline[2+24]))
-        cov_10_mid.append(float(strline[3+24]))
-        acc_5_mid.append(float(strline[8+24]))
-        cov_5_mid.append(float(strline[9+24]))
-        acc_2_mid.append(float(strline[14+24]))
-        cov_2_mid.append(float(strline[15+24]))
-        acc_1_5_mid.append(float(strline[20+24]))
-        cov_1_5_mid.append(float(strline[21+24]))
+        acc_10_mid.append(float(strline[2+30]))
+        cov_10_mid.append(float(strline[3+30]))
+        acc_5_mid.append(float(strline[8+30]))
+        cov_5_mid.append(float(strline[9+30]))
+        acc_2_mid.append(float(strline[14+30]))
+        cov_2_mid.append(float(strline[15+30]))
+        acc_1_mid.append(float(strline[20+30]))
+        cov_1_mid.append(float(strline[21+30]))
+        acc_1_5_mid.append(float(strline[26+30]))
+        cov_1_5_mid.append(float(strline[27+30]))
 
         counter +=1
 #    else:
@@ -92,9 +100,11 @@ print
 out_string = "".join(["%.3f," % np.mean(acc_10),
                        "%.3f," % np.mean(acc_5),
                        "%.3f," % np.mean(acc_2),
+                       "%.3f," % np.mean(acc_1),
                        "%.3f," % np.mean(acc_1_5),
                        "%.3f," % np.mean(acc_10_mid),
                        "%.3f," % np.mean(acc_5_mid),
                        "%.3f," % np.mean(acc_2_mid),
+                       "%.3f," % np.mean(acc_1_mid),
                        "%.3f" % np.mean(acc_1_5_mid)])
 print out_string

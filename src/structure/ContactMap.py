@@ -132,7 +132,7 @@ class ContactMap:
       for resnum_lower, residue_lower in enumerate(self.contact_map):
           for resnum_upper, residue_upper in enumerate(residue_lower):
               if resnum_lower <= resnum_upper and self.contact_map[resnum_lower][resnum_upper] == 1:
-                  list.append((resnum_lower, resnum_upper, 1.0))
+                  list.append((resnum_lower+1, resnum_upper+1, 1.0))
       return list
 
   def distances(self, seq_sep, include_residue_numbers):

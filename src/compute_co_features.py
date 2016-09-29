@@ -95,24 +95,29 @@ def co_occurence_feature_with_label(contacts, sec_struct, shift_dict, feature_ma
                 sec_lower_j = sec_struct[contacts[j][1][0]]
                 sec_upper_j = sec_struct[contacts[j][1][0]]
                 sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
-                if shift_tuple in sec_struct_shift_dict:
+                if not shift_tuple in sec_struct_shift_dict:
                     #contacts[i][0], contacts[j][0]
                     feature_vector = [contacts[i][0], contacts[j][0], shift_tuple[0], shift_tuple[1],
-                                      sec_struct_shift_dict[shift_tuple],
-                                      i,
-                                      j,
-                                      abs(i-j)] # ,
+                                      sec_struct_encoding(sec_lower)[0],
+                                      sec_struct_encoding(sec_lower)[1],
+                                      sec_struct_encoding(sec_lower)[2],
+                                      sec_struct_encoding(sec_upper)[0],
+                                      sec_struct_encoding(sec_upper)[1],
+                                      sec_struct_encoding(sec_upper)[2],
+                                      abs(contacts[i][1][0]-contacts[i][1][1]),
+                                      abs(contacts[j][1][0] - contacts[j][1][1])]
+                # ,
                     #,
                     #vector_i = neighborhood_vector(contacts, contacts[i][1][0], contacts[i][1][1], shift_dict, sec_struct)
                     #vector_j = neighborhood_vector(contacts, contacts[j][1][0], contacts[j][1][1], shift_dict, sec_struct)
 
-                   # feature_vector = list(itertools.chain(vector_i, vector_j))
+                #feature_vector = list(itertools.chain(vector_i, vector_j))
                                       #sec_struct_encoding(sec_lower)[0],
                                       #sec_struct_encoding(sec_lower)[1],
                                       #sec_struct_encoding(sec_lower)[2],
                                       #sec_struct_encoding(sec_upper)[0],
                                       #sec_struct_encoding(sec_upper)[1],
-                                      #sec_struct_encoding(sec_upper)[2]]  # ,
+                                      #sec_struct_encoding(sec_upper)[2]]
                       # ,
                     #,
                                       #sec_struct_encoding(sec_lower)[0],
@@ -135,7 +140,7 @@ def co_occurence_feature_with_label(contacts, sec_struct, shift_dict, feature_ma
                         labels.append(1)
                     else:
                         labels.append(0)
-                    #feature_vector = list(itertools.chain(vector_i, vector_j))
+                        #feature_vector = list(itertools.chain(vector_i, vector_j))
                     feature_matrix.append(feature_vector)
 
 
@@ -171,13 +176,17 @@ def co_occurance_features_easy(contacts, sec_struct, shift_dict, feature_matrix,
                 sec_lower_j = sec_struct[contacts[j][1][0]]
                 sec_upper_j = sec_struct[contacts[j][1][0]]
                 sec_struct_shift_dict = shift_dict[(sec_lower, sec_upper)]
-                if shift_tuple in sec_struct_shift_dict:
+                if not shift_tuple in sec_struct_shift_dict:
                     #contacts[i][0], contacts[j][0]
                     feature_vector = [contacts[i][0], contacts[j][0], shift_tuple[0], shift_tuple[1],
-                                      sec_struct_shift_dict[shift_tuple],
-                                      i,
-                                      j,
-                                      abs(i-j)] # ,
+                                     sec_struct_encoding(sec_lower)[0],
+                                     sec_struct_encoding(sec_lower)[1],
+                                     sec_struct_encoding(sec_lower)[2],
+                                     sec_struct_encoding(sec_upper)[0],
+                                     sec_struct_encoding(sec_upper)[1],
+                                     sec_struct_encoding(sec_upper)[2],
+                                     abs(contacts[i][1][0]-contacts[i][1][1]),
+                                     abs(contacts[j][1][0] - contacts[j][1][1])]
                                       #sec_struct_encoding(sec_lower)[0],
                                       #sec_struct_encoding(sec_lower)[1],
                                       #sec_struct_encoding(sec_lower)[2],
@@ -245,7 +254,7 @@ def load_files(pdb_id, length):
                             ".prediction"])
     sec_struct = InputOutput.InputOutput.parse_psipred(psipred_file)
     xl_data = InputOutput.InputOutput.load_restraints_pr(contact_file, seq_sep_min=12,
-                                                         max_contacts=int(int(length)*0.1))
+                                                         max_contacts=int(int(length)*0.2))
     return xl_data, sec_struct
 
 

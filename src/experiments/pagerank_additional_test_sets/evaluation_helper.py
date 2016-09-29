@@ -3,7 +3,7 @@ import os
 def load_pdb_ids(pdb_id_file):
     protein_data = []
     for line in open(pdb_id_file):
-        pdb_id = str(line).strip().split()[0]
+        pdb_id = str(line).strip().split()[0][0:5]
         length = str(line).strip().split()[1]
         protein_data.append((pdb_id, length))
     return protein_data

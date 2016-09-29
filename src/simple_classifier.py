@@ -192,10 +192,10 @@ def main():
     feature_folder = "/scratch/schneider/projects/pagerank_refinement/data/co-occurence_features_easy_both/"
     protein_data = protein_data[0:21]
     data = load_feature_data(protein_data, feature_folder)
-    kfold_split_iterator = dataset_splits(protein_data, 2)
+    kfold_split_iterator = dataset_splits(protein_data, 5)
 
-    #cost_range = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3]#, 0.00001, 0.0001]#, 0.00001, 0.0001, 0.001]
-    cost_range = [0.001, 0.01, 0.1]
+    cost_range = [1e-8, 1e-7, 1e-6, 1e-5, 1e-4, 1e-3, 0.01, 0.1, 1.0, 10.0]#, 0.00001, 0.0001]#, 0.00001, 0.0001, 0.001]
+    #cost_range = [10, 20, 50, 100, 150]
     all_values = {}
 
 
@@ -219,13 +219,13 @@ def main():
             clf = LogisticRegression(C=c).fit(scaled_training, training_labels)
 
             #clf = svm.SVC(C=c, kernel='linear', probability=True).fit(training_features, training_labels)
-            #clf = RandomForestClassifier(n_estimators=c, min_samples_split=500, min_samples_leaf=500).fit(training_features, training_labels)
+            #clf = RandomForestClassifier(n_estimators=c, min_samples_split=500, min_samples_leaf=500).fit(scaled_training, training_labels)
             #clf = KNeighborsClassifier(n_neighbors=c).fit(training_features, training_labels)
             print "Tuning PageRank parameters cost %s" % str(c)
 
             scaled_test = norm.transform(test_features)
-            probs = clf.predict(scaled_test)
-            """
+            probs = clf.predict_proba(scaled_test)
+
             class_indicator = 1
             count = 0
             for i in clf.classes_:
@@ -236,12 +236,18 @@ def main():
             prob_list = []
 
             for i in xrange(0, len(probs)):
-                    #prob_list.append(probs[i][class_indicator])  # / sum_probs
-                    prob_list.append(probs[i])  # / sum_probs
-            """
+                    #if probs[i][class_indicator] >= 0.8:
+                    #    prob_list.append(1)
+                    #else:
+                    #    prob_list.append(0)
+                    prob_list.append(probs[i][class_indicator])  # / sum_probs
+
+                    #prob_list.append(probs[i])
+                    #prob_list.append(probs[i])  # / sum_probs
+
             #for i, j in zip(test_labels, prob_list):
             #    print i,j
-            prec =  precision_score(test_labels, probs, pos_label=1)
+            prec =  roc_auc_score(test_labels, prob_list)
             all_values[c].append(prec)
 
     best_c = best_parameters(all_values)[0][1]
@@ -259,7 +265,7 @@ def main():
     scaled_training = norm.transform(training_features)
 
     clf = LogisticRegression(C=best_c).fit(scaled_training, training_labels)
-    #clf = RandomForestClassifier(n_estimators=best_c, min_samples_split=500, min_samples_leaf=500).fit(training_features, training_labels)
+    #clf = RandomForestClassifier(n_estimators=best_c, min_samples_split=500, min_samples_leaf=500).fit(scaled_training, training_labels)
     #print clf.feature_importances_
 
     with open('easy_model.clf', 'wb') as outfile:

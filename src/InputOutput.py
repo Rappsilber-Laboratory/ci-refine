@@ -26,6 +26,19 @@ class InputOutput:
 
 
     @staticmethod
+    def parse_solpred(solvpred_file):
+        solvpred_dict = {}
+        for line in open(solvpred_file):
+            if float(line.strip().split()[-1]) <= 0.25:
+                solvpred_dict[int(line.strip().split()[0])] = "B" 
+            else:
+                solvpred_dict[int(line.strip().split()[0])] = "A"
+
+        return solvpred_dict
+
+
+
+    @staticmethod
     def load_xl_data( xl_file, offset ):
         col_names = {}
         max_score = 0
@@ -42,14 +55,16 @@ class InputOutput:
                 to_site = int(line[col_names['ToSite']]) + offset
                 score = float(line[col_names['Score']])
                 is_decoy = line[col_names['isDecoy']]
+                protein_1 = line[col_names['Protein1']]
+                protein_2 = line[col_names['Protein2']]
                 site_list = [from_site, to_site]
                 site_list.sort()
 		
-                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
+                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE') and protein_1 == "HSA" and protein_2 == "HSA":
                     if max_score == 0:
                         max_score = score
                     xls.append(((site_list[0], site_list[1]), score/max_score))
-                    gt_data.append((site_list[0], 'CA', site_list[1], 'CA', score / max_score))
+                    gt_data.append((site_list[0], site_list[1], score / max_score))
 
         return xls, gt_data
 
@@ -104,7 +119,7 @@ class InputOutput:
             to_site = int(strline[8])-28
             score = float(strline[9])
             is_decoy = strline[10]
-            if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 12 and is_decoy == 'FALSE':
+            if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and is_decoy == 'FALSE':
                 xls.append(((from_site, to_site), score/30.0))
                 gt_data.append((from_site, 'CA', to_site, 'CA', score))
         file.close()
@@ -176,7 +191,7 @@ class InputOutput:
 
 
     @staticmethod
-    def load_restraints( restraint_file, seq_sep_min = 24, seq_sep_max=9999 ):
+    def load_restraints( restraint_file, seq_sep_min = 24, seq_sep_max=9999, pos_min=1, pos_max =999999):
         file = open(restraint_file,"r")
         res = []
         res_dict = {}
@@ -184,7 +199,7 @@ class InputOutput:
             strline = str(line).strip().split()
             if len(strline) > 2:
                 if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
-                    if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
+                    if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max and int(strline[0]) >= pos_min and int(strline[1]) >= pos_min and int(strline[0]) <= pos_max and int(strline[1]) <= pos_max:
                         if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1]))) == False:
                              res.append( (float(strline[-1]),int(strline[0]), int(strline[1]), float(strline[2]), float(strline[3]) ) )
                              res_dict[(int(strline[0]), int(strline[1]))] = 1

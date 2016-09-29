@@ -35,9 +35,9 @@ options, args  = add_options( parser )
 
 def shift_matrix():
     matrix = []
-    for i in xrange(-9,10):
+    for i in xrange(-8,9):
         row = []
-        for j in xrange(-9,10):
+        for j in xrange(-8,9):
             if i == 0 and j == 0:
                 pass
             else:
@@ -245,19 +245,19 @@ def main():
             all_contacts = 0
             sec_struct_pair_types[(sec_struct_types[i], sec_struct_types[j])] = (all_shifts, all_contacts)
 
-    print sec_struct_pair_types
-    #return 0
-    new_stuff = {}
-    for keys,values in sec_struct_pair_types.iteritems():
-        #if keys == ('H','H'):
-        c = load_contact_maps(keys)
+    #print sec_struct_pair_types
+    ##return 0
+    #new_stuff = {}
+    #for keys,values in sec_struct_pair_types.iteritems():
+    #    #if keys == ('H','H'):
+    #    c = load_contact_maps(keys)#
 
-        shift_dict = cluster_shift_maps(c)
-        print shift_dict
-        new_stuff[keys] = shift_dict
+    #    shift_dict = cluster_shift_maps(c)
+    #    print shift_dict
+    #    new_stuff[keys] = shift_dict#
 
-    print new_stuff
-    cPickle.dump(new_stuff, open( "shifts_test.p", "wb" ),protocol=2 )
+    #print new_stuff
+    #cPickle.dump(new_stuff, open( "shifts_test.p", "wb" ),protocol=2 )
 
     file = open(options.pdb_id_list)
     all_contacts = 0
@@ -265,6 +265,9 @@ def main():
         pdb_id = str(line).strip().split()[0][0:5]
 
         pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
+        #pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
+        #pdb_file = "/scratch/schneider/projects/pagerank_refinement/data/predictor_results/metapsicov_test/pdb/%s.pdb"%(pdb_id)
+
         tmp_struct = StructureContainer.StructureContainer()
         sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)
         sec_struct = sec_struct.ss_dict
@@ -274,7 +277,7 @@ def main():
             tmp_struct.load_structure('xxxx', pdb_id[-1],pdb_file, seqsep =1)
         except:
             tmp_struct.load_structure('xxxx', ' ',pdb_file, seqsep =1)
-
+        all_contacts += add_contacts(tmp_struct, sec_struct_pair_types, shift_mat, sec_struct, None )
 
     for keys, values in sec_struct_pair_types.iteritems():
         all_shifts = values[0]
@@ -307,7 +310,7 @@ def main():
                 #print distance
     pickle.dump(all_shifts, open( "shifts.p", "wb" ) )
     """
-    cPickle.dump(sec_struct_pair_types, open( "shifts_test.p", "wb" ),protocol=2 )
+    cPickle.dump(sec_struct_pair_types, open( "shifts_test_metapsicov.p", "wb" ),protocol=2 )
 
 if __name__ == '__main__':
     sys.exit(main())

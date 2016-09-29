@@ -1,7 +1,7 @@
 import os
 import sys
 
-methods = ["epc-map", "metapsicov_stage2", "evfold"]
+methods = ["epc-map", "metapsicov_stage2", "evfold", "metapsicov_stage1"]
 datasets = ["psicov", "metapsicov_test", "d329", "svmcon"]
 
 # set up data folders
@@ -17,15 +17,27 @@ for d in datasets:
 os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_psicov.sh")
 os.system("qsub -o /scratch/schneider/run_tmp/ evfold_psicov.sh")
 os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_psicov.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage1_psicov.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ gremlin_psicov.sh")
+
 
 os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_svmcon.sh")       
 os.system("qsub -o /scratch/schneider/run_tmp/ evfold_svmcon.sh")
 os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_svmcon.sh")        
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage1_svmcon.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ gremlin_svmcon.sh")
+
 
 os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_d329.sh")       
 os.system("qsub -o /scratch/schneider/run_tmp/ evfold_d329.sh")
 os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_d329.sh")  
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage1_d329.sh")
+os.system("qsub -o /scratch/schneider/run_tmp/ gremlin_d329.sh")
+
 
 os.system("qsub -o /scratch/schneider/run_tmp/ epc-map_metapsicov_test.sh")       
 os.system("qsub -o /scratch/schneider/run_tmp/ evfold_metapsicov_test.sh")
-os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_metapsicov_test.sh")  #
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage2_metapsicov_test.sh") 
+os.system("qsub -o /scratch/schneider/run_tmp/ metapsicov_stage1_metapsicov_test.sh")  
+os.system("qsub -o /scratch/schneider/run_tmp/ gremlin_metapsicov_test.sh")
+
