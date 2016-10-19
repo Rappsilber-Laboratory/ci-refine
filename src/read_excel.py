@@ -63,7 +63,17 @@ def gmm_fit(chromatogram):
                      38: 5,
                      39: 5,
                      40: 5,
-                     41: 5}
+                     41: 5,
+                     42: 5,
+                     43: 5,
+                     44: 5,
+                     45: 5,
+                     46: 5,
+                     47: 5,
+                     48: 5,
+		     49: 5,
+		     50: 5}
+
     for n_com in xrange(1, num_gauss_map[max_consecutive(chromatogram)]+1):
         gmm = mixture.GMM(n_components=n_com, covariance_type='full')
         gmm.fit(chromatogram[:, np.newaxis])
@@ -106,15 +116,20 @@ workbook = xlrd.open_workbook("../data/protein_interaction_data/chromatogram_dat
 sh = workbook.sheet_by_name("Exp1")
 # print sh.col_values(0)
 
-for row in range(29, 30):
+#for row in range(0, 1): # Exp 2, 3
+for row in range(29, 30): # Experiment 1
     for i in range(len(sh.row_values(row))):
         print i, sh.row_values(row)[i]
 
-relevant_cols = [i for i in range(61, 109)]
+relevant_cols = [i for i in range(61, 109)] # Exp 1
+#relevant_cols = [i for i in range(58, 103)] # Exp 2
+#relevant_cols = [i for i in range(63, 113)] # Exp 3
 print relevant_cols
 
 data = []
-for row in range(30, 1991):
+for row in range(30, 1991): # Exp1
+#for row in range(2, 2222): #Exp2
+#for row in range(2, 2938): # Exp3
     uniprot = sh.row_values(row)[4]
     chromatogram_data = []
 
@@ -125,29 +140,26 @@ for row in range(30, 1991):
             chromatogram_data.append(0.0)
 
     if check_chromatogram(chromatogram_data, val=0.0, con_count=5) and check_chromatogram(chromatogram_data, val=0.5, con_count=3):
+
         if uniprot.count(";") == 0 and len(uniprot) > 1:
-            data.append((str(uniprot), np.array(chromatogram_data), gmm_fit(np.array(chromatogram_data))))
-            #print gmm_fit(np.array(chromatogram_data))
-            #print chromatogram_data
+            data.append((str(uniprot), np.array(chromatogram_data)))#, gmm_fit(np.array(chromatogram_data))))
         else:
-            #print chromatogram_data
             protein_ids = [str(i.split("-")[0]) for i in uniprot.split(";") if len(str(i.split("-")[0])) > 1]
-            if len(protein_ids) > 1:
-                #print gmm_fit(np.array(chromatogram_data))
-                data.append((list(set(protein_ids))[0], np.array(chromatogram_data), gmm_fit(np.array(chromatogram_data))))
+            if len(list(set(protein_ids))) >= 1:
+                data.append((list(set(protein_ids))[0], np.array(chromatogram_data)))#, gmm_fit(np.array(chromatogram_data))))
+            #print (list(set(protein_ids)))
+                print(list(set(protein_ids)))[0]
 
 interaction_data = []
 for i in range(0, len(data)):
     for j in range(0, len(data)):
         if i < j:
             euclidean_distance = euclidean(data[i][1], data[j][1])#euclidean(data[i][1], data[j][1])
-            if euclidean_distance <= 5.0 and abs(data[i][2]-data[j][2]) < 0.6:
-                interaction_data.append((1.0-euclidean_distance/5.0, data[i][0], data[j][0]))
+            if euclidean_distance <= 8.0: #and abs(data[i][2]-data[j][2]) < 0.5:
+                interaction_data.append((1.0-euclidean_distance/8.0, data[i][0], data[j][0]))
 interaction_data.sort(reverse=True)
 
-with open('interaction_data_euclidean_test.pkl', 'wb') as outfile:
+with open('interaction_data_exp_1_eu_8_final.pkl', 'wb') as outfile:
     cPickle.dump(interaction_data, outfile, cPickle.HIGHEST_PROTOCOL)
-print interaction_data
-print len(interaction_data)
 # print sh.nrows
 # print sh.ncols

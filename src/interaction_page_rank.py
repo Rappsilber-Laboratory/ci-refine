@@ -27,13 +27,13 @@ def parse_arguments():
 def share_interaction(protein_tuple_1, protein_tuple_2):
 
     #if protein_tuple_1[0] in protein_tuple_2 or protein_tuple_1[1] in protein_tuple_2:
-    #if any(i in protein_tuple_1[0] for i in protein_tuple_2[0]) or \
-    #   any(i in protein_tuple_1[0] for i in protein_tuple_2[1]) or \
-    #   any(i in protein_tuple_1[1] for i in protein_tuple_2[0]) or \
-    #   any(i in protein_tuple_1[1] for i in protein_tuple_2[1]):
+    if any(i in protein_tuple_1[0] for i in protein_tuple_2[0]) or \
+       any(i in protein_tuple_1[0] for i in protein_tuple_2[1]) or \
+       any(i in protein_tuple_1[1] for i in protein_tuple_2[0]) or \
+       any(i in protein_tuple_1[1] for i in protein_tuple_2[1]):
         #print protein_tuple_1, protein_tuple_2, "true"
         #sys.exit()
-    if any(i in protein_tuple_1 for i in protein_tuple_2):
+    #if any(i in protein_tuple_1 for i in protein_tuple_2):
         return True
     else:
         #print protein_tuple_1, protein_tuple_2, "false"
@@ -64,7 +64,7 @@ def build_ce_graph(interactions):
                 if share_interaction(protein_tuple_n, protein_tuple_o):
                     edges.append((n[0], o[0]))
 
-        print index / float(len(interactions))
+        #print index / float(len(interactions))
         index += 1
     g.add_edges_from(edges)
     print len(g.edges())
@@ -104,17 +104,17 @@ def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
 
 def main():
     parse_arguments()
-    with open('interaction_data_euclidean_test.pkl', 'rb') as infile:
+    with open('interaction_data_exp_1_eu_8_final.pkl', 'rb') as infile:
         interactions = cPickle.load(infile)
     #interactions = load_interactions("../data/protein_interaction_data/interactions_and_centers.txt")
     print("Building CI Graph")
-    print len(interactions)
+    print("Number of interactions:", len(interactions))
     interactions.sort(reverse=True)
     xl_graph, node_weights = build_ce_graph(interactions)
     print("Applying PageRank")
     xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, 99999999999)
 
-    with open('output_interactions_pagerank_eucleadian.pkl', 'wb') as outfile:
+    with open('interaction_data_exp_1_eu_8_final_pr.pkl', 'wb') as outfile:
         cPickle.dump(xl_ranked, outfile, cPickle.HIGHEST_PROTOCOL)
     print xl_ranked
 
