@@ -5,10 +5,11 @@ import os
 import sys
 import networkx as nx
 import InputOutput
-import numpy
+import numpy as np
 import argparse
 import cPickle
 #import matplotlib.pyplot as plt
+import pandas as pd
 
 options = {}
 
@@ -24,13 +25,51 @@ def parse_arguments():
     options = parser.parse_args()
 
 
+def load_go_terms(uniprot_kb_file):
+    go_dict = {}
+    df = pd.read_table(uniprot_kb_file)
+    for index, row in df.iterrows():
+        go = row['Gene ontology (cellular component)']
+        if isinstance(go, str):
+            go_list = go.split(";")
+        else:
+            go_list = None
+        go_dict[row['Entry']] = go_list
+    return go_dict
+
+
+def go_interaction_score(uniprot_1, uniprot_2, go_dict):
+    if uniprot_1 not in go_dict or uniprot_2 not in go_dict:
+        return 0.0
+    if go_dict[uniprot_1] is None or go_dict[uniprot_2] is None:
+        return 0.0
+
+    else:
+        go_score = 0
+        go_term_list_1 = go_dict[uniprot_1]
+        go_term_list_2 = go_dict[uniprot_2]
+        for go_terms_1 in go_term_list_1:
+            for go_terms_2 in go_term_list_2:
+                if go_terms_1 == go_terms_2:
+                    go_score += 1
+        return float(go_score) / max(len(go_term_list_1), len(go_term_list_2))
+
+
+def max_go_interaction(protein_tuple_1, protein_tuple_2, go_dict):
+    go_interaction_scores = [go_interaction_score(protein_tuple_1[0], protein_tuple_2[0], go_dict),
+                             go_interaction_score(protein_tuple_1[1], protein_tuple_2[0], go_dict),
+                             go_interaction_score(protein_tuple_1[0], protein_tuple_2[1], go_dict),
+                             go_interaction_score(protein_tuple_1[1], protein_tuple_2[1], go_dict)]
+    return np.mean(go_interaction_scores)
+
+
 def share_interaction(protein_tuple_1, protein_tuple_2):
 
-    #if protein_tuple_1[0] in protein_tuple_2 or protein_tuple_1[1] in protein_tuple_2:
-    if any(i in protein_tuple_1[0] for i in protein_tuple_2[0]) or \
-       any(i in protein_tuple_1[0] for i in protein_tuple_2[1]) or \
-       any(i in protein_tuple_1[1] for i in protein_tuple_2[0]) or \
-       any(i in protein_tuple_1[1] for i in protein_tuple_2[1]):
+    if protein_tuple_1[0] in protein_tuple_2 or protein_tuple_1[1] in protein_tuple_2:
+    #if any(i in protein_tuple_1[0] for i in protein_tuple_2[0]) or \
+    #   any(i in protein_tuple_1[0] for i in protein_tuple_2[1]) or \
+    #   any(i in protein_tuple_1[1] for i in protein_tuple_2[0]) or \
+    #   any(i in protein_tuple_1[1] for i in protein_tuple_2[1]):
         #print protein_tuple_1, protein_tuple_2, "true"
         #sys.exit()
     #if any(i in protein_tuple_1 for i in protein_tuple_2):
@@ -40,7 +79,7 @@ def share_interaction(protein_tuple_1, protein_tuple_2):
         return False
 
 
-def build_ce_graph(interactions):
+def build_ce_graph(interactions, go_dict):
     # Initialize graph datastructure. The score of the contact will be used as node weights and also the personalization
     # vector will be set to the interaction scores
     g = nx.Graph()
@@ -61,12 +100,14 @@ def build_ce_graph(interactions):
                 # Draw edge if an interaction shares a protein
                 protein_tuple_n = (n[1]['xl'][0], n[1]['xl'][1])
                 protein_tuple_o = (o[1]['xl'][0], o[1]['xl'][1])
-                if share_interaction(protein_tuple_n, protein_tuple_o):
-                    edges.append((n[0], o[0]))
-
+                #if share_interaction(protein_tuple_n, protein_tuple_o):
+                go_score = max_go_interaction(protein_tuple_n, protein_tuple_o, go_dict)
+                if go_score >= 0.5:
+                    g.add_edge(n[0], o[0])#, weight=go_score)
+                    #edges.append((n[0], o[0]))
         #print index / float(len(interactions))
         index += 1
-    g.add_edges_from(edges)
+    #g.add_edges_from(edges)
     print len(g.edges())
     return g, pers
 
@@ -95,7 +136,7 @@ def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
     for_sorting.sort(reverse=True)
     xl_ranked = []
     for score, n in for_sorting:
-        print score, n
+        #print score, n
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
         xl_ranked.append((score, res_lower, res_upper))
@@ -104,19 +145,21 @@ def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
 
 def main():
     parse_arguments()
-    with open('interaction_data_exp_1_eu_8_final.pkl', 'rb') as infile:
+    with open('interaction_data_exp_1_eu_6_final.pkl', 'rb') as infile:
         interactions = cPickle.load(infile)
     #interactions = load_interactions("../data/protein_interaction_data/interactions_and_centers.txt")
+    go_dict = load_go_terms("uniprot_data_experiment_1_cell.txt")
+    #print go_dict
     print("Building CI Graph")
     print("Number of interactions:", len(interactions))
     interactions.sort(reverse=True)
-    xl_graph, node_weights = build_ce_graph(interactions)
+    xl_graph, node_weights = build_ce_graph(interactions, go_dict)
     print("Applying PageRank")
     xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, 99999999999)
 
-    with open('interaction_data_exp_1_eu_8_final_pr.pkl', 'wb') as outfile:
+    with open('interaction_data_exp_1_eu_6_final_pr.pkl', 'wb') as outfile:
         cPickle.dump(xl_ranked, outfile, cPickle.HIGHEST_PROTOCOL)
-    print xl_ranked
+    #print xl_ranked
 
 if __name__ == '__main__':
     sys.exit(main())

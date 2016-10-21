@@ -104,11 +104,12 @@ def check_chromatogram(chromatogram, val = 0.0, con_count=5):
     for value in chromatogram:
         if value > val:
             consecutive_count += 1
+            if consecutive_count == con_count:
+                # print chromatogram
+                return True
         else:
             consecutive_count = 0
-        if consecutive_count == con_count:
-            #print chromatogram
-            return True
+
     #print chromatogram
     return False
 
@@ -116,8 +117,8 @@ workbook = xlrd.open_workbook("../data/protein_interaction_data/chromatogram_dat
 sh = workbook.sheet_by_name("Exp1")
 # print sh.col_values(0)
 
-#for row in range(0, 1): # Exp 2, 3
-for row in range(29, 30): # Experiment 1
+for row in range(0, 1): # Exp 2, 3
+#for row in range(29, 30): # Experiment 1
     for i in range(len(sh.row_values(row))):
         print i, sh.row_values(row)[i]
 
@@ -142,24 +143,37 @@ for row in range(30, 1991): # Exp1
     if check_chromatogram(chromatogram_data, val=0.0, con_count=5) and check_chromatogram(chromatogram_data, val=0.5, con_count=3):
 
         if uniprot.count(";") == 0 and len(uniprot) > 1:
+            #print uniprot
             data.append((str(uniprot), np.array(chromatogram_data)))#, gmm_fit(np.array(chromatogram_data))))
         else:
+            #print uniprot
             protein_ids = [str(i.split("-")[0]) for i in uniprot.split(";") if len(str(i.split("-")[0])) > 1]
+            #print protein_ids
+            #print
             if len(list(set(protein_ids))) >= 1:
                 data.append((list(set(protein_ids))[0], np.array(chromatogram_data)))#, gmm_fit(np.array(chromatogram_data))))
-            #print (list(set(protein_ids)))
-                print(list(set(protein_ids)))[0]
+            #print (list(set(protein_ids)))                #print(list(set(protein_ids)))[0]
+
+
 
 interaction_data = []
 for i in range(0, len(data)):
-    for j in range(0, len(data)):
+    for j in range(i, len(data)):
         if i < j:
             euclidean_distance = euclidean(data[i][1], data[j][1])#euclidean(data[i][1], data[j][1])
-            if euclidean_distance <= 8.0: #and abs(data[i][2]-data[j][2]) < 0.5:
-                interaction_data.append((1.0-euclidean_distance/8.0, data[i][0], data[j][0]))
+            if euclidean_distance <= 4.0: #and abs(data[i][2]-data[j][2]) < 0.5:
+                interaction_data.append((1.0-euclidean_distance/4.0, data[i][0], data[j][0]))
 interaction_data.sort(reverse=True)
 
-with open('interaction_data_exp_1_eu_8_final.pkl', 'wb') as outfile:
+with open('interaction_data_exp_1_eu_4_final.pkl', 'wb') as outfile:
     cPickle.dump(interaction_data, outfile, cPickle.HIGHEST_PROTOCOL)
+
+file = open("protein_list.txt", "w")
+proteins = [protein for protein, _ in data]
+proteins = list(set(proteins))
+for protein in proteins:
+    file.write(protein + '\n')
+file.close()
+
 # print sh.nrows
 # print sh.ncols

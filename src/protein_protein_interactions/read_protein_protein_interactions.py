@@ -1,14 +1,20 @@
 import pandas as pd
-import re
-import numpy as np
-from sklearn import metrics
 from matplotlib.pylab import plt
 import cPickle
 import seaborn as sns
+from sklearn.metrics import roc_curve, precision_recall_curve
 import sys
+import numpy as np
 
 
 def set_plot_parameters():
+    """
+    Set parameters of matplotlib plotting for font style and size
+
+    Returns
+    -------
+    Nothing
+    """
     f_size = 8
     plt.rcParams.update({'font.size': f_size,
                            #'font.name':'Arial',
@@ -21,50 +27,93 @@ def set_plot_parameters():
                         'ytick.minor.size':0,
                         'ytick.minor.width':0.0})
 
-set_plot_parameters()
-sns.set(style="white", palette="muted")
 
+def tresh_at_fpr(fpr, thresholds, fpr_limit=0.53):
+    """
+    Return the score threshold at a fixed FPR limit
 
-def tresh_at_fpr(fpr, thresholds, fpr_limit = 0.7):
+    Parameters
+    ----------
+    fpr : List of input FPRs
+    thresholds : List of score thresholds
+    fpr_limit : Maximum FPR value at which to return the threshold
+
+    Returns
+    -------
+    fp, tresh (float) : FPR value, score threshold
+    """
     for fp, thresh in zip(fpr, thresholds):
-        if fp >= 0.0067:
+        #print fp, thresh
+        if fp <= fpr_limit:
+
             return fp, thresh
-    #return fpr[-1], thresholds[-1]
 
 
 def interactions_at_tresh(data, tresh):
+    """
+    Return the interactions above a given threshold
+
+    Parameters
+    ----------
+    data : Interaction Data
+    tresh : Threshold
+
+    Returns
+    -------
+    count, interactions_above_tresh : Number of interactions and the list of interactions.
+
+    """
     count = 0
     interactions_above_tresh = []
     for d in data:
         if d[0] >= tresh:
             interactions_above_tresh.append((d[0], d[1], d[2]))
-            #y_true_above_tresh.append(y)
             count += 1
     return count, interactions_above_tresh
 
 
 def sorted_uniprot_tuple(protein_1, protein_2):
+    """
+    Sort Uniprot tuple so that the ordering is consistent.
+
+    Parameters
+    ----------
+    protein_1 : Uniprot string 1
+    protein_2: Uniprot string 2
+
+    Returns
+    -------
+    sorted_tuple: Sorted tuple containing the two Uniprot IDs in alphanumerical order
+    """
     sort_list = [protein_1, protein_2]
     sort_list.sort()
     sorted_tuple = (sort_list[0], sort_list[1])
     return sorted_tuple
 
+
 def get_interaction_scoring_list(interactions, core_complex_list):
+    """
+    DEPRECATED
+
+    Parameters
+    ----------
+    interactions
+    core_complex_list
+
+    Returns
+    -------
+
+    """
     y_true = []
     scores = []
     for score, protein_1, protein_2 in interactions:
-        # print interaction_1, interaction_2
+
         is_in_core_complex = False
         for complex in core_complex_list:
             # test overlaps
             if any(i in protein_1 for i in complex) and any(i in protein_2 for i in complex):
-            #if interaction_1 in complex and interaction_2 in complex:
-                # print interaction_1, interaction_2, complex
-                #print protein_1, protein_2, complex
                 is_in_core_complex = True
                 break
-            #else:
-            #    is_in_core_complex = False
         if is_in_core_complex:
             y_true.append(1)
             scores.append(score)
@@ -76,21 +125,39 @@ def get_interaction_scoring_list(interactions, core_complex_list):
 
 
 def filter_interactions(interactions, core_complex_list):
+    """
+
+    Parameters
+    ----------
+    interactions
+    core_complex_list
+
+    Returns
+    -------
+
+    """
     filtered_interactions = []
+
     for score, protein_1, protein_2 in interactions:
-        # print interaction_1, interaction_2
         protein_1_in_corum = False
         protein_2_in_corum = False
-
+        protein_1_complex = 0
+        protein_2_complex = 0
         for complex in core_complex_list:
-            if protein_1 in complex or protein_1 in complex:
-            #if any(i in protein_1 for i in complex):
+            if protein_1 in complex:
                 protein_1_in_corum = True
-            #if any(i in protein_2 for i in complex):
-                protein_2_in_corum = True
+                protein_1_complex = complex
 
+            if protein_2 in complex:
+                protein_2_in_corum = True
+                protein_2_complex = complex
         if protein_1_in_corum and protein_2_in_corum:
+            #
+            # print protein_1, protein_1_complex
+            #print protein_2, protein_2_complex
+            #print
             filtered_interactions.append((score, protein_1, protein_2))
+
     return filtered_interactions
 
 
@@ -120,9 +187,6 @@ def get_non_interactions(interactions, corum_interactions):
 
 def get_interaction_scoring(interactions, interaction_list, non_interaction_list):
 
-    y_true = []
-    scores = []
-
     tp = 0
     fp = 0
     tn = 0
@@ -130,10 +194,13 @@ def get_interaction_scoring(interactions, interaction_list, non_interaction_list
     tpr = []
     fpr = []
     tresholds = []
-    for score, protein_1, protein_2 in interactions:
-        is_in_core_complex = False
-        protein_tuple = sorted_uniprot_tuple(protein_1, protein_2)
+    count = 0
 
+    y_true = []
+    y_score = []
+    for score, protein_1, protein_2 in interactions:
+        protein_tuple = sorted_uniprot_tuple(protein_1, protein_2)
+        """
         # True positives
         if protein_tuple in interaction_list:
             tp += 1
@@ -142,105 +209,109 @@ def get_interaction_scoring(interactions, interaction_list, non_interaction_list
             fp += 1
 
         tn = len(non_interaction_list) - (tp+fp)
-
-        fn = len(interaction_list) - tp
+        fn = max(0, len(interaction_list) - (tp+fp))
 
         fpr.append(float(fp)/float((fp+tn)))
         tpr.append(float(tp)/float((tp+fn)))
+
         tresholds.append(score)
+        count += 1
+        """
+        if protein_tuple in interaction_list:
+            y_true.append(1)
+            y_score.append(score)
+        else:
+            y_true.append(0)
+            y_score.append(score)
 
-        #elif protein_tuple in interaction_list
-
-    #    for complex in core_complex_list:
-    #        if interaction_1 in complex and interaction_2 in complex:
-    #            is_in_core_complex = True
-    #            break
-    #        else:
-    #            is_in_core_complex = False
-
-    #    if is_in_core_complex:
-    #        y_true.append(1)
-    #        scores.append(score)
-    #    else:
-    #        y_true.append(0)
-    #        scores.append(score)
-    return fpr, tpr, tresholds
-
-file = open("../../data/protein_interaction_data/interactions_and_centers.txt")
-interactions = []
-for line in file:
-    strline = str(line).strip().split()
-
-    score = (abs(float(strline[0])-float(strline[2])) / 37.950100000000006)
-    interactions.append((score, strline[1], strline[3]))
-file.close()
-
-with open('../interaction_data_exp_1_eu_8_final.pkl', 'rb') as infile:
-    interactions = cPickle.load(infile)
-
-with open('../interaction_data_exp_1_eu_8_final.pkl', 'rb') as infile:
-    interactions_pr = cPickle.load(infile)
-
-interactions.sort(reverse=True)
-interactions_pr.sort(reverse=True)
-
-core_complexes = pd.read_csv("../../data/protein_interaction_data/allComplexes.csv", sep=';')
-core_complexes.fillna(0.0, inplace=True)
-
-core_complex_list = []
-for index, row in core_complexes.iterrows():
-
-    if row["subunits (UniProt IDs)"] is not 0.0:
-        split_line = row["subunits (UniProt IDs)"].split(',')
-        cleaned_line = [i.strip('(').strip(')') for i in split_line]
-        core_complex_list.append(cleaned_line)
-
-print len(core_complex_list)
-core_interactions = get_interactions(core_complex_list)
-non_interactions = get_non_interactions(interactions, core_interactions)
-#sys.exit()
-#sys.exit()
-print "Scoring interactions"
-
-interactions = filter_interactions(interactions, core_complex_list)
-interactions_pr = filter_interactions(interactions_pr, core_complex_list)
-print len(interactions)
-fpr, tpr, treshs = get_interaction_scoring(interactions, core_interactions, non_interactions)
-#print tpr
-#print treshs
-fpr_pr, tpr_pr, treshs_pr = get_interaction_scoring(interactions_pr, core_interactions, non_interactions)
+    return y_true, y_score # fpr, tpr, tresholds
 
 
-f, ax = plt.subplots(1, 1, figsize=(3.0, 3.0), sharex=True)
-sns.despine()
+def main():
+    # Load interaction data
+    with open('../interaction_data_exp_1_eu_6_final.pkl', 'rb') as infile:
+        interactions = cPickle.load(infile)
 
-#fpr, tpr, treshs = metrics.roc_curve(y_true, scores)
-#print metrics.roc_auc_score(y_true, scores)
-#sys.exit()
-#fpr_pr, tpr_pr, treshs_pr = metrics.roc_curve(y_true_pr, scores_pr)
-#print metrics.roc_auc_score(y_true_pr, scores_pr)
+    with open('../interaction_data_exp_1_eu_6_final_pr.pkl', 'rb') as infile:
+        interactions_pr = cPickle.load(infile)
+    interactions.sort(reverse=True)
+    interactions_pr.sort(reverse=True)
+    interactions_pr = [(np.log(interaction[0]), interaction[1], interaction[2]) for interaction in interactions_pr]
+    #for i in interactions_pr:
+    #    print i
+    #x = [np.log(interaction[0]) for interaction in interactions_pr]
+    #print x
+    #plt.plot(x)
+    #plt.show()
+    #sys.exit()
+    #sys.exit()
 
-print fpr
-fp, tresh = tresh_at_fpr(fpr, treshs)
-num_interactions, interactions_above_tresh = interactions_at_tresh(interactions, tresh)
-print "SEC Interactions", num_interactions#, metrics.precision_score(y_true_above_tresh, [1]*len(y_true_above_tresh))
+    # Read Corom complexes
+    core_complexes = pd.read_csv("../../data/protein_interaction_data/allComplexes.csv", sep=';')
+    core_complexes.fillna(0.0, inplace=True)
+    core_complex_list = []
+    for index, row in core_complexes.iterrows():
+        if row["subunits (UniProt IDs)"] is not 0.0:
+            split_line = row["subunits (UniProt IDs)"].split(',')
+            cleaned_line = [i.strip('(').strip(')') for i in split_line]
+            core_complex_list.append(cleaned_line)
 
-print fpr_pr
-fp, tresh = tresh_at_fpr(fpr_pr, treshs_pr)
-num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, tresh)
-print "PR Interactions", num_interactions#, metrics.precision_score(y_true_above_tresh, [1]*len(y_true_above_tresh))
+    # Filter interactions by proteins that are actually present in Corum
+    filtered_interactions = filter_interactions(interactions, core_complex_list)
+    filtered_interactions_pr = filter_interactions(interactions_pr, core_complex_list)
 
+    # Get Interaction and non interaction dictionaries
+    core_interactions = get_interactions(core_complex_list) # Is this on filtered proteins?
+    non_interactions = get_non_interactions(filtered_interactions, core_interactions) # Is this on filtered proteins?
 
-[i.set_linewidth(0.4) for i in ax.spines.itervalues()]
-plt.xlim((0, 1))
-plt.ylim((0, 1))
-plt.ylabel("TPR")
-plt.xlabel("FPR")
+    print len(non_interactions)
+    print len(filtered_interactions)
+    print len(filtered_interactions_pr)
+    #for i in range(0, len(non_interactions) - len(filtered_interactions)):
+    #    filtered_interactions.append((0, "fake1", "fake2"))
+    #for i in range(0, len(non_interactions) - len(filtered_interactions_pr)):
+    #    filtered_interactions_pr.append((0, "fake1", "fake2"))
+    # Compute FPR, TPR curve and thresholds
+    y_true, y_score = get_interaction_scoring(filtered_interactions, core_interactions, non_interactions)
+    y_true_pr, y_score_pr = get_interaction_scoring(filtered_interactions_pr, core_interactions, non_interactions)
 
-plt.plot(fpr, tpr)
-plt.plot(fpr_pr, tpr_pr)
-plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.svg", bbox_inches="tight", pad_inches=0.02, dpi=300)
-plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.png", bbox_inches="tight", pad_inches=0.02, dpi=300)
-plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.pdf", bbox_inches="tight", pad_inches=0.02, dpi=300)
-plt.show()
+    #fpr, tpr, treshs = get_interaction_scoring(filtered_interactions, core_interactions, non_interactions)
+    #fpr_pr, tpr_pr, treshs_pr = get_interaction_scoring(filtered_interactions_pr, core_interactions, non_interactions)
 
+    #fpr, tpr, treshs = roc_curve(y_true, y_score)
+    #fpr_pr, tpr_pr, treshs_pr = roc_curve(y_true_pr, y_score_pr)
+    fpr, tpr, treshs = precision_recall_curve(y_true, y_score)
+    fpr_pr, tpr_pr, treshs_pr = precision_recall_curve(y_true_pr, y_score_pr)
+
+    for p, r, t in zip(fpr_pr, tpr_pr, treshs_pr):
+        print p, r, t
+    #print tpr_pr
+    # Check how many interactions are found at that score threshold
+    fp, tresh = tresh_at_fpr(fpr, treshs)
+    num_interactions, interactions_above_tresh = interactions_at_tresh(interactions, 0.176)
+    print("SEC Interactions", num_interactions)
+
+    fp, tresh = tresh_at_fpr(fpr_pr, treshs_pr)
+    num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, -9.19853216241)
+    print("PR Interactions", num_interactions)
+
+    # Plot results
+    set_plot_parameters()
+    sns.set(style="white", palette="muted")
+    f, ax = plt.subplots(1, 1, figsize=(3.0, 3.0), sharex=True)
+    sns.despine()
+
+    [i.set_linewidth(0.4) for i in ax.spines.itervalues()]
+
+    plt.xlim((0, 1.0))
+    plt.ylim((0, 1.0))
+    plt.ylabel("TPR")
+    plt.xlabel("FPR")
+
+    plt.plot(fpr, tpr)
+    plt.plot(fpr_pr, tpr_pr)
+    plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.svg", bbox_inches="tight", pad_inches=0.02, dpi=300)
+    plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.png", bbox_inches="tight", pad_inches=0.02, dpi=300)
+    plt.savefig("protein_protein_interaction_pagerank_alpha_no_pers_0.85.pdf", bbox_inches="tight", pad_inches=0.02, dpi=300)
+    plt.show()
+main()
