@@ -217,6 +217,8 @@ def get_interaction_scoring(interactions, interaction_list, non_interaction_list
         tresholds.append(score)
         count += 1
         """
+        #print protein_tuple
+        #print interaction_list
         if protein_tuple in interaction_list:
             y_true.append(1)
             y_score.append(score)
@@ -236,14 +238,12 @@ def main():
         interactions_pr = cPickle.load(infile)
     interactions.sort(reverse=True)
     interactions_pr.sort(reverse=True)
-    interactions_pr = [(np.log(interaction[0]), interaction[1], interaction[2]) for interaction in interactions_pr]
+    interactions_pr = [(interaction[0], interaction[1], interaction[2]) for interaction in interactions_pr]
     #for i in interactions_pr:
     #    print i
-    #x = [np.log(interaction[0]) for interaction in interactions_pr]
+    #x = [interaction[0] for interaction in interactions_pr]
     #print x
     #plt.plot(x)
-    #plt.show()
-    #sys.exit()
     #sys.exit()
 
     # Read Corom complexes
@@ -256,6 +256,8 @@ def main():
             cleaned_line = [i.strip('(').strip(')') for i in split_line]
             core_complex_list.append(cleaned_line)
 
+    with open('core_complexes.pkl', 'wb') as outfile:
+        cPickle.dump(core_complex_list, outfile, cPickle.HIGHEST_PROTOCOL)
     # Filter interactions by proteins that are actually present in Corum
     filtered_interactions = filter_interactions(interactions, core_complex_list)
     filtered_interactions_pr = filter_interactions(interactions_pr, core_complex_list)
@@ -283,17 +285,59 @@ def main():
     fpr, tpr, treshs = precision_recall_curve(y_true, y_score)
     fpr_pr, tpr_pr, treshs_pr = precision_recall_curve(y_true_pr, y_score_pr)
 
+    print("Cutoff List Standard")
+    for p, r, t in zip(fpr, tpr, treshs):
+        print p, r, t
+    print("Cutoff List CI")
     for p, r, t in zip(fpr_pr, tpr_pr, treshs_pr):
         print p, r, t
-    #print tpr_pr
-    # Check how many interactions are found at that score threshold
-    fp, tresh = tresh_at_fpr(fpr, treshs)
-    num_interactions, interactions_above_tresh = interactions_at_tresh(interactions, 0.176)
+
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.176) # Exp 1
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.241044043869)  # Exp 1 Target precision 0.6
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.394482660393)  # Exp 1 Target precision 0.65
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.227327282579) # Exp 2
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.341766955407)  # Exp 2 # Target precision 0.6
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions,
+    #                                                                        0.378015642113)  # Exp 2 # Target precision 0.65
+    # precision 0.53 returns pretty much all interactions...
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions, 0.018069923595)  # Exp 3 # Target precision 0.53
+    #num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions, 0.148888315685)  # Exp 3 # Target precision 0.6
+    num_interactions, interactions_above_tresh_orig = interactions_at_tresh(interactions,
+                                                                            0.20356058527)  # Exp 3 # Target precision 0.65
     print("SEC Interactions", num_interactions)
 
-    fp, tresh = tresh_at_fpr(fpr_pr, treshs_pr)
-    num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, -9.19853216241)
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 0.00010118782017)  # Exp 1
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 0.000138949631778)  # Exp 1 # Target precision 0.6
+    num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr,
+                                                                       0.000188719955985)  # Exp 1 # Target precision 0.62
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 0.000211079165048)  # Exp 1 # Target precision 0.65
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 6.73617417516e-05) # Exp 2
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 9.7943746924e-05)  # Exp 2 # Target precision 0.6
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr,
+    #                                                                   0.000111704795997)  # Exp 2 # Target precision 0.62
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr,
+    #                                                                   0.000148467824096)  # Exp 2 # Target precision 0.65
+
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 6.64360536357e-06)  # Exp 3 # Target Precision 0.53
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr, 2.36669556527e-05)  # Exp 3 # Target Precision 0.6
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr,
+    #                                                                   3.03039503386e-05)  # Exp 3 # Target Precision 0.62
+    #num_interactions, interactions_above_tresh = interactions_at_tresh(interactions_pr,
+    #                                                                   3.67293035622e-05)  # Exp 3 # Target Precision 0.65
+
+
+
     print("PR Interactions", num_interactions)
+
+    interaction_list = []
+    for score, protein_1, protein_2 in interactions_above_tresh:
+        interaction_list.append(sorted_uniprot_tuple(protein_1, protein_2))
+
+    with open('interactions_exp1_0.62.pkl', 'wb') as outfile:
+            cPickle.dump(interaction_list, outfile, cPickle.HIGHEST_PROTOCOL)
+   # 2.45933254562e-05
+
+
 
     # Plot results
     set_plot_parameters()

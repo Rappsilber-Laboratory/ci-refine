@@ -113,8 +113,8 @@ def check_chromatogram(chromatogram, val = 0.0, con_count=5):
     #print chromatogram
     return False
 
-workbook = xlrd.open_workbook("../data/protein_interaction_data/chromatogram_data.xls")
-sh = workbook.sheet_by_name("Exp1")
+workbook = xlrd.open_workbook("../data/protein_interaction_data/chromatogram_data_2.xls")
+sh = workbook.sheet_by_name("Exp2")
 # print sh.col_values(0)
 
 for row in range(0, 1): # Exp 2, 3
@@ -122,14 +122,14 @@ for row in range(0, 1): # Exp 2, 3
     for i in range(len(sh.row_values(row))):
         print i, sh.row_values(row)[i]
 
-relevant_cols = [i for i in range(61, 109)] # Exp 1
-#relevant_cols = [i for i in range(58, 103)] # Exp 2
+#relevant_cols = [i for i in range(61, 109)] # Exp 1
+relevant_cols = [i for i in range(58, 103)] # Exp 2
 #relevant_cols = [i for i in range(63, 113)] # Exp 3
 print relevant_cols
 
 data = []
-for row in range(30, 1991): # Exp1
-#for row in range(2, 2222): #Exp2
+#for row in range(30, 1991): # Exp1
+for row in range(2, 2222): #Exp2
 #for row in range(2, 2938): # Exp3
     uniprot = sh.row_values(row)[4]
     chromatogram_data = []
@@ -161,14 +161,14 @@ for i in range(0, len(data)):
     for j in range(i, len(data)):
         if i < j:
             euclidean_distance = euclidean(data[i][1], data[j][1])#euclidean(data[i][1], data[j][1])
-            if euclidean_distance <= 4.0: #and abs(data[i][2]-data[j][2]) < 0.5:
-                interaction_data.append((1.0-euclidean_distance/4.0, data[i][0], data[j][0]))
+            if euclidean_distance <= 6.0: #and abs(data[i][2]-data[j][2]) < 0.5:
+                interaction_data.append((1.0-euclidean_distance/6.0, data[i][0], data[j][0]))
 interaction_data.sort(reverse=True)
 
-with open('interaction_data_exp_1_eu_4_final.pkl', 'wb') as outfile:
+with open('interaction_data_exp_2_eu_6_final.pkl', 'wb') as outfile:
     cPickle.dump(interaction_data, outfile, cPickle.HIGHEST_PROTOCOL)
 
-file = open("protein_list.txt", "w")
+file = open("protein_list_exp_2.txt", "w")
 proteins = [protein for protein, _ in data]
 proteins = list(set(proteins))
 for protein in proteins:

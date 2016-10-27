@@ -10,6 +10,7 @@ import argparse
 import cPickle
 #import matplotlib.pyplot as plt
 import pandas as pd
+import itertools
 
 options = {}
 
@@ -25,23 +26,55 @@ def parse_arguments():
     options = parser.parse_args()
 
 
-def load_go_terms(uniprot_kb_file):
-    go_dict = {}
-    df = pd.read_table(uniprot_kb_file)
+def get_go_term_column(df, go_dict, col_string):
+    """
+    Parameters
+    ----------
+    df
+    go_dict
+    col_string
+
+    Returns
+    -------
+    """
     for index, row in df.iterrows():
-        go = row['Gene ontology (cellular component)']
+        # go = row['Gene ontology (cellular component)']
+        go = row[col_string]
         if isinstance(go, str):
             go_list = go.split(";")
         else:
-            go_list = None
-        go_dict[row['Entry']] = go_list
-    return go_dict
+            go_list = []
 
+        if row['Entry'] not in go_dict:
+            go_dict[row['Entry']] = []
+
+        #if go_list is None and len(go_dict[row['Entry']]) == 0:
+        #    go_dict[row['Entry']] = []# go_list
+        #elif
+        #else:
+        go_dict[row['Entry']] = list(set(list(itertools.chain(go_dict[row['Entry']], go_list))))
+
+            #print go_dict[row['Entry']]
+            #if row['Entry'] not in go_dict:
+        #    go_dict[row['Entry']] = go_list
+        #elif row['Entry'] in go_dict and go_list is not None:
+        #    print go_listrow['Entry']
+        #
+        #elif row['Entry'] in go_dict and go_list is None:
+        #    go_dict[row['Entry']] = go_list
+
+
+def load_go_terms(uniprot_kb_file):
+    go_dict = {}
+    df = pd.read_table(uniprot_kb_file)
+    get_go_term_column(df, go_dict, 'Gene ontology (cellular component)')
+    #get_go_term_column(df, go_dict, 'Gene ontology (biological process)')
+    return go_dict
 
 def go_interaction_score(uniprot_1, uniprot_2, go_dict):
     if uniprot_1 not in go_dict or uniprot_2 not in go_dict:
         return 0.0
-    if go_dict[uniprot_1] is None or go_dict[uniprot_2] is None:
+    if len(go_dict[uniprot_1]) is 0 or len(go_dict[uniprot_2]) is 0:
         return 0.0
 
     else:
@@ -145,10 +178,10 @@ def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
 
 def main():
     parse_arguments()
-    with open('interaction_data_exp_1_eu_6_final.pkl', 'rb') as infile:
+    with open('interaction_data_exp_3_eu_6_final.pkl', 'rb') as infile:
         interactions = cPickle.load(infile)
     #interactions = load_interactions("../data/protein_interaction_data/interactions_and_centers.txt")
-    go_dict = load_go_terms("uniprot_data_experiment_1_cell.txt")
+    go_dict = load_go_terms("uniprot_data_experiment_3_cell.txt")
     #print go_dict
     print("Building CI Graph")
     print("Number of interactions:", len(interactions))
@@ -157,7 +190,7 @@ def main():
     print("Applying PageRank")
     xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, 99999999999)
 
-    with open('interaction_data_exp_1_eu_6_final_pr.pkl', 'wb') as outfile:
+    with open('interaction_data_exp_3_eu_6_final_pr.pkl', 'wb') as outfile:
         cPickle.dump(xl_ranked, outfile, cPickle.HIGHEST_PROTOCOL)
     #print xl_ranked
 
