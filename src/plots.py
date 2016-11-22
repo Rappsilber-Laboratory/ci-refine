@@ -55,15 +55,15 @@ def plot_fdr(x, y, x2, y2, out_folder="./"):
             max_index_2 = index
             break
     """
-    max_20_y = max([b for a, b in zip(x,y) if a <=50])
-    max_20_y2 = max([b2 for a2, b2 in zip(x2, y2) if a2 <= 50])
+    max_20_y = max([b for a, b in zip(x,y) if a <=10])
+    max_20_y2 = max([b2 for a2, b2 in zip(x2, y2) if a2 <= 10])
 
     plt.ylim((0,max(max_20_y, max_20_y2)+100))
     fig.set_size_inches(3.0, 3.0)
     #plt.show()
     #fig.set_size_inches(2.5,2.5)
     #print fig.patches
-    plt.xlim((0, 50))
+    plt.xlim((0, 10))
     if not os.path.exists(out_folder):
         os.mkdir(out_folder)
         os.mkdir("%s/raster/" % out_folder)

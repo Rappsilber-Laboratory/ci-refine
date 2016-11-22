@@ -39,7 +39,7 @@ class InputOutput:
 
 
     @staticmethod
-    def load_xl_data( xl_file, offset ):
+    def load_xl_data( xl_file, offset, sequence_length=586):
         col_names = {}
         decoy_dict = {}
         max_score = 0
@@ -68,14 +68,24 @@ class InputOutput:
                 #if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE') and protein_1 == "HSA" and protein_2 == "HSA":
                     if max_score == 0:
                         max_score = score
-                    xls.append(((site_list[0], site_list[1]), score/max_score))
-                    gt_data.append((site_list[0], site_list[1], score / max_score))
                     if (is_TT == 'true' or is_TT=='TRUE'):
                         decoy_dict[(site_list[0], site_list[1])] = "TT"
+                        xls.append(((site_list[0], site_list[1]), score / max_score))
+                        gt_data.append((site_list[0], site_list[1], score / max_score))
+
                     elif (is_TD == 'true' or is_TD=='TRUE'):
-                        decoy_dict[(site_list[0], site_list[1])] = "TD"
+
+                        if protein_1.count("DECOY") == 1:
+                            decoy_dict[(sequence_length + 1 - from_site, to_site)] = "TD"
+                            xls.append(((sequence_length + 1 - from_site, to_site), score / max_score))
+                            gt_data.append((sequence_length + 1 - from_site, to_site, score / max_score))
+                        else:
+                            decoy_dict[(from_site, sequence_length + 1 - to_site)] = "TD"
+                            xls.append(((from_site, sequence_length + 1 - to_site), score / max_score))
+                            gt_data.append((from_site, sequence_length + 1 - to_site, score / max_score))
+
                     elif (is_DD == 'true' or is_DD=='TRUE'):
-                        decoy_dict[(site_list[0], site_list[1])] = "DD"
+                        decoy_dict[(sequence_length + 1 - site_list[0], sequence_length + 1 - site_list[1])] = "DD"
 
         return xls, gt_data, decoy_dict
 
