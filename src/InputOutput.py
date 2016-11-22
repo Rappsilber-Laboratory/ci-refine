@@ -41,11 +41,12 @@ class InputOutput:
     @staticmethod
     def load_xl_data( xl_file, offset ):
         col_names = {}
+        decoy_dict = {}
         max_score = 0
         xls = []
         gt_data = []
         for line in open(xl_file):
-            if line.startswith('LinkID') or not line.strip():
+            if line.startswith('SearchIDs') or not line.strip():
                 for index, col in enumerate(str(line).split(',')):
                     col_names[col] = index
             else:
@@ -57,16 +58,26 @@ class InputOutput:
                 is_decoy = line[col_names['isDecoy']]
                 protein_1 = line[col_names['Protein1']]
                 protein_2 = line[col_names['Protein2']]
+                is_TT = line[col_names['isTT']]
+                is_TD = line[col_names['isTD']]
+                is_DD = line[col_names['isDD']]
                 site_list = [from_site, to_site]
                 site_list.sort()
-		
-                if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE') and protein_1 == "HSA" and protein_2 == "HSA":
+                if from_site > 0 and to_site > 0 and abs(from_site - to_site) >= 1:
+
+                #if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE') and protein_1 == "HSA" and protein_2 == "HSA":
                     if max_score == 0:
                         max_score = score
                     xls.append(((site_list[0], site_list[1]), score/max_score))
                     gt_data.append((site_list[0], site_list[1], score / max_score))
+                    if (is_TT == 'true' or is_TT=='TRUE'):
+                        decoy_dict[(site_list[0], site_list[1])] = "TT"
+                    elif (is_TD == 'true' or is_TD=='TRUE'):
+                        decoy_dict[(site_list[0], site_list[1])] = "TD"
+                    elif (is_DD == 'true' or is_DD=='TRUE'):
+                        decoy_dict[(site_list[0], site_list[1])] = "DD"
 
-        return xls, gt_data
+        return xls, gt_data, decoy_dict
 
 
     @staticmethod
@@ -172,14 +183,23 @@ class InputOutput:
 
 
     @staticmethod
-    def write_contact_file(  contacts, contact_file_name, upper_distance = 8 ):
+    def write_contact_file(  contacts, contact_file_name, upper_distance = 8, decoy_dict={}):
         file = open( contact_file_name, 'w' )
         for c_lower, c_upper, prob in contacts:
-            file.write(" ".join(["%s"%(c_lower),
-                                 "%s"%(c_upper),
-                                 "%s"%(0),
-                                 "%s"%(upper_distance),
-                                 "%s\n"%(prob)]))
+            if len(decoy_dict) > 0:
+                file.write(" ".join(["%s"%(c_lower),
+                                     "%s"%(c_upper),
+                                     "%s"%(0),
+                                     "%s"%(upper_distance),
+                                     "%s"%(prob),
+                                     "%s\n"%(decoy_dict[(c_lower, c_upper)])]))
+            else:
+                file.write(" ".join(["%s" % (c_lower),
+                                     "%s" % (c_upper),
+                                     "%s" % (0),
+                                     "%s" % (upper_distance),
+                                     "%s\n" % (prob)]))
+
         file.close()
     
     @staticmethod

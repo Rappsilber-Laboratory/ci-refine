@@ -207,14 +207,14 @@ def is_neighbourhood(tuple_1, tuple_2, delta = 1, double=True):
     if double:
         if m_1 == 1 and m_2 == 1:
             is_nei = True
-            print t_1, t_2, t_1[0] - t_2[0], t_1[1] - t_2[1]
+            #print t_1, t_2, t_1[0] - t_2[0], t_1[1] - t_2[1]
     else:
         if m_1 == 1 or m_2 == 1:
             is_nei = True
     return is_nei
 
    
-def do_page_rank (xl_graph,pers):
+def do_page_rank (xl_graph,pers, decoy_dict):
 
     ranked_nodes, error = pagerank(xl_graph, max_iter=10000, alpha=0.85, tol=1e-08, personalization=pers)#, weight = 'weight')
     print (0.85 / (1-0.85))* error
@@ -223,11 +223,12 @@ def do_page_rank (xl_graph,pers):
     for_sorting.reverse()
     xl_ranked = []
     for score, n in for_sorting:
-        print score, n
+        #print score, n
         res_lower = xl_graph.node[n]['xl'][0]
         res_upper = xl_graph.node[n]['xl'][1]
+        print score, res_lower, res_upper, decoy_dict[(res_lower, res_upper)]
         xl_ranked.append((res_lower, res_upper, score))
-    InputOutput.InputOutput.write_contact_file(xl_ranked, options.id + "_PR.txt", upper_distance=20)
+    InputOutput.InputOutput.write_contact_file(xl_ranked, options.id + "_PR.txt", upper_distance=20, decoy_dict=decoy_dict)
 
 
 def add_loops(xl_graph):
@@ -289,30 +290,12 @@ def build_xl_graph( xl_data ):
 
     return g, pers
 
-def main():        
-   """Generic main function. Executes main functionality of program
-   """
-   #tg = toy_graph()
-   #has_loop(2,4,tg)
-   #sys.exit()
-   #rint tg.edges()
-   #pagerank(tg)
-   #sys.exit()
-   #xl_data, gt_data = InputOutput.InputOutput.load_xl_data_random(options.example,options.offset, max_links = options.max_links) 
-   xl_data, gt_data = InputOutput.InputOutput.load_xl_data(options.example, options.offset)
-   print len(gt_data)
-   #print gt_data
-   InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20)
 
-   #sys.exit()
-   #break
-   xl_graph,pers = build_xl_graph(xl_data)
-   for n in xl_graph.nodes(data=True):
-       print xl_graph.degree(n[0]), pers[n[0]], n[0]
-   #for n in xl_graph.edges(data=True):
-   #    print n
-   #print  xl_graph.number_of_edges()
-   do_page_rank(xl_graph,pers)
+def main():
+    xl_data, gt_data, decoy_dict = InputOutput.InputOutput.load_xl_data(options.example, options.offset)
+    InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance = 20, decoy_dict=decoy_dict)
+    xl_graph, pers = build_xl_graph(xl_data)
+    do_page_rank(xl_graph, pers, decoy_dict)
 
 if __name__ == '__main__':
     sys.exit(main())
