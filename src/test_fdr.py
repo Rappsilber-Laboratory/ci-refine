@@ -7,19 +7,19 @@ def load_data_file(file_name):
     file.close()
     return labels
 
-labels = load_data_file("HSA_17Perc_new_PSM.txt")
+labels = load_data_file("HSA_13Perc_new_PSM.txt")
 fdr, hits =  compute_fdr_from_labels(labels, target_fdr=99)
 
 for f, h in zip(fdr, hits):
     print f, h
 
-labels_pr = load_data_file("HSA_17Perc_new_PR.txt")
+labels_pr = load_data_file("HSA_13Perc_new_PR.txt")
 fdr_pr, hits_pr =  compute_fdr_from_labels(labels_pr, target_fdr=99)
 
 for f, h in zip(fdr_pr, hits_pr):
     print f, h
 
-plot_fdr(fdr, hits, fdr_pr, hits_pr)
+plot_fdr(fdr, hits, fdr_pr, hits_pr, out_folder="../results/pagerank_cross_links/")
 
 
 

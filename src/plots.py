@@ -24,12 +24,12 @@ def plot_fdr(x, y, x2, y2, out_folder="./"):
     plt.plot(x, y, '#3B4CC0' , linewidth=1.0)
     plt.plot(x2, y2,'#B40426' , linewidth=1.0)
 
-    plt.ylabel("Number of PSMs")
+    plt.ylabel("Number of cross-links")
     plt.xlabel("False discovery rate")
     ax = plt.gca()
 
-    ax.set_xticks([0, 1, 2, 5, 10, 20])
-    ax.set_xticklabels(["0", "1", "2", "5", "10", "20"])
+    ax.set_xticks([1, 5, 10])
+    ax.set_xticklabels(["%s" % i for i in [1, 5, 10]])
 
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -59,21 +59,79 @@ def plot_fdr(x, y, x2, y2, out_folder="./"):
     max_20_y2 = max([b2 for a2, b2 in zip(x2, y2) if a2 <= 10])
 
     plt.ylim((0,max(max_20_y, max_20_y2)+100))
-    fig.set_size_inches(3.0, 3.0)
+    fig.set_size_inches(2.0, 2.0)
     #plt.show()
     #fig.set_size_inches(2.5,2.5)
     #print fig.patches
     plt.xlim((0, 10))
-    if not os.path.exists(out_folder):
-        os.mkdir(out_folder)
+    if not os.path.exists("%s/raster/" % out_folder):
+        #os.mkdir(out_folder)
         os.mkdir("%s/raster/" % out_folder)
         os.mkdir("%s/vector" % out_folder)
 
-    #plt.savefig("%s/vector/psm_scoring.svg" % out_folder, dpi=300)
-    #plt.savefig("%s/raster/psm_scoring.pdf" % out_folder, dpi=300)
-    #plt.savefig("%s/raster/psm_scoring.png" % out_folder, dpi=300)
+    plt.savefig("%s/vector/psm_scoring.svg" % out_folder, dpi=300)
+    plt.savefig("%s/raster/psm_scoring.pdf" % out_folder, dpi=300)
+    plt.savefig("%s/raster/psm_scoring.png" % out_folder, dpi=300)
     plt.show()
     #pylab.ylim((0,1.00))
+
+
+def plot_input_fdr_dependency(x, y, out_folder="./"):
+
+    sns.set(style="white", palette="muted")
+    fig = plt.gcf()
+
+    plt.plot(x, y, '#B40426', linewidth=1.0)
+    plt.plot((6, 20), (0, 0), '0.3', linewidth=1.0)
+    plt.ylabel("Percent increase of links at 5% FDR")
+    plt.xlabel("Input FDR")
+    ax = plt.gca()
+
+    #ax.set_xticks([i for i in range(1, 11)])
+    #ax.set_xticklabels(["%s" % i for i in range(1, 11)])
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.yaxis.set_ticks_position('left')
+    ax.xaxis.set_ticks_position('bottom')
+
+    #ax.spines['bottom'].set_visible(False)
+    #ax.spines['left'].set_visible(False)
+
+    [i.set_linewidth(0.4) for i in ax.spines.itervalues()]
+
+    #plt.plot([0, 100], [0, 100], '-k', linewidth = 0.3)
+    #plt.xlim((0,10))
+    """
+    max_index_1 = 0
+    max_index_2 = 0
+    for index, i in enumerate(x):
+        if i >=10:
+            max_index_1 = index
+            break
+    for index, i in enumerate(x2):
+        if i >=10:
+            max_index_2 = index
+            break
+    """
+    #max_20_y = max([b for a, b in zip(x,y) if a <=10])
+    #max_20_y2 = max([b2 for a2, b2 in zip(x2, y2) if a2 <= 10])
+
+    #plt.ylim((0,max(max_20_y, max_20_y2)+100))
+    fig.set_size_inches(2.0, 2.0)
+    #plt.show()
+    #fig.set_size_inches(2.5,2.5)
+    #print fig.patches
+    #plt.xlim((0, 10))
+    if not os.path.exists("%s/raster/" % out_folder):
+        #os.mkdir(out_folder)
+        os.mkdir("%s/raster/" % out_folder)
+        os.mkdir("%s/vector" % out_folder)
+
+    plt.savefig("%s/vector/input_fdr_dependency.svg" % out_folder, dpi=300)
+    plt.savefig("%s/raster/input_fdr_dependency.pdf" % out_folder, dpi=300)
+    plt.savefig("%s/raster/input_fdr_dependency.png" % out_folder, dpi=300)
+    plt.show()
 
 
 def plot_score_distribution(y, y2, out_folder, out_name='score_distribution'):
@@ -130,7 +188,6 @@ def plot_spectrum(spectrum):
 
 def plot_peaks(x, y):
     sns.set(style="white", palette="muted")
-
     # Set up the matplotlib figure
     f, ax = plt.subplots(1, 1, figsize=(3.0, 3.0), sharex=True)
     sns.despine()
@@ -142,7 +199,6 @@ def plot_peaks(x, y):
     # Axis naming
     plt.ylabel("Intensity")
     plt.xlabel("m/z")
-
     plt.show()
 
 

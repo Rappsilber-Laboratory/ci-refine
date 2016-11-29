@@ -1,5 +1,5 @@
-from plots import plot_fdr
-from metrics import compute_fdr_from_labels, compute_number_of_entries_at_fdr
+from plots import plot_fdr, plot_input_fdr_dependency
+from metrics import compute_fdr_from_labels
 
 def load_data_file(file_name):
     file = open(file_name)
@@ -8,6 +8,9 @@ def load_data_file(file_name):
     return labels
 
 def compute_increase_at_fdr():
+    input_fdr = []
+    percent_increase = []
+
     fdr_cutoffs = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     for cutoff in fdr_cutoffs:
 
@@ -18,9 +21,12 @@ def compute_increase_at_fdr():
         fdr_pr, hits_pr = compute_fdr_from_labels(labels_pr)
 
         print cutoff, 399, hits_pr[-1], ((hits_pr[-1]-399)/float(399))*100
+        input_fdr.append(cutoff)
+        percent_increase.append(((hits_pr[-1]-399)/float(399))*100)
+    return input_fdr, percent_increase
 
-
-compute_increase_at_fdr()
+input_fdr, percent_increase = compute_increase_at_fdr()
+plot_input_fdr_dependency(input_fdr, percent_increase, out_folder="../results/pagerank_cross_links/")
 
 
 
