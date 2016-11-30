@@ -1,8 +1,0 @@
-
-PageRank Interactions: 9146
-Interactions in Corum: 402
-Precision of the interactions: 0.537313432836
-
-Euclidean distance interactions: 8718
-Interactions in Corum: 290
-Precision of the interactions: 0.548275862069
