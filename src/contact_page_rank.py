@@ -8,7 +8,6 @@ import InputOutput
 import numpy
 import argparse
 import cPickle
-#import matplotlib.pyplot as plt
 
 options = {}
 
@@ -33,12 +32,7 @@ def parse_arguments():
     options = parser.parse_args()
 
 
-def default_output_folder():
-    return "../results/" + datetime.datetime.today().date().isoformat() + "/"
-
-
 def build_ce_graph(xl_data, length, shift_dict, sec_struct):
-
     # Initialize graph datastructure. The score of the contact will be used as node weights and also the personalization
     # vector will be set to the contact scores
     g = nx.Graph()
@@ -64,7 +58,6 @@ def build_ce_graph(xl_data, length, shift_dict, sec_struct):
                     if (sec_struct_shift_dict.has_key(shift_tuple) and not
                     numpy.isnan(sec_struct_shift_dict[shift_tuple]) and sec_struct_shift_dict[shift_tuple] != 0.0):
                         # If there is already this edge, keep the edge with the lower weight
-                        
                         if g.has_edge(n[0], o[0]):
                             old_weight = g.edge[n[0]][o[0]]['weight']
                             if old_weight > sec_struct_shift_dict[shift_tuple]:
@@ -91,18 +84,6 @@ def do_page_rank(xl_graph, node_weights, input_alpha, input_len):
         res_upper = xl_graph.node[n]['xl'][1]
         xl_ranked.append((res_lower, res_upper, score))
     return xl_ranked
-
-
-def output_file_name():
-    output_directory = os.path.abspath(options.out_folder)
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
-    i = 0
-    output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
-    while os.path.exists(os.path.join(output_directory, output_file_name)):
-        i += 1
-        output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
-    return os.path.join(output_directory, output_file_name)
 
 
 def shift_matrix():
@@ -320,18 +301,6 @@ def add_loops_node_graph(xl_graph):
     add_cycles_to_graph(cycles, xl_graph, cycle_len=4)
 
 
-def toy_graph():
-    y = nx.Graph()
-    y.add_node(1)
-    y.add_node(2)
-    y.add_node(3)
-    # y.add_node(4)
-    # y.add_node(5)
-    y.add_edge(1, 2)
-    y.add_edge(2, 3)
-    # y.add_edge(1,5)
-    return y
-
 
 def get_relative_sec_struct_pos(ss_dict, i):
     anchor = ss_dict[i]
@@ -441,33 +410,6 @@ def remove_weight_percentile(graph):
     return graph
 
 
-def which_clust(i, all_clust):
-    for clust in all_clust:
-        if i in clust:
-            return clust
-
-
-
-def draw_graph(graph, true_map, pers, clust=None):
-    true_nodes = []
-    false_nodes = []
-
-    true_pers = []
-    false_pers = []
-    for n in graph.nodes(data=True):
-        if true_map.has_key(n[1]['xl']):
-            true_nodes.append(n[0])
-            true_pers.append(int(pers[n[0]] * 10000))
-        else:
-            false_nodes.append(n[0])
-            false_pers.append(int(pers[n[0]] * 10000))
-    pos = nx.spring_layout(graph)
-
-    nx.draw_networkx_nodes(graph, pos, nodelist=true_nodes, node_color='b', node_size=true_pers, alpha=0.8)
-    nx.draw_networkx_nodes(graph, pos, nodelist=false_nodes, node_color='r', node_size=false_pers, alpha=0.9)
-    nx.draw_networkx_edges(graph, pos, width=0.2, alpha=0.5)
-    plt.show()
-
 
 def clean_sec_structs(sec_struct):
     for i in xrange(2, len(sec_struct) - 1):
@@ -505,12 +447,26 @@ def get_prediction_vector(contact_list, i, j):
     return numpy.array(pred_vec)
 
 
+def default_output_folder():
+    return "../results/" + datetime.datetime.today().date().isoformat() + "/"
+
+
+def output_file_name():
+    output_directory = os.path.abspath(options.out_folder)
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+    i = 0
+    output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
+    while os.path.exists(os.path.join(output_directory, output_file_name)):
+        i += 1
+        output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
+    return os.path.join(output_directory, output_file_name)
+
+
 def main():
     parse_arguments()
     sec_struct = InputOutput.InputOutput.parse_psipred(options.psipred_file)
     shift_dict = cPickle.load(open("probabilities/shifts_sigma_0.05.txt", "rb"))
-    #shift_dict = cPickle.load(open("probabilities/shifts_test_metapsicov.p", "rb"))
-
     xl_data = InputOutput.InputOutput.load_restraints_pr(options.contact_file, seq_sep_min=12)
     xl_graph, node_weights = build_ce_graph(xl_data, int(options.length * options.top), shift_dict, sec_struct)
     xl_ranked = do_page_rank(xl_graph, node_weights, options.alpha, options.length)
