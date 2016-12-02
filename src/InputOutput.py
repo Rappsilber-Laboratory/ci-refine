@@ -1,5 +1,27 @@
-import os
-import sys
+"""
+MIT License
+
+Copyright (c) 2016 Michael Schneider
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
 
 class InputOutput:
     
@@ -89,7 +111,6 @@ class InputOutput:
 
         return xls, gt_data, decoy_dict
 
-
     @staticmethod
     def load_xl_data_random(xl_file, offset, max_links=None):
         import random
@@ -116,37 +137,12 @@ class InputOutput:
                     if max_score == 0:
                         max_score = score
                     xls.append(((site_list[0], site_list[1]), score/max_score))
-                    #gt_data.append((site_list[0], 'CA', site_list[1], 'CA', score / max_score))
         sampled_xls = []
         sampled_xls = random.sample(xls, max_links)
         print sampled_xls
         for i, score in sampled_xls:
                 gt_data.append((i[0],'CA',i[1],'CA',score))
         return sampled_xls, gt_data
-
-
-
-    """
-        file  = open(xl_file)
-        from_site = 0
-        to_site = 0
-        score = 0
-        gt_data = []
-        xls = []
-        is_decoy = 0
-        for line in file:
-            strline = str(line).strip().split(',')
-            from_site = int(strline[7])-28
-            to_site = int(strline[8])-28
-            score = float(strline[9])
-            is_decoy = strline[10]
-            if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and is_decoy == 'FALSE':
-                xls.append(((from_site, to_site), score/30.0))
-                gt_data.append((from_site, 'CA', to_site, 'CA', score))
-        file.close()
-        InputOutput.InputOutput.write_contact_file(gt_data, 'gt', upper_distance = 20)
-        return xls
-    """
 
     @staticmethod
     def read_fasta( fasta_file ):
@@ -191,7 +187,6 @@ class InputOutput:
             atom_1, c_lower, atom_2, c_upper, 1.5, upper_distance, sigma))
         file.close()
 
-
     @staticmethod
     def write_contact_file(  contacts, contact_file_name, upper_distance = 8, decoy_dict={}):
         file = open( contact_file_name, 'w' )
@@ -221,11 +216,8 @@ class InputOutput:
             strline = str(line).strip().split()
             if len(strline) > 2:
                 if strline[0] != "REMARK" and strline[0] != "METHOD" and len(strline[0]) <= 35:
-                    #if abs(int(strline[0]) - int(strline[1])) >= seq_sep_min and abs(int(strline[0]) - int(strline[1])) < seq_sep_max:
-                    #if res_dict.has_key((int(strline[0]), int(strline[1]))) == False or res_dict.has_key((int(strline[0]), int(strline[1]))) == False:
                     res.append( (int(strline[2]), int(strline[4]) ) )
-                    # res_dict[(int(strline[0]), int(strline[1]))] = 1
-                    # res_dict[(int(strline[1]), int(strline[0]))] = 1
+
         file.close()
         res.sort()
         res.reverse()

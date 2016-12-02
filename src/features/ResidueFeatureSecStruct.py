@@ -1,8 +1,4 @@
-import os 
-import sys
 import GENERAL
-import os 
-import sys 
 import random
 import numpy
 from ResidueFeature import *
@@ -82,7 +78,7 @@ class ResidueFeatureSecStruct( ResidueFeature ):
                      #   don_count += 1
             self.acc_dict[residue_id] = res_acc_dict
             self.dnr_dict[residue_id] = res_don_dict
-    
+
     def calculate_SS_limits( self, residue_id, structure ):
         #print structure
         current_ss = self.ss_dict[residue_id]
@@ -121,20 +117,6 @@ class ResidueFeatureSecStruct( ResidueFeature ):
     
     def calculate_feature( self, residue_id, structure, RelSasaFeature = None ):
         """Derived classes need to calculate features here!"""
-        
-      #  do = "something"
-      #  
-
-        
-      #  for line in self.stride_out: 
-      #      if line.find("ASG") == 0:
-      #          
-      #          line_list = line.split()
-      #          res_num = int(line_list[3])
-      #          ss_struct = line_list[5]
-                
-      #          if res_num == residue_id:
-      #              self.feature_value = ss_struct
 
         
         if self.feature_value == None:
@@ -173,8 +155,3 @@ class ResidueFeatureSecStruct( ResidueFeature ):
                                   acc_count,
                                   dist_to_cen
                                   )
-            
-        
-        
-       
-   

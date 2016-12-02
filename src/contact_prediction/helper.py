@@ -3,7 +3,7 @@ idecoys are intermediate decoys
 """
 import random, string
 random.seed(26031987)
-import pdb
+
 import glob
 import os, sys, re, subprocess, shutil
 from optparse import OptionParser

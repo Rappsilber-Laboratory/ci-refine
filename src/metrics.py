@@ -28,14 +28,14 @@ def compute_fdr_from_labels(labels, target_fdr=5):
             fdr = (target_decoy_count - decoy_decoy_count) / float(target_target_count)
             if fdr > max_fdr:
                 max_fdr = fdr
-	    else:
-		fdr = max(max_fdr, fdr)
+            else:
+                fdr = max(max_fdr, fdr)
         except:
             fdr = 0
         fdr_index.append(fdr*100)
         hits.append(target_target_count)
         if fdr*100 >= target_fdr:
-	    return fdr_index, hits
+            return fdr_index, hits
     return fdr_index, hits
 
 
@@ -74,6 +74,6 @@ def compute_number_of_entries_at_fdr(labels):
         except:
             fdr = 0
         fdr_index.append(fdr*100)
-        hits.append(target_target_count+target_decoy_count+decoy_decoy_count)
+        hits.append(target_target_count)
     return fdr_index, hits
 
