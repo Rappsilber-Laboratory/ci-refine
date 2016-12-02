@@ -131,13 +131,10 @@ class InputOutput:
                 is_decoy = line[col_names['isDecoy']]
                 site_list = [from_site, to_site]
                 site_list.sort()
-
-
                 if from_site > 0 and to_site > 0 and abs(from_site-to_site) >= 1 and (is_decoy == 'false' or is_decoy=='FALSE'):
                     if max_score == 0:
                         max_score = score
                     xls.append(((site_list[0], site_list[1]), score/max_score))
-        sampled_xls = []
         sampled_xls = random.sample(xls, max_links)
         print sampled_xls
         for i, score in sampled_xls:
@@ -246,7 +243,6 @@ class InputOutput:
         res.sort()
         res.reverse()
         return res
-
 
     @staticmethod
     def load_restraints_pr( restraint_file, seq_sep_min = 12, seq_sep_max=9999, max_contacts=99999):
