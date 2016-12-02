@@ -1,24 +1,35 @@
-"""Author: Michael Schneider
-""" 
-import os 
+"""
+MIT License
+
+Copyright (c) 2016 Michael Schneider
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
 import sys 
-import random
-sys.path.append("../src")
-sys.path.append("/scratch/schneider/libs/lib/python2.7/site-packages")
-sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/features/")
-sys.path.append("/scratch/schneider/projects/contact_prediction_git/src/contact_git_code/contact_prediction/structure/")
-import networkx as nx
-import InputOutput
+
 import numpy
 from optparse import OptionParser
-import pdb
-import ResidueFeatureSecStruct
-import ResidueFeatureRelSasa
-import StructureContainer
+import src.features.ResidueFeatureSecStruct as ResidueFeatureSecStruct
+import src.structure.StructureContainer as StructureContainer
 import numpy as np
-import pickle
 import cPickle
-from sklearn import cluster, datasets, neighbors
+from sklearn import cluster, neighbors
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -265,8 +276,6 @@ def main():
         pdb_id = str(line).strip().split()[0][0:5]
 
         pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
-        #pdb_file = "/scratch/schneider/pdb_select_dataset/%s/%s.pdb"%(pdb_id[0:4],pdb_id)
-        #pdb_file = "/scratch/schneider/projects/pagerank_refinement/data/predictor_results/metapsicov_test/pdb/%s.pdb"%(pdb_id)
 
         tmp_struct = StructureContainer.StructureContainer()
         sec_struct = ResidueFeatureSecStruct.ResidueFeatureSecStruct(pdb_file)

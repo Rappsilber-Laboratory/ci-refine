@@ -1,5 +1,5 @@
-from plots import plot_fdr, plot_input_fdr_dependency
-from metrics import compute_fdr_from_labels
+from src.plots import plot_fdr, plot_input_fdr_dependency
+from src.metrics import compute_fdr_from_labels
 
 def load_data_file(file_name):
     file = open(file_name)

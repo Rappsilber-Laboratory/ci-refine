@@ -8,7 +8,7 @@ import glob
 import os, sys, re, subprocess, shutil
 from optparse import OptionParser
 import ConfigParser
-import commands
+import src.commands
 from time import sleep
 import cPickle
 import logging
@@ -120,7 +120,7 @@ class helper: #Stands for Process INput
 
     def is_job_finished(self, job_name):
         """Check if the abinitio job is done or not"""
-        out = commands.getstatusoutput("qstat")[1]
+        out = src.commands.getstatusoutput("qstat")[1]
         result = re.findall(job_name[:10] , out) #qstat shows only the first 10 chars of the jobname
         if len(result) > 0:
             return False
@@ -128,7 +128,7 @@ class helper: #Stands for Process INput
             return True
 
     def job_on_q(self, queue):
-        tmp = commands.getstatusoutput('qstat -q '+queue+' | wc -l')
+        tmp = src.commands.getstatusoutput('qstat -q ' + queue + ' | wc -l')
         n_jobs = max(int(tmp[1])-2, 0) 
         return n_jobs
     
@@ -229,7 +229,7 @@ class helper: #Stands for Process INput
                 protein1 + " " +  protein2
         print command
         
-        out = commands.getstatusoutput(command)
+        out = src.commands.getstatusoutput(command)
         #Match TM score
         match = re.search("TM-score=\s+(\S+)\s+.*Chain\_2", out[1])
         if match:

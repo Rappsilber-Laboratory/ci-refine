@@ -3,7 +3,7 @@
 """ 
 import os 
 import sys 
-import random
+
 sys.path.append("../src")
 sys.path.append("experiments/")
 sys.path.append("/scratch/schneider/libs/lib/python2.7/site-packages")
