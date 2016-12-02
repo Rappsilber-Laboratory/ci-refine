@@ -42,6 +42,18 @@ options, args = add_options(parser)
 
 
 def build_corroborating_information_graph(xl_data):
+    """
+    Builds the corroborating information graph for CLMS data. Description can be found in main paper
+
+    Parameters
+    ----------
+    xl_data : Cross-link data
+
+    Returns
+    -------
+    g : Corroborating information graph
+    pers : Personalization vector (containing cross-link scores)
+    """
     g = nx.Graph()
     index = 1
     pers = {}
@@ -70,15 +82,27 @@ def build_corroborating_information_graph(xl_data):
     return g, pers
 
 
-def do_page_rank(xl_graph, pers, decoy_dict):
-    ranked_nodes = nx.pagerank(xl_graph, max_iter=10000, alpha=0.85, tol=1e-08, personalization=pers)
+def do_page_rank(ci_graph, pers, decoy_dict):
+    """
+    Perform PageRank on CI graph
+    Parameters
+    ----------
+    ci_graph : Corroborating information graph
+    pers : Personalization vector
+    decoy_dict : Contains which links are decoy. Only used for writing data, not for calculation
+
+    Returns
+    -------
+    None
+    """
+    ranked_nodes = nx.pagerank(ci_graph, max_iter=10000, alpha=0.85, tol=1e-08, personalization=pers)
     for_sorting = [ (score, node) for node, score in ranked_nodes.iteritems()]
     for_sorting.sort()
     for_sorting.reverse()
     xl_ranked = []
     for score, n in for_sorting:
-        res_lower = xl_graph.node[n]['xl'][0]
-        res_upper = xl_graph.node[n]['xl'][1]
+        res_lower = ci_graph.node[n]['xl'][0]
+        res_upper = ci_graph.node[n]['xl'][1]
         xl_ranked.append((res_lower, res_upper, score))
     InputOutput.InputOutput.write_contact_file(xl_ranked, options.id + "_PR.txt", upper_distance=20, decoy_dict=decoy_dict)
 
