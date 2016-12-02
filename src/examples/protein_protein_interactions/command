@@ -1,0 +1,2 @@
+python ../../interaction_page_rank.py -p interaction_data_exp_1_eu_6_final.pkl -g uniprot_data_experiment_1_cell.txt -o interaction_data_exp_1_eu_6_final_PR.pkl
+

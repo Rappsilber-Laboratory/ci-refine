@@ -1,0 +1,2 @@
+cd ../../
+python contact_page_rank.py -a 0.65 -t 2.0  -l 100 -c examples/contact_prediction/1d2sA.prediction -p 1d2sA -s examples/contact_prediction/1d2sA.horiz -o examples/contact_prediction/

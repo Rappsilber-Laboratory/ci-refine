@@ -143,10 +143,10 @@ def output_file_name():
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     i = 0
-    output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
+    output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.beta, i)
     while os.path.exists(os.path.join(output_directory, output_file_name)):
         i += 1
-        output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.top, i)
+        output_file_name = "%s_RRPAR_%s_%s__%s" % (options.pdb_id, options.alpha, options.beta, i)
     return os.path.join(output_directory, output_file_name)
 
 
