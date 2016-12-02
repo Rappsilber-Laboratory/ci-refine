@@ -183,38 +183,11 @@ def get_protein_intersection(interactions_1, interactions_2, level='protein'):
 
 def get_interaction_scoring(interactions, interaction_list):
 
-    tp = 0
-    fp = 0
-    tn = 0
-    fn = 0
-    tpr = []
-    fpr = []
-    tresholds = []
-    count = 0
-
     y_true = []
     y_score = []
     for score, protein_1, protein_2 in interactions:
         protein_tuple = sorted_uniprot_tuple(protein_1, protein_2)
-        """
-        # True positives
-        if protein_tuple in interaction_list:
-            tp += 1
-        # False positives
-        elif protein_tuple not in interaction_list:
-            fp += 1
 
-        tn = len(non_interaction_list) - (tp+fp)
-        fn = max(0, len(interaction_list) - (tp+fp))
-
-        fpr.append(float(fp)/float((fp+tn)))
-        tpr.append(float(tp)/float((tp+fn)))
-
-        tresholds.append(score)
-        count += 1
-        """
-        #print protein_tuple
-        #print interaction_list
         if protein_tuple in interaction_list:
             y_true.append(1)
             y_score.append(score)
@@ -222,7 +195,7 @@ def get_interaction_scoring(interactions, interaction_list):
             y_true.append(0)
             y_score.append(score)
 
-    return y_true, y_score # fpr, tpr, tresholds
+    return y_true, y_score
 
 
 def read_corum_complexes(corum_csv_file):
@@ -290,7 +263,7 @@ def main():
                            '../interaction_data_exp_2_eu_6_final_pr.pkl',
                            '../interaction_data_exp_3_eu_6_final_pr.pkl']
 
-
+    cutoffs = [0.55]
     for precision_cutoff in cutoffs:
         all_interactions = []
         all_interactions_pr = []
@@ -329,4 +302,4 @@ def main():
         print "Orig:", get_precision(filtered_interactions, core_interactions), len(all_interactions_with_score)
         print "PR:", get_precision(filtered_interactions_pr, core_interactions), len(all_interactions_with_score_pr)
 
-main()
+#main()

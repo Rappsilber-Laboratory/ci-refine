@@ -29,7 +29,6 @@ import src.features.ResidueFeatureSecStruct as ResidueFeatureSecStruct
 import src.structure.StructureContainer as StructureContainer
 import numpy as np
 import cPickle
-from sklearn import cluster, neighbors
 ## @var parser
 #  Global parser object used to call program options from anywhere in the program.
 parser = OptionParser()
@@ -44,6 +43,7 @@ def add_options( parser ):
 
 options, args  = add_options( parser )
 
+
 def shift_matrix():
     matrix = []
     for i in xrange(-8,9):
@@ -54,15 +54,10 @@ def shift_matrix():
             else:
                 row.append((i,j))
                 matrix.append((i,j))
-    #for i in matrix:
-        #print i
     return matrix
 
 
-
-
 def calculate_probabities( all_shifts ):
-
     shift_len = len(all_shifts[0])
     for i in xrange(0,shift_len):
         shift_val = 0.0
@@ -72,12 +67,12 @@ def calculate_probabities( all_shifts ):
             if vec[i] ==1.0:
                 contact_val += 1.0
         print contact_val / shift_val
-            #shift_vec.append(vec[i])
+
 
 def get_relative_sec_struct_pos(ss_dict, i):
     anchor = ss_dict[i]
     pos = 1
-    #print pos
+
     for j in xrange(1,20):
         if ss_dict.has_key(i-j):
             if anchor == ss_dict[i-j]:
@@ -115,8 +110,6 @@ def get_contact_vectors(structure, sec_struct,sec_struct_types, shift_mat):
     return np.array(all_contacts)
 
 
-
-
 def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
     all_contacts = 0
     for i in xrange(9, structure.get_number_of_residues()+1-9):
@@ -142,72 +135,14 @@ def add_contacts( structure,  sec_struct_pair_types, shift_mat, sec_struct,sol):
                     sec_struct_pair_types[(sec_lower,sec_upper)] = ( all_shifts, all_contacts )
     return all_contacts
 
-def clean_sec_structs(sec_struct):
 
+def clean_sec_structs(sec_struct):
     for i in xrange(2,len(sec_struct)-1):
         if sec_struct[i-1] == sec_struct[i+1]:
             if sec_struct[i-1] == "H" or sec_struct[i-1] == "E":
                 if sec_struct[i] == 'C':
                     sec_struct[i] = sec_struct[i-1]
 
-
-def cluster_shift_maps(shift_map_vector):
-    #from sk
-    print shift_map_vector[1]
-    print shift_map_vector[2]
-    dist = neighbors.DistanceMetric.get_metric('rogerstanimoto')
-    print dist.pairwise(shift_map_vector[0:10])
-    k_means = cluster.Ward(n_clusters = 5)
-    labels =  k_means.fit_predict(shift_map_vector)
-    n_clusters = 5
-    shift_mat = shift_matrix()
-    print labels
-    from collections import Counter
-    res = Counter(labels)
-    print res
-    #num_list = []
-    #for label in xrange(0,50):
-    #    num_list.append((list(k_means.labels_).count(label),label))#
-
-    #num_list.sort()
-    #num_list.reverse()
-
-    #print num_list
-    true = []
-    false = []
-    count = 0
-    shift_dict = {}
-    #for dummy,label in num_list[:n_clusters]:
-    for label in xrange(0,n_clusters):
-        #print list(k_means.labels_).count(label)
-        i_0 = numpy.array([0]*shift_map_vector.shape[1])
-        for i,pred in zip(shift_map_vector, labels):
-            if pred == label:
-                i_0 = i_0 + numpy.array(i)
-
-        for i in xrange(0,i_0.shape[0]):
-            i_0[i] = i_0[i] / float( list(labels).count(label) )
-        sum_prob = numpy.sum([i for i in i_0])
-
-        for i in xrange(0,i_0.shape[0]):
-            i_0[i] = i_0[i] / sum_prob
-        a = numpy.array(i_0)
-
-        for i,pred in zip(shift_map_vector, labels):
-            if pred == label:
-                true.append(numpy.dot(i,a))
-            else:
-                false.append( numpy.dot(i,a))
-
-        all_values = {}
-        for shift, val in zip(shift_mat, a):
-            all_values[shift] = val
-        shift_dict[count] = all_values
-        count+=1
-    return shift_dict
-    #print sec_struct_pair_types
-    #print numpy.mean(true)
-    #print numpy.mean(false)
 
 def load_contact_maps(sec_struct_type):
     all_c = []
@@ -235,40 +170,19 @@ def load_contact_maps(sec_struct_type):
     file.close()
     return c
 
+
 def main():
     
     """Generic main function. Executes main functionality of program
     """
-
-
-    #print bur_dict
     shift_mat = shift_matrix()
-    #
     sec_struct_types = ["H","C","E"]
-    bur_types = ["B","A"]
-    seq_sep_types = [(12, 24),(24, 9999)]
     sec_struct_pair_types = {}
     for i in xrange(0,len(sec_struct_types)):
         for j in xrange(0,len(sec_struct_types)):
-            #for k in xrange(0,len(seq_sep_types)):
-                #for l in xrange(0,len(seq_sep_types)):
             all_shifts = {}
             all_contacts = 0
             sec_struct_pair_types[(sec_struct_types[i], sec_struct_types[j])] = (all_shifts, all_contacts)
-
-    #print sec_struct_pair_types
-    ##return 0
-    #new_stuff = {}
-    #for keys,values in sec_struct_pair_types.iteritems():
-    #    #if keys == ('H','H'):
-    #    c = load_contact_maps(keys)#
-
-    #    shift_dict = cluster_shift_maps(c)
-    #    print shift_dict
-    #    new_stuff[keys] = shift_dict#
-
-    #print new_stuff
-    #cPickle.dump(new_stuff, open( "shifts_test.p", "wb" ),protocol=2 )
 
     file = open(options.pdb_id_list)
     all_contacts = 0
@@ -298,28 +212,12 @@ def main():
 
         for shifts, counts in all_shifts.iteritems():
             all_shifts[shifts] = counts / float(sum_prob)
-            #sum_prob += counts / float(all_contacts)
         sec_struct_pair_types[keys] = all_shifts
-
 
     for keys, values in sec_struct_pair_types.iteritems():
         print keys, values
 
-
-    """
-    for keys, values in all_shifts.iteritems():
-        all_shifts[keys] = values / float(all_contacts)
-    for keys, values in all_shifts.iteritems():
-        print keys, values
-    #calculate_probabities(all_shifts)
-   # print all_shifts
-                        #print tmp_struct.get_contact_map().get_mapped_distance(i+i_shift,j+j_shift)
-                    #print
-                #distance = tmp_struct.get_contact_map().get_mapped_distance(i,j)
-                #print distance
-    pickle.dump(all_shifts, open( "shifts.p", "wb" ) )
-    """
-    cPickle.dump(sec_struct_pair_types, open( "shifts_test_metapsicov.p", "wb" ),protocol=2 )
+    cPickle.dump(sec_struct_pair_types, open("shifts.p", "wb"), protocol=2)
 
 if __name__ == '__main__':
     sys.exit(main())
