@@ -30,8 +30,8 @@ from optparse import OptionParser
 def add_options(parser):
     """Generic options function to specify command line inputs
     """
-    parser.add_option("-e", type="string", dest="example", help="An example")
-    parser.add_option("-o", type="int", dest="offset", help="offset")
+    parser.add_option("-x", type="string", dest="clms_file", help="Cross-link search result file from Xi")
+    parser.add_option("-o", type="int", dest="offset", help="Offset to deal with differences in PDB and UNIPROT sequences")
     parser.add_option("-n", type="string", dest="id", help="id")
     parser.add_option("-m", type="int", dest="max_links", help="max_links")
     options, args = parser.parse_args()
@@ -149,7 +149,7 @@ def return_sorted_tuple(tuple):
 
 
 def main():
-    xl_data, gt_data, decoy_dict = InputOutput.InputOutput.load_xl_data(options.example, options.offset)
+    xl_data, gt_data, decoy_dict = InputOutput.InputOutput.load_xl_data(options.clms_file, options.offset)
     InputOutput.InputOutput.write_contact_file(gt_data, options.id + "_PSM.txt", upper_distance=20, decoy_dict=
     decoy_dict)
     xl_graph, pers = build_corroborating_information_graph(xl_data)
